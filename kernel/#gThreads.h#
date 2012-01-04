@@ -10,7 +10,7 @@
  * of a collaborative one.
  */
 
-/*
+/**
  * gHome simplified thread's structure.
  */ 
 typedef struct gThread
@@ -23,22 +23,22 @@ typedef struct gThread
     struct gThread *next;
 } gThread;
 
-/*
+/**
  * Threading system initialisation.
  */
 void initGThreadingSystem();
 
-/*
+/**
  * New gThread creation.
  */
 void createGThread(void(*function)(void));
 
-/*
+/**
  * Launch the gThreads.
  */
 void launchGThreads();
 
-/*
+/**
  * Activate the next gThread (collaborative function).
  */
 void yield();
