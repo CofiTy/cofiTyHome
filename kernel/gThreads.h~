@@ -1,0 +1,21 @@
+#ifndef kernel_myThreads_h
+#define kernel_myThreads_h
+
+#include <setjmp.h>
+
+typedef struct gThread
+{  
+    int id;
+    int priority;
+    void* stack[200];
+    int stackSize;
+    jmp_buf ctx;
+    struct gThread *next;
+} gThread;
+
+void initGThreadingSystem();
+void createGThread(void(*function)(void));
+void yield();
+void launchGThreads();
+
+#endif

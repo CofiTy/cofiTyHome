@@ -1,24 +1,22 @@
-//
-//  main.c
-//  kernel
-//
-//  Created by Vincent Bailly on 24/12/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
-//
-
 #include <stdio.h>
-#include "myThreads.h"
 #include <signal.h>
+
+#include "gThreads.h"
 
 void child();
 void child2();
+void mess();
+
+/**
+ * Procédure de test de l'ordonnanceur.
+ */
 
 int main()
 {
-    init_threading_system();
-    createThread(&child);
-    createThread(&child2);
-    launch_threads();
+    initGThreadingSystem();
+    createGThread(&child);
+    createGThread(&child2);
+    launchGThreads();
     return 1;
 }
 
@@ -31,7 +29,7 @@ void child()
     }
 }
 
-void mess(void)
+void mess()
 {
     printf("\t in mess\n");
     yield();
