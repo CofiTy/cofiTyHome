@@ -5,6 +5,8 @@
 
 #define ERROR_STACK_OVERFLOW -42
 
+#define IDLE_LAPSE 0.1
+
 #define STACK_SIZE 200
 #define NAME_SIZE 16
 

@@ -4,6 +4,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <stdio.h>
+
 #include "gThreads.h"
 
 /**
@@ -33,6 +35,11 @@ gThread *currentThread;
 static int saveCtx(gThread* task);
 
 /**
+ * Idle Thread, do nothing.
+ */
+static void idleFunc();
+
+/**
  * Initialise the threading
  * by getting the current base pointer
  * and setting the thread list to NULL.
@@ -41,6 +48,8 @@ void initGThreadingSystem()
 {
     asm("mov %%ebp, %0" : "=r" (ebp));
     firstThread = currentThread = NULL;
+
+    createGThread("idle", &idleFunc);
     /*
     int timer;
     struct sigaction sa;
@@ -152,6 +161,17 @@ char * getCurrentThreadName()
     return currentThread->name;
 }
 
+/**
+ * Idle Thread...
+ */
+static void idleFunc()
+{
+    for(;;)
+    {
+        sleep(IDLE_LAPSE);
+        yield();
+    }
+}
 
 
 

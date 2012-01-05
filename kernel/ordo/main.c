@@ -8,6 +8,7 @@
 void child();
 void child2();
 void child3();
+void child4();
 void mess();
 
 /**
@@ -24,9 +25,19 @@ int main()
     return 1;
 }
 
+void child4()
+{
+  for(;;)
+  {
+    printf("Voila voila %s\n", getCurrentThreadName());
+    sleep(1);
+    yield();
+  }
+}
+
 void child3()
 {
-
+  createGThread("process 4", &child4);
   for(;;)
   {
       printf("Pas mal %s!\n", getCurrentThreadName());
