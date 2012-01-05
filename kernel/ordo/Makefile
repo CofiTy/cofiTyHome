@@ -3,14 +3,14 @@ CC = gcc
 # Options du compilateur (ici on met des options strictes).
 CFLAGS = -Wall -Werror -pedantic
 # Nom de l'exécutable.
-EXEC_NAME = ordo
+EXEC_NAME = ordoExe
 # Rien à inclure.
 INCLUDES = 
 # Libraries utilisées.
 LIBS = 
 # Fichiers à compiler (les fichiers sont ajoutés automatiquement).
 SRC = $(wildcard *.c)
-OBJ_FILES = $(SRC:.cpp=.o)
+OBJ_FILES = $(SRC:.c=.o)
 
 # Compilation générale (par défault).
 all: $(EXEC_NAME)
@@ -24,5 +24,5 @@ $(EXEC_NAME): $(OBJ_FILES)
 	$(CC) -o $(EXEC_NAME) $(OBJ_FILES) $(LIBS)
 
 # Compilation des fichiers indépendants (Patterns).
-%.o: %.cpp
+%.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<

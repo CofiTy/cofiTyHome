@@ -1,7 +1,10 @@
-#ifndef kernel_myThreads_h
-#define kernel_myThreads_h
+#ifndef _GTHREADS_H_
+#define _GTHREADS_H_
 
 #include <setjmp.h>
+
+#define STACK_SIZE 200
+#define NAME_SIZE 16
 
 /**
  * Thread API For gHome.
@@ -16,8 +19,9 @@
 typedef struct gThread
 {  
     int id;
+    char name[NAME_SIZE];
     int priority;
-    void* stack[200];
+    void* stack[STACK_SIZE];
     int stackSize;
     jmp_buf ctx;
     struct gThread *next;
@@ -31,7 +35,7 @@ void initGThreadingSystem();
 /**
  * New gThread creation.
  */
-void createGThread(void(*function)(void));
+void createGThread(char *name, void(*function)(void));
 
 /**
  * Launch the gThreads.
@@ -42,5 +46,10 @@ void launchGThreads();
  * Activate the next gThread (collaborative function).
  */
 void yield();
+
+/**
+ * Return the name of the running process.
+ */
+char * getCurrentThreadName();
 
 #endif

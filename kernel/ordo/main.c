@@ -14,8 +14,8 @@ void mess();
 int main()
 {
     initGThreadingSystem();
-    createGThread(&child);
-    createGThread(&child2);
+    createGThread("process 1", &child);
+    createGThread("process 2", &child2);
     launchGThreads();
     return 1;
 }
@@ -24,14 +24,14 @@ void child()
 {
     for (;;)
     {
-        printf(" 1");  
+        printf("%s\n", getCurrentThreadName());
         yield();
     }
 }
 
 void mess()
 {
-    printf("\t in mess\n");
+    printf("\t%s in mess\n", getCurrentThreadName());
     yield();
 }
 
@@ -39,8 +39,8 @@ void child2()
 {
     for (;;)
     {
-        printf("before mess");
+        printf("%s before mess\n", getCurrentThreadName());
         mess();
-        printf("after mess");
+        printf("%s after mess\n", getCurrentThreadName());
     }
 }

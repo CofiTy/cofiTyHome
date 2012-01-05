@@ -58,10 +58,11 @@ void initGThreadingSystem()
  * create it a context and
  * and later used to call its function.
  */
-void createGThread(void(*function)(void))
+void createGThread(char *name, void(*function)(void))
 {
     gThread *new = malloc(sizeof(gThread));
     new->id = ++id_counter;
+    memcpy(new->name, name, NAME_SIZE);
     if (thread==NULL)
     {
         new->next = new;
@@ -124,6 +125,10 @@ static int saveCtx(gThread* task)
     return 0;
 }
 
+char * getCurrentThreadName()
+{
+    return thread->name;
+}
 
 
 
