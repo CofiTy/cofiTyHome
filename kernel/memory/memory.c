@@ -18,7 +18,7 @@ static Header base;
 static Header *freep = NULL;
 
 /* free: put block ap in free list */
-void free(void *ap)
+void gFree(void *ap)
 {
   Header *bp, *p;
   bp = (Header *)ap - 1;
@@ -56,12 +56,12 @@ static Header *morecore(unsigned nu)
     return NULL;
   up = (Header *) cp;
   up->s.size = nu;
-  free((void *)(up+1));
+  gFree((void *)(up+1));
   return freep;
 }
 
 /* malloc: general-purpose storage allocator */
-void *malloc(unsigned nbytes)
+void *gMalloc(unsigned nbytes)
 {
   Header *p, *prevp;
   unsigned nunits;
@@ -92,5 +92,6 @@ void *malloc(unsigned nbytes)
 }
 
 
+int main() {
 
-
+}
