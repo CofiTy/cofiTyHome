@@ -11,8 +11,12 @@
 /**
  * Thread API For gHome.
  *
- * TODO: Make a roundrobin system instead
- * of a collaborative one.
+ * TODO:
+ * -- Rendre le système préemptif.
+ * -- Faire quelque chose afin de lancer le thread à sa création.
+ * -- Gérer la mort d'un thread, afin de libérer la mémoire.
+ * -- Gérer les wait.
+ * -- Gérer les bloquages du aux entrées/sortie???
  */
 
 typedef void threadFunc(void);

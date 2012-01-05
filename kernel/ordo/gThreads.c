@@ -4,8 +4,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <stdio.h>
-
 #include "gThreads.h"
 
 /**
