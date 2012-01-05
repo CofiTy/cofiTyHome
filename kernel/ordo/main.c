@@ -21,7 +21,11 @@ int main()
     createGThread("process 1", &child);
     createGThread("process 2", &child2);
     createGThread("process 3", &child3);
-    launchGThreads();
+    for(;;)
+    {
+      sleep(1);
+      yield();
+    }
     return 1;
 }
 

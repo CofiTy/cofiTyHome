@@ -29,6 +29,11 @@ gThread *firstThread;
 gThread *currentThread;
 
 /**
+ * Launch the gThreads.
+ */
+static void launchGThreads();
+
+/**
  * Our function to save the context,
  * not to be used by the programmer...
  */
@@ -46,10 +51,25 @@ static void idleFunc();
  */
 void initGThreadingSystem()
 {
+    gThread *mainThread;
     asm("mov %%ebp, %0" : "=r" (ebp));
     firstThread = currentThread = NULL;
 
     createGThread("idle", &idleFunc);
+    
+    mainThread = malloc(sizeof(gThread));
+    memset(mainThread, 0, sizeof(gThread));
+    mainThread->id = id_counter++;
+    memcpy(mainThread->name, "main", NAME_SIZE);
+    mainThread->next = firstThread;
+    mainThread->start = NULL;
+    firstThread = mainThread;
+    
+    if (!saveCtx(mainThread))
+    {
+       launchGThreads();
+    }
+    
     /*
     int timer;
     struct sigaction sa;
@@ -74,7 +94,7 @@ void createGThread(char *name, threadFunc function)
 {
     gThread *new = malloc(sizeof(gThread));
     memset(new, 0, sizeof(gThread));
-    new->id = ++id_counter;
+    new->id = id_counter++;
     memcpy(new->name, name, NAME_SIZE);
     new->next = firstThread;
     new->start = function;
@@ -89,7 +109,7 @@ void createGThread(char *name, threadFunc function)
 /**
  * Launch the first gThread in the list.
  */
-void launchGThreads()
+static void launchGThreads()
 {
     currentThread = firstThread;
     longjmp(currentThread->ctx,1);
