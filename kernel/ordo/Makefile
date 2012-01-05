@@ -7,7 +7,7 @@ EXEC_NAME = ordoExe
 # Rien à inclure.
 INCLUDES = 
 # Libraries utilisées.
-LIBS = 
+LIBS = -lrt
 # Fichiers à compiler (les fichiers sont ajoutés automatiquement).
 SRC = $(wildcard *.c)
 OBJ_FILES = $(SRC:.c=.o)

@@ -23,8 +23,9 @@ int main()
     createGThread("process 3", &child3);
     for(;;)
     {
+      printf("main\n");
       sleep(1);
-      yield();
+      /*yield();*/
     }
     return 1;
 }
@@ -35,7 +36,7 @@ void child4()
   {
     printf("Voila voila %s\n", getCurrentThreadName());
     sleep(1);
-    yield();
+    /*yield();*/
   }
 }
 
@@ -45,7 +46,7 @@ void child3()
   for(;;)
   {
       printf("Pas mal %s!\n", getCurrentThreadName());
-      sleep(1);
+      /*sleep(1);*/
       yield();
   }
 }

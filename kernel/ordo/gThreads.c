@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <time.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include <stdio.h>
 
@@ -51,12 +52,40 @@ static void idleFunc();
  */
 void initGThreadingSystem()
 {
+
     gThread *mainThread;
+    
+    /* Timer */ 
+    timer_t timerid;
+    struct itimerspec value;
+
+    struct sigevent sev;
+    struct sigaction sa;
+  
+    value.it_value.tv_sec = SWITCH_LAPSE_SEC;
+    value.it_value.tv_nsec = SWITCH_LAPSE_NANO;
+    value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
+    value.it_interval.tv_nsec = SWITCH_LAPSE_NANO;
+    sa.sa_flags = SA_SIGINFO;
+    sa.sa_sigaction = yield;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGRTMIN, &sa, NULL);
+    sev.sigev_notify = SIGEV_SIGNAL;
+    sev.sigev_signo = SIGRTMIN;
+    sev.sigev_value.sival_ptr = &timerid;
+    timer_create (CLOCK_REALTIME, &sev, &timerid);
+
+    /* Threading Init */
     asm("mov %%ebp, %0" : "=r" (ebp));
     firstThread = currentThread = NULL;
-
     createGThread("idle", &idleFunc);
-    
+
+    /*
+     * Création du thread principal
+     * On le créé ici car ce n'est pas
+     * une fonction et il ne peut donc
+     * pas être créé dans createGThread.
+     */
     mainThread = malloc(sizeof(gThread));
     memset(mainThread, 0, sizeof(gThread));
     mainThread->id = id_counter++;
@@ -64,24 +93,15 @@ void initGThreadingSystem()
     mainThread->next = firstThread;
     mainThread->start = NULL;
     firstThread = mainThread;
-    
+     
+    /* L'appel d'init lance les threads,
+     * la restauration de contexte passe.
+     */
     if (!saveCtx(mainThread))
     {
+       timer_settime (timerid, 0, &value, NULL);
        launchGThreads();
     }
-    
-    /*
-    int timer;
-    struct sigaction sa;
-    struct sigevent sev;
-    sa.sa_flags = SA_SIGINFO;
-    sa.sa_sigaction = yield;
-    sigemptyset(&sa.sa_mask);
-    sev.sigev_notify = SIGEV_SIGNAL;
-    sev.sigev_signo = 15;
-    sev.sigev_value.sival_ptr = &timer;
-    timer_create(CLOCK_REALTIME, &sev, &timerid);
-    */
 }
 
 /**
@@ -112,7 +132,7 @@ void createGThread(char *name, threadFunc function)
 static void launchGThreads()
 {
     currentThread = firstThread;
-    longjmp(currentThread->ctx,1);
+    siglongjmp(currentThread->ctx,1);
 }
 
 /**
@@ -121,13 +141,15 @@ static void launchGThreads()
  */
 void yield()
 {
+    
     if (saveCtx(currentThread)==0)
     {
+      /*printf("Timer Tick\n");*/
         if(currentThread->next != NULL) 
             currentThread = currentThread->next;
 	else
 	    currentThread = firstThread;
-        longjmp(currentThread->ctx,1);
+        siglongjmp(currentThread->ctx,1);
     }
 }
 
@@ -139,6 +161,7 @@ static int saveCtx(gThread* task)
 {
     int i;
     void **esp;
+    
     asm("mov %%esp, %0" : "=r" (esp));
 
     /* Get the current process stack size
@@ -148,7 +171,7 @@ static int saveCtx(gThread* task)
     {
         exit(ERROR_STACK_OVERFLOW);
     }
-    
+   
     /* Copy the current stack size
      * into the process backup stack
      */
@@ -162,7 +185,7 @@ static int saveCtx(gThread* task)
      * say to saveCtx that we can execute
      * the thread function.
      */
-    if (setjmp(task->ctx))
+    if (sigsetjmp(task->ctx, 1))
     {
         for (i=0;i<currentThread->stackSize;i++)
         {
@@ -188,8 +211,9 @@ static void idleFunc()
 {
     for(;;)
     {
-        sleep(IDLE_LAPSE);
-        yield();
+        printf("Idle\n");
+        sleep(1);
+        /*yield();*/
     }
 }
 
