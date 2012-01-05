@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <signal.h>
 
+#include <unistd.h>
+
 #include "gThreads.h"
 
 void child();
 void child2();
+void child3();
 void mess();
 
 /**
@@ -16,15 +19,28 @@ int main()
     initGThreadingSystem();
     createGThread("process 1", &child);
     createGThread("process 2", &child2);
+    createGThread("process 3", &child3);
     launchGThreads();
     return 1;
+}
+
+void child3()
+{
+
+  for(;;)
+  {
+      printf("Pas mal %s!\n", getCurrentThreadName());
+      sleep(1);
+      yield();
+  }
 }
 
 void child()
 {
     for (;;)
     {
-        printf("%s\n", getCurrentThreadName());
+        printf("Yeahhh %s\n", getCurrentThreadName());
+	sleep(1);
         yield();
     }
 }
@@ -32,6 +48,7 @@ void child()
 void mess()
 {
     printf("\t%s in mess\n", getCurrentThreadName());
+    sleep(1);
     yield();
 }
 

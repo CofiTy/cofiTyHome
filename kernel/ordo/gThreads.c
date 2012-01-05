@@ -4,8 +4,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <stdio.h>
-
 #include "gThreads.h"
 
 /**
@@ -21,7 +19,12 @@ void **ebp;
 /**
  * Linked List of gThreads.
  */
-gThread *thread;
+gThread *firstThread;
+
+/**
+ * Running gThread.
+ */
+gThread *currentThread;
 
 /**
  * Our function to save the context,
@@ -37,7 +40,7 @@ static int saveCtx(gThread* task);
 void initGThreadingSystem()
 {
     asm("mov %%ebp, %0" : "=r" (ebp));
-    thread=NULL;
+    firstThread = currentThread = NULL;
     /*
     int timer;
     struct sigaction sa;
@@ -64,16 +67,8 @@ void createGThread(char *name, void(*function)(void))
     memset(new, 0, sizeof(gThread));
     new->id = ++id_counter;
     memcpy(new->name, name, NAME_SIZE);
-    if (thread==NULL)
-    {
-        new->next = new;
-    }
-    else
-    {
-        new->next = thread;
-        thread->next = new;
-    }
-    thread = new;
+    new->next = firstThread;
+    firstThread = new;
     if (saveCtx(new))
     {
         function();
@@ -85,7 +80,8 @@ void createGThread(char *name, void(*function)(void))
  */
 void launchGThreads()
 {
-    longjmp(thread->ctx,1);
+    currentThread = firstThread;
+    longjmp(currentThread->ctx,1);
 }
 
 /**
@@ -94,10 +90,13 @@ void launchGThreads()
  */
 void yield()
 {
-    if (saveCtx(thread)==0)
+    if (saveCtx(currentThread)==0)
     {
-        thread = thread->next; 
-        longjmp(thread->ctx,1);
+        if(currentThread->next != NULL) 
+            currentThread = currentThread->next;
+	else
+	    currentThread = firstThread;
+        longjmp(currentThread->ctx,1);
     }
 }
 
@@ -110,21 +109,33 @@ static int saveCtx(gThread* task)
     int i;
     void **esp;
     asm("mov %%esp, %0" : "=r" (esp));
-    
+
+    /* Get the current process stack size
+     * and exit brutally if to big...
+     */
     if((task->stackSize = (int)(ebp - esp)) >= STACK_SIZE)
     {
         exit(ERROR_STACK_OVERFLOW);
     }
-    
+
+    /* Copy the current stack size
+     * into the process backup stack
+     */
     for (i=0;i<task->stackSize;i++)
     {
         task->stack[i] = ebp[-i];
     }
+
+    /* If called by longjmp,
+     * restore the stack, and
+     * say to saveCtx that we can execute
+     * the thread function.
+     */
     if (setjmp(task->ctx))
     {
-        for (i=0;i<thread->stackSize;i++)
+        for (i=0;i<currentThread->stackSize;i++)
         {
-            *(ebp-i) = thread->stack[i];
+            *(ebp-i) = currentThread->stack[i];
         }
         return 1;
     }
@@ -136,7 +147,7 @@ static int saveCtx(gThread* task)
  */
 char * getCurrentThreadName()
 {
-    return thread->name;
+    return currentThread->name;
 }
 
 
