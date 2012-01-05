@@ -40,7 +40,7 @@ void initGThreadingSystem();
 /**
  * New gThread creation.
  */
-void createGThread(char *name, void(*function)(void));
+void createGThread(char *name, threadFunc function);
 
 /**
  * Launch the gThreads.

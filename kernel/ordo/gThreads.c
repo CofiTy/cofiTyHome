@@ -63,7 +63,7 @@ void initGThreadingSystem()
  * create it a context and
  * and later used to call its function.
  */
-void createGThread(char *name, void(*function)(void))
+void createGThread(char *name, threadFunc function)
 {
     gThread *new = malloc(sizeof(gThread));
     memset(new, 0, sizeof(gThread));
