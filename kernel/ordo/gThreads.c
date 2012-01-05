@@ -4,6 +4,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <stdio.h>
+
 #include "gThreads.h"
 
 /**
@@ -68,10 +70,12 @@ void createGThread(char *name, void(*function)(void))
     new->id = ++id_counter;
     memcpy(new->name, name, NAME_SIZE);
     new->next = firstThread;
+    new->start = function;
     firstThread = new;
+    
     if (saveCtx(new))
     {
-        function();
+        new->start();
     }
 }
 
@@ -117,7 +121,7 @@ static int saveCtx(gThread* task)
     {
         exit(ERROR_STACK_OVERFLOW);
     }
-
+    
     /* Copy the current stack size
      * into the process backup stack
      */

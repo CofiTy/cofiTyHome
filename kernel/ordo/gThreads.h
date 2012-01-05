@@ -15,6 +15,8 @@
  * of a collaborative one.
  */
 
+typedef void threadFunc(void);
+
 /**
  * gHome simplified thread's structure.
  */ 
@@ -26,6 +28,7 @@ typedef struct gThread
     void* stack[STACK_SIZE];
     int stackSize;
     jmp_buf ctx;
+    threadFunc *start;
     struct gThread *next;
 } gThread;
 

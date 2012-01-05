@@ -54,9 +54,9 @@ void mess()
 
 void child2()
 {
-    for (;;)
+  for (;;)
     {
-        printf("%s before mess\n", getCurrentThreadName());
+      printf("%s before mess\n", getCurrentThreadName());
         mess();
         printf("%s after mess\n", getCurrentThreadName());
     }
