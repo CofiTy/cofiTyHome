@@ -54,26 +54,6 @@ void initGThreadingSystem()
 {
 
     gThread *mainThread;
-    
-    /* Timer */ 
-    timer_t timerid;
-    struct itimerspec value;
-
-    struct sigevent sev;
-    struct sigaction sa;
-  
-    value.it_value.tv_sec = SWITCH_LAPSE_SEC;
-    value.it_value.tv_nsec = SWITCH_LAPSE_NANO;
-    value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
-    value.it_interval.tv_nsec = SWITCH_LAPSE_NANO;
-    sa.sa_flags = SA_SIGINFO;
-    sa.sa_sigaction = yield;
-    sigemptyset(&sa.sa_mask);
-    sigaction(SIGRTMIN, &sa, NULL);
-    sev.sigev_notify = SIGEV_SIGNAL;
-    sev.sigev_signo = SIGRTMIN;
-    sev.sigev_value.sival_ptr = &timerid;
-    timer_create (CLOCK_REALTIME, &sev, &timerid);
 
     /* Threading Init */
     asm("mov %%ebp, %0" : "=r" (ebp));
@@ -93,15 +73,15 @@ void initGThreadingSystem()
     mainThread->next = firstThread;
     mainThread->start = NULL;
     firstThread = mainThread;
-     
+    
     /* L'appel d'init lance les threads,
      * la restauration de contexte passe.
      */
     if (!saveCtx(mainThread))
     {
-       timer_settime (timerid, 0, &value, NULL);
        launchGThreads();
     }
+   
 }
 
 /**
@@ -131,7 +111,28 @@ void createGThread(char *name, threadFunc function)
  */
 static void launchGThreads()
 {
+    /* Timer */ 
+    timer_t timerid;
+    struct itimerspec value;
+
+    struct sigevent sev;
+    struct sigaction sa;
+  
+    value.it_value.tv_sec = SWITCH_LAPSE_SEC;
+    value.it_value.tv_nsec = SWITCH_LAPSE_MILLI*1000000;
+    value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
+    value.it_interval.tv_nsec = SWITCH_LAPSE_MILLI*1000000;
+    sa.sa_flags = SA_SIGINFO;
+    sa.sa_sigaction = yield;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGRTMIN, &sa, NULL);
+    sev.sigev_notify = SIGEV_SIGNAL;
+    sev.sigev_signo = SIGRTMIN;
+    sev.sigev_value.sival_ptr = &timerid;
+    timer_create (CLOCK_REALTIME, &sev, &timerid);
+    
     currentThread = firstThread;
+    timer_settime (timerid, 0, &value, NULL);
     siglongjmp(currentThread->ctx,1);
 }
 
