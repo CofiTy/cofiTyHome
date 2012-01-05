@@ -1,10 +1,10 @@
-#include <setjmp.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <stdio.h>
 
 #include "gThreads.h"
 
@@ -61,6 +61,7 @@ void initGThreadingSystem()
 void createGThread(char *name, void(*function)(void))
 {
     gThread *new = malloc(sizeof(gThread));
+    memset(new, 0, sizeof(gThread));
     new->id = ++id_counter;
     memcpy(new->name, name, NAME_SIZE);
     if (thread==NULL)
@@ -109,7 +110,12 @@ static int saveCtx(gThread* task)
     int i;
     void **esp;
     asm("mov %%esp, %0" : "=r" (esp));
-    task->stackSize = (int)(ebp - esp);
+    
+    if((task->stackSize = (int)(ebp - esp)) >= STACK_SIZE)
+    {
+        exit(ERROR_STACK_OVERFLOW);
+    }
+    
     for (i=0;i<task->stackSize;i++)
     {
         task->stack[i] = ebp[-i];
@@ -125,6 +131,9 @@ static int saveCtx(gThread* task)
     return 0;
 }
 
+/**
+ * Return the running process name.
+ */
 char * getCurrentThreadName()
 {
     return thread->name;

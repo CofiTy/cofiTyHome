@@ -3,6 +3,8 @@
 
 #include <setjmp.h>
 
+#define ERROR_STACK_OVERFLOW -42
+
 #define STACK_SIZE 200
 #define NAME_SIZE 16
 
