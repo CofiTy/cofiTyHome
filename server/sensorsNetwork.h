@@ -4,5 +4,6 @@
 #include common.h
 
 int sensorsMsgRec(int sock);
+int sensorsMsgSend(int sock);
 
 #endif /*SNET*/
