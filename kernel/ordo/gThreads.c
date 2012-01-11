@@ -41,9 +41,25 @@ static void launchGThreads();
 static int saveCtx(gThread* task);
 
 /**
- * Idle Thread, do nothing.
+ * Can switch context or not?
  */
-static void idleFunc();
+static volatile int irqEnabled;
+
+/**
+ * Enable Timer (and context switching).
+ */
+void irqEnable()
+{
+    irqEnabled = 1;
+}
+
+/**
+ * Disable Timer (and context switching).
+ */
+void irqDisable()
+{
+    irqEnabled = 0;
+}
 
 /**
  * Initialise the threading
@@ -58,8 +74,7 @@ void initGThreadingSystem()
     /* Threading Init */
     asm("mov %%ebp, %0" : "=r" (ebp));
     firstThread = currentThread = NULL;
-    createGThread("idle", &idleFunc);
-
+    
     /*
      * Création du thread principal
      * On le créé ici car ce n'est pas
@@ -73,6 +88,8 @@ void initGThreadingSystem()
     mainThread->next = firstThread;
     mainThread->start = NULL;
     firstThread = mainThread;
+
+    irqEnable();
     
     /* L'appel d'init lance les threads,
      * la restauration de contexte passe.
@@ -92,18 +109,24 @@ void initGThreadingSystem()
  */
 void createGThread(char *name, threadFunc function)
 {
-    gThread *new = malloc(sizeof(gThread));
+    gThread *new;
+    
+    irqDisable();
+
+    new = malloc(sizeof(gThread));
     memset(new, 0, sizeof(gThread));
     new->id = id_counter++;
     memcpy(new->name, name, NAME_SIZE);
     new->next = firstThread;
     new->start = function;
-    firstThread = new;
-    
+    firstThread = new;   
+
     if (saveCtx(new))
     {
-        new->start();
+       new->start();
     }
+
+    irqEnable();
 }
 
 /**
@@ -155,15 +178,21 @@ static void launchGThreads()
  */
 void yield()
 {
-    
-    if (saveCtx(currentThread)==0)
+    if(irqEnabled)
     {
-      /*printf("Timer Tick\n");*/
-        if(currentThread->next != NULL) 
-            currentThread = currentThread->next;
-	else
-	    currentThread = firstThread;
-	longjmp(currentThread->ctx,1);
+        if (saveCtx(currentThread)==0)
+	{
+	  /*printf("Timer Tick\n");*/
+            if(currentThread->next != NULL) 
+              currentThread = currentThread->next;
+	    else
+	      currentThread = firstThread;
+	    longjmp(currentThread->ctx,1);
+	}
+    }
+    else
+    {
+      printf("Timer Tick\n");
     }
 }
 
@@ -219,17 +248,49 @@ char * getCurrentThreadName()
 }
 
 /**
- * Idle Thread...
+ * Stop and get out the current thread.
  */
-static void idleFunc()
+void exitCurrentThread()
 {
+  
+  gThread *prev;
+  irqDisable();
+  if(firstThread == NULL || currentThread == NULL)
+    return;
+
+  if(firstThread->id == currentThread->id)
+  {
+    firstThread = currentThread->next;
+    /*free(currentThread->stack);*/
+    free(currentThread);
+    currentThread = firstThread;
+  }
+  else
+  {
+    prev = firstThread->next;
     for(;;)
     {
-        printf("Idle\n");
-        sleep(1);
-        /*yield();*/
+      printf("Machin %s\n", prev->name);
+      if(prev->next == NULL)
+	prev = firstThread;
+      else
+	prev = prev->next;
+      if(prev->id != currentThread->id)
+	break;
+      sleep(1);
     }
+    printf("Je sors!\n");
+    if(currentThread->next == NULL)
+      prev->next = firstThread;
+    else
+      prev->next = currentThread->next;
+    /*free(currentThread->stack);*/
+    free(currentThread);
+    /* We don't get prev->next,
+     * cause in yield we take the next!
+     */
+    currentThread = prev->next;
+  }
+  irqEnable();
+  yield();
 }
-
-
-

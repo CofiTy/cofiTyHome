@@ -57,6 +57,7 @@ void child()
     {
         printf("Yeahhh %s\n", getCurrentThreadName());
 	sleep(1);
+	exitCurrentThread();
         /*yield();*/
     }
 }

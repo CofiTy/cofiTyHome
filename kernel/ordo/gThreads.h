@@ -9,8 +9,8 @@
 #define IDLE_LAPSE 0.1
 
 /* Time for RoundRobin, sec in int and milli in int */
-#define SWITCH_LAPSE_SEC 0
-#define SWITCH_LAPSE_MILLI 1
+#define SWITCH_LAPSE_SEC 1
+#define SWITCH_LAPSE_MILLI 0
 
 #define STACK_SIZE 1000
 #define NAME_SIZE 16
@@ -61,5 +61,10 @@ void yield();
  * Return the name of the running process.
  */
 char * getCurrentThreadName();
+
+/**
+ * Stop and get out the current thread.
+ */
+void exitCurrentThread();
 
 #endif
