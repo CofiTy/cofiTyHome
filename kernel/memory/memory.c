@@ -90,8 +90,3 @@ void *gMalloc(unsigned nbytes)
     /* none left */
   }
 }
-
-
-int main() {
-
-}

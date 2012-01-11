@@ -7,8 +7,8 @@
    Remplacer sbrk par nmap
  */
 
-void *malloc(unsigned nbytes);
+void *gMalloc(unsigned nbytes);
 
-void free(void *ap);
+void gFree(void *ap);
 
 #endif
