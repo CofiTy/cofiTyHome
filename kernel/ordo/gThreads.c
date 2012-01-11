@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
 
@@ -111,13 +111,14 @@ void createGThread(char *name, threadFunc function)
  */
 static void launchGThreads()
 {
-    /* Timer */ 
+    /* Timer */
+    /*
     timer_t timerid;
     struct itimerspec value;
-
+    
     struct sigevent sev;
     struct sigaction sa;
-  
+
     value.it_value.tv_sec = SWITCH_LAPSE_SEC;
     value.it_value.tv_nsec = SWITCH_LAPSE_MILLI*1000000;
     value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
@@ -130,10 +131,22 @@ static void launchGThreads()
     sev.sigev_signo = SIGRTMIN;
     sev.sigev_value.sival_ptr = &timerid;
     timer_create (CLOCK_REALTIME, &sev, &timerid);
+    */
+    static struct sigaction sa;
+    struct itimerval value;
+	
+    sigemptyset(&sa.sa_mask);
+    sa.sa_handler = yield;
+    sa.sa_flags = SA_RESTART | SA_NODEFER;
+    sigaction(SIGALRM, &sa, (struct sigaction *)0);
+    value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
+    value.it_interval.tv_usec = SWITCH_LAPSE_MILLI*1000;
+    value.it_value = value.it_interval; 
+    setitimer(ITIMER_REAL, &value, (struct itimerval *)0);
     
     currentThread = firstThread;
-    timer_settime (timerid, 0, &value, NULL);
-    siglongjmp(currentThread->ctx,1);
+    /*timer_settime (timerid, 0, &value, NULL);*/
+    longjmp(currentThread->ctx,1);
 }
 
 /**
@@ -150,7 +163,7 @@ void yield()
             currentThread = currentThread->next;
 	else
 	    currentThread = firstThread;
-        siglongjmp(currentThread->ctx,1);
+	longjmp(currentThread->ctx,1);
     }
 }
 
@@ -186,7 +199,7 @@ static int saveCtx(gThread* task)
      * say to saveCtx that we can execute
      * the thread function.
      */
-    if (sigsetjmp(task->ctx, 1))
+    if (setjmp(task->ctx))
     {
         for (i=0;i<currentThread->stackSize;i++)
         {
