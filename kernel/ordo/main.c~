@@ -46,8 +46,8 @@ void child3()
   for(;;)
   {
       printf("Pas mal %s!\n", getCurrentThreadName());
-      sleep(1);
-      /*yield();*/
+      /*sleep(1);*/
+      yield();
   }
 }
 
@@ -57,7 +57,7 @@ void child()
     {
         printf("Yeahhh %s\n", getCurrentThreadName());
 	sleep(1);
-        /*yield();*/
+        yield();
     }
 }
 
@@ -65,7 +65,7 @@ void mess()
 {
     printf("\t%s in mess\n", getCurrentThreadName());
     sleep(1);
-    /*yield();*/
+    yield();
 }
 
 void child2()
