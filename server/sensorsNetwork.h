@@ -3,7 +3,7 @@
 
 #include common.h
 
-int sensorsMsgRec(int sock);
-int sensorsMsgSend(int sock);
+void sensorsNetworkStart();
+void sensorsNetworkStop();
 
 #endif /*SNET*/
