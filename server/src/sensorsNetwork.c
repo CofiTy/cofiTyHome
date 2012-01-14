@@ -100,8 +100,8 @@ void sensorsNetworkStart(){
 
 void sensorsNetworkStop(){
 
-  pthread_kill(&pthreadSensorsRec, SIGTERM);
-  pthread_kill(&pthreadSensorsSend, SIGTERM);
+  pthread_kill(pthreadSensorsRec, SIGTERM);
+  pthread_kill(pthreadSensorsSend, SIGTERM);
   close(sock);
 }
 
