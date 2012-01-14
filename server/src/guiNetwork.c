@@ -34,7 +34,7 @@ void * guiMsgRec(){
     receiving += nb;
 
     /* If enough data we can process */
-    if(buff[total - 1] == '£')
+    if(buff[total - 1] == '#')
     {
       puts("recv");
       total = 0;
