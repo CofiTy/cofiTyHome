@@ -10,23 +10,27 @@ void sensorsMsgRec(){
 
   char buff[128];
   int nb, total
+    char* receiving = (char *) buff[0];
 
-    memset(buff, 0, 128);
+  memset(buff, 0, 128);
   total = 0;
 
   for(;;)
   {
     /* reception form sensors */
-    nb = recv(sock, buff, 32, 0);
+    nb = recv(sock, buff, 128, 0);
     FAIL(nb)
+
       total += nb;
+    receiving += nb;
 
     /* If enough data we can process */
     if(total >= 104)
     {
       puts("recv");
       total = 0;
-      memset(buff, 0, 32);
+      receiving = (char *) buff[0];
+      memset(buff, 0, 128);
     }
   }
 }
@@ -41,6 +45,7 @@ void sensorsMsgSend();{
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
     nb = msgQReceive(balEnvoi, buff, SIZE_BUFF, WAIT_FOREVER);
+    nb= mq_receive(mqSensorsSend, buff, 128, 0);
     FAIL(nb)
 
       total = nb;
@@ -77,7 +82,7 @@ void sensorsNetworkStart(){
   pthread_create(&pthreadSensorsRec, NULL, sensorsMsgRec, null);
   pthread_detach(pthreadSensorsRec);
 
-  pthread_create(&pthreadSensorsiSend, NULL, sensorsMsgSend, null);
+  pthread_create(&pthreadSensorsSend, NULL, sensorsMsgSend, null);
   pthread_detach(pthreadSensorsSend);
 
 }
