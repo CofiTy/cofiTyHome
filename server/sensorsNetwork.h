@@ -5,5 +5,6 @@
 
 void sensorsNetworkStart();
 void sensorsNetworkStop();
+int sensorsNetworkSend(const char * msg_ptr, size_t msg_len);
 
 #endif /*SNET*/

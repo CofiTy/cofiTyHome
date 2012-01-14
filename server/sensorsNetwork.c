@@ -1,10 +1,13 @@
-#include sensorsNetwork.h
+#include <pthread.h>
+#include <mqueue.h>
+#include "sensorsNetwork.h"
+
 int sock;
 pthread pthreadSensorsRec, pthreadSensorsSend;
-
+mqd_t mqSensorsSend;
 
 void sensorsMsgRec(){
-  
+
   char buff[128];
   int nb, total
 
@@ -29,7 +32,7 @@ void sensorsMsgRec(){
 }
 
 void sensorsMsgSend();{
-  
+
   char buff[128];
   int nb, nbSent, total;
   char* sending = (char *) buff[0];
@@ -56,7 +59,9 @@ void sensorsMsgSend();{
 }
 
 void sensorsNetworkStart(){
-  
+
+  mqSensorsSend = mq_open("SensorsMsgSend", O_RDWR | O_CREAT);
+
   struct sockaddr_in saddr;
   memset(&saddr, 0, sizeof(struct sockaddr_in));
 
@@ -78,8 +83,12 @@ void sensorsNetworkStart(){
 }
 
 void sensorsNetworkStop(){
-  
+
   pthread_kill(&pthreadSensorsRec, SIGTERM);
   pthread_kill(&pthreadSensorsSend, SIGTERM);
   close(sock);
+}
+
+int sensorsNetworkSend(const char * msg_ptr, size_t msg_len){
+  return mq_send( mqSensorsSend, msg_ptr, msg_len, 0);
 }
