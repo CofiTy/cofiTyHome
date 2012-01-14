@@ -1,5 +1,7 @@
+#include <stdio.h>
+#include <json/json.h>
+
 #include "guiInterface.h"
-#include "json.h"
 
 typedef enum {
     INITIALISE = 1,
@@ -32,7 +34,8 @@ void processTypeClose(){
 
 void processCommand(char * command){
   
-  struct json_object* objCommand, objPart;
+  struct json_object* objCommand;
+  struct json_object* objPart;
   int type;
 
   objCommand = json_tokener_parse(command);
