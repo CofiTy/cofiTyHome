@@ -1,7 +1,7 @@
 #if ! defined ( SNET_H_ )
 #define SNET_H_
 
-#include common.h
+#include "common.h"
 
 void sensorsNetworkStart();
 void sensorsNetworkStop();

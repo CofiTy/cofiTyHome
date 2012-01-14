@@ -3,16 +3,11 @@ EDL=gcc
 RM=rm
 BUILDDIR=build/
 SRCDIR=src/
-KERNEL=$(shell uname -r | cut -d '-' -f1 | cut -d '.' -f3)
-ifeq ($(shell expr $(KERNEL) \< 28),1)
-	CCFLAGS=-DOLD -g -O0 -Wall -Werror
-else
-	CCFLAGS=-DNEW -g -O0 -Wall -Werror
-endif
+CCFLAGS=-g -O0 -Wall
 LDFLAGS=
 RMFLAGS=-f
 EXE=CofiTyHome
-LIBS=-lpthread
+LIBS=-lpthread -lrt
 EFFACE=clean
 OBJ=$(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o
 

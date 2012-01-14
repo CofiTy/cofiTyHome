@@ -1,16 +1,26 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <string.h>
 #include <pthread.h>
 #include <mqueue.h>
+#include <signal.h>
+#include <unistd.h>
+
 #include "sensorsNetwork.h"
 
 int sock;
-pthread pthreadSensorsRec, pthreadSensorsSend;
+pthread_t pthreadSensorsRec, pthreadSensorsSend;
 mqd_t mqSensorsSend;
 
-void sensorsMsgRec(){
+void * sensorsMsgRec(){
 
   char buff[128];
-  int nb, total
-    char* receiving = (char *) buff[0];
+  int nb, total;
+  char* receiving = (char *) buff[0];
 
   memset(buff, 0, 128);
   total = 0;
@@ -35,7 +45,7 @@ void sensorsMsgRec(){
   }
 }
 
-void sensorsMsgSend();{
+void * sensorsMsgSend(){
 
   char buff[128];
   int nb, nbSent, total;
@@ -44,7 +54,6 @@ void sensorsMsgSend();{
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb = msgQReceive(balEnvoi, buff, SIZE_BUFF, WAIT_FOREVER);
     nb= mq_receive(mqSensorsSend, buff, 128, 0);
     FAIL(nb)
 
@@ -70,19 +79,21 @@ void sensorsNetworkStart(){
   struct sockaddr_in saddr;
   memset(&saddr, 0, sizeof(struct sockaddr_in));
 
-  saddr.sin_addr.s_addr = htonl(134.214.1.28); //TODO macro avec les bonnes valeur
+  saddr.sin_addr.s_addr = inet_addr("134.214.1.28"); //TODO macro avec les bonnes valeur
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5000); //TODO macro avec les bonnes valeur
+
+  socklen_t len = sizeof(struct sockaddr_in);
 
   sock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(sock);
 
   FAIL(connect(sock, (struct sockaddr *)&saddr, len));
 
-  pthread_create(&pthreadSensorsRec, NULL, sensorsMsgRec, null);
+  pthread_create(&pthreadSensorsRec, NULL, sensorsMsgRec, NULL);
   pthread_detach(pthreadSensorsRec);
 
-  pthread_create(&pthreadSensorsSend, NULL, sensorsMsgSend, null);
+  pthread_create(&pthreadSensorsSend, NULL, sensorsMsgSend, NULL);
   pthread_detach(pthreadSensorsSend);
 
 }

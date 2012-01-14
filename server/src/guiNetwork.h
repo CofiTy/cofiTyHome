@@ -1,7 +1,7 @@
 #if ! defined ( GNET_H_ )
 #define GNET_H_
 
-#include common.h
+#include "common.h"
 
 void guiNetworkStart();
 void guiNetworkStop();
