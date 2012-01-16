@@ -16,5 +16,7 @@ typedef struct thread
 
 void createNewThread(void (*sf_addr)(void*),void *sf_arg);
 void yield();
+void disableInterrupt();
+void enableInterrupt();
 
 #endif /* SCHEDULER_H_ */
