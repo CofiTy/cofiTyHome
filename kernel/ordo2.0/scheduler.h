@@ -9,7 +9,7 @@ void createNewThread(void (*sf_addr)(void*),void *sf_arg);
 void disableInterrupt();
 void enableInterrupt();
 /* Function to exit the current thread, do not use to exit the
- * thread
+ * main thread
  */
 void exitCurrentThread();
 
