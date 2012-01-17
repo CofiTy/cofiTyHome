@@ -4,19 +4,23 @@
 
 void child()
 {
-	for (;;)
+	int i;
+	for ( i = 0 ; i < 5 ; i++ )
 	{
 		printf("child\n");
 		sleep(1);
 	}
+	exitCurrentThread();
 }
 void child2()
 {
-	for (;;)
+	int i;
+	for ( i = 0 ; i < 2 ; i++ )
 	{
 		printf("child2\n");
 		sleep(1);
 	}
+	exitCurrentThread();
 }
 
 int main()
@@ -27,7 +31,6 @@ int main()
 	{
 		printf("main\n");
 		sleep(1);
-	//	yield();
 	}
 	return 1;
 }

@@ -34,6 +34,6 @@ void mctx_create(mctx_t *mctx, void (*sf_addr)(void*),
 		void *sf_arg, void *sk_addr, size_t sk_size);
 
 
-
+void yield();
 
 #endif /* GTHREAD_H_ */

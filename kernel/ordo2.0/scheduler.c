@@ -7,10 +7,21 @@
 #define SWITCH_LAPSE_SEC 1
 #define SWITCH_LAPSE_MILLI 0
 
+typedef struct thread
+{
+	struct thread *next;
+	mctx_t context;
+	int id;
+	char stack[STACK_SIZE];
+}thread;
+
 static thread *firstThread = NULL;
 static thread *currentThread = NULL;
+static thread *threadForDeletion = NULL;
 static int counter = 0;
 volatile int itEnabled = FALSE;
+
+
 
 void disableInterrupt()
 {
@@ -62,6 +73,13 @@ void createNewThread(void (*sf_addr)(void*),void *sf_arg)
 void yield()
 {
 	thread* old;
+	thread* toDeletion;
+	while (threadForDeletion != NULL)
+	{
+		toDeletion = threadForDeletion;
+		threadForDeletion = threadForDeletion->next;
+		free(toDeletion);
+	}
 	if (itEnabled == TRUE)
 	{
 		old = currentThread;
@@ -74,7 +92,46 @@ void yield()
 			currentThread = currentThread->next;
 		}
 		mctx_switch(&(old->context),&(currentThread->context));
+		enableInterrupt();
 	}
+}
+
+void exitCurrentThread()
+{
+	thread* old = currentThread;
+	thread* iter = firstThread;
+	disableInterrupt();
+	if (currentThread == firstThread)
+	{
+		firstThread = firstThread->next;
+		currentThread = firstThread;
+	}
+	else
+	{
+		while (iter->next != old)
+		{
+			if (iter->next == NULL)
+			{
+				iter = firstThread;
+			}
+			else
+			{
+				iter = iter->next;
+			}
+		}
+		iter->next = old->next;
+		if (old->next == NULL)
+		{
+			currentThread = firstThread;
+		}
+		else
+		{
+			currentThread = old->next;
+		}
+	}
+	old->next = threadForDeletion;
+	threadForDeletion = old;
+	mctx_restore(&(currentThread->context));
 }
 
 
