@@ -38,6 +38,9 @@ void mctx_create(mctx_t *mctx, void (*sf_addr)(void*),
 	ss.ss_size = sk_size;
 	ss.ss_flags = 0;
 	sigaltstack(&ss, &oss);
+
+	/* ToDelete */
+	mctx->toDelete = FALSE;
 	
 	/* step 4 */
 	mctx_creat = mctx;
@@ -101,6 +104,10 @@ void mctx_creat_boot(void)
 
 	/* The thread starts */
 	mctx_start_func(mctx_start_arg);
+
+	/* On dit au scheduler qu'il faudra détruire ce thread */
+	mctx_creat->toDelete = TRUE;
+	for(;;);
 
 	/* NOTREACHED */
 	abort();

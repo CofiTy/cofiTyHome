@@ -12,23 +12,39 @@
 
 #include "guiNetwork.h"
 
-int guiSock;
-pthread_t pthreadGUIRec, pthreadGUISend;
-mqd_t mqGUISend;
+typedef struct Client *PClient;
 
-void * guiMsgRec(){
+typedef struct Client {
+  PClient next;
+  int sock;
+  pthread_t pthreadRec;
+  pthread_t pthreadSend;
+  mqd_t mqSend;
+}Client;
+
+typedef struct {
+  PClient first;
+  PClient current;
+}List;
+
+pthread_t pthreadConnexion;
+
+List clientList;
+
+void * guiMsgRec(void* data){
 
   char buff[128];
   int nb, total;
   char* receiving = (char *) buff[0];
-
+  Client* client = (Client*)data;
+  
   memset(buff, 0, 128);
   total = 0;
 
   for(;;)
   {
     /* reception form sensors */
-    nb = recv(guiSock, receiving, 128, 0);
+    nb = recv(client->sock, receiving, 128, 0);
     FAIL(nb)
       total += nb;
     receiving += nb;
@@ -44,16 +60,17 @@ void * guiMsgRec(){
   }
 }
 
-void * guiMsgSend(){
+void * guiMsgSend(void* data){
 
   char buff[128];
   int nb, nbSent, total;
   char* sending = (char *) buff[0];
+  Client* client = (Client*)data;
 
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb= mq_receive(mqGUISend, buff, 128, 0);
+    nb = mq_receive(client->mqSend, buff, 128, 0);
     FAIL(nb)
 
       total = nb;
@@ -61,7 +78,7 @@ void * guiMsgSend(){
     while(nbSent < total)
     {
       /* Sending toward sensors */
-      nb = send(guiSock, sending, nb, 0);
+      nb = send(client->sock, sending, nb, 0);
       FAIL(nb)
         nbSent += nb;
       sending += nb;
@@ -71,45 +88,76 @@ void * guiMsgSend(){
 
 }
 
-void guiNetworkStart(){
+void * guiNetworkConnexion(){
 
-  int tmpSock;
-  mqGUISend = mq_open("mqGUIMsgSend", O_RDWR | O_CREAT);
+  int acceptSock, tmpSock;
+  int i = 0;
+  char name[32];
 
+  struct sockaddr_in saddr_client;
   struct sockaddr_in saddr;
-  memset(&saddr, 0, sizeof(struct sockaddr_in));
-
+  socklen_t size_addr = sizeof(struct sockaddr_in);
+  memset(&saddr_client, 0, sizeof(struct sockaddr_in));
+  
   saddr.sin_addr.s_addr = htonl(INADDR_ANY);
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5003);
 
-  FAIL(bind(tmpSock, (struct sockaddr *)&saddr, sizeof(saddr)));
+  FAIL(bind(acceptSock, (struct sockaddr *)&saddr, sizeof(saddr)));
 
-  FAIL(listen(tmpSock, 10));
+  FAIL(listen(acceptSock, 10));
 
-  struct sockaddr_in saddr_client;
-  memset(&saddr_client, 0, sizeof(struct sockaddr_in));
+  for(;;){
+    memset(&saddr, 0, sizeof(struct sockaddr_in));
+    sprintf(name, "mqMsgSendNb%d", i++);
+    
+    tmpSock = accept(acceptSock, (struct sockaddr *)&saddr_client, &size_addr);
+    FAIL(tmpSock)
 
-  socklen_t size_addr = sizeof(struct sockaddr_in);
+    if(clientList.first == NULL){
+      clientList.first = malloc(sizeof(Client));
+      clientList.first->next = NULL;
+      clientList.current = clientList.first;
+    } 
+    else{
+      clientList.current = malloc(sizeof(Client));
+      clientList.current->next = clientList.first;
+      clientList.first = clientList.current;
+    }
 
-  guiSock = accept(tmpSock, (struct sockaddr *)&saddr_client, &size_addr);
-  FAIL(guiSock)
+    clientList.current->sock = tmpSock;
 
-    pthread_create(&pthreadGUIRec, NULL, guiMsgRec, NULL);
-  pthread_detach(pthreadGUIRec);
+    clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT);
 
-  pthread_create(&pthreadGUISend, NULL, guiMsgSend, NULL);
-  pthread_detach(pthreadGUISend);
+    pthread_create(&clientList.current->pthreadRec, NULL, guiMsgRec, (void*)clientList.current);
+    pthread_detach(clientList.current->pthreadRec);
 
+    pthread_create(&clientList.current->pthreadSend, NULL, guiMsgSend, (void*)clientList.current);
+    pthread_detach(clientList.current->pthreadSend);
+  }
+}
+
+void guiNetworkStart(){
+    clientList.first = NULL;
+    pthread_create(&pthreadConnexion, NULL, guiNetworkConnexion, NULL);
+    pthread_detach(pthreadConnexion);
 }
 
 void guiNetworkStop(){
 
-  pthread_kill(pthreadGUIRec, SIGTERM);
-  pthread_kill(pthreadGUISend, SIGTERM);
-  close(guiSock);
+  pthread_kill(pthreadConnexion, SIGTERM);
+  while(clientList.first != NULL){
+    pthread_kill(clientList.first->pthreadSend, SIGTERM);
+    pthread_kill(clientList.first->pthreadRec, SIGTERM);
+    close(clientList.first->sock);
+    FAIL(mq_close(clientList.first->mqSend))
+    
+    clientList.current = clientList.first;
+    clientList.first = clientList.first->next;
+    free(clientList.current);
+  }
 }
 
-int guiNetworkSend(const char * msg_ptr, size_t msg_len){
-  return mq_send( mqGUISend, msg_ptr, msg_len, 0);
+int guiNetworkSend(const char * msg_ptr, size_t msg_len, mqd_t mqId){
+  return mq_send( mqId, msg_ptr, msg_len, 0);
 }

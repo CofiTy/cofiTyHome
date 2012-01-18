@@ -27,6 +27,7 @@
 typedef struct mctx_st
 {
 	jmp_buf jb;
+        int toDelete;
 }mctx_t;
 
 
