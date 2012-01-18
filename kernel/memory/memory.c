@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <pthread.h>
 
 #include "memory.h"
 
@@ -17,11 +18,20 @@ typedef union header Header;
 static Header base;
 static Header *freep = NULL;
 
+static pthread_mutex_t myLock;
+
+void initMemory()
+{
+    pthread_mutex_init (&myLock, NULL);
+}
+
 /* free: put block ap in free list */
 void gFree(void *ap)
 {
   Header *bp, *p;
   bp = (Header *)ap - 1;
+
+  pthread_mutex_lock(&myLock);
   /* point to block header */
   for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
     if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
@@ -39,6 +49,7 @@ void gFree(void *ap)
   } else
     p->s.ptr = bp;
   freep = p;
+  pthread_mutex_unlock(&myLock);
 }
 
 #define NALLOC 1024
@@ -65,6 +76,7 @@ void *gMalloc(unsigned nbytes)
 {
   Header *p, *prevp;
   unsigned nunits;
+  pthread_mutex_lock(&myLock);
   nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
   if ((prevp = freep) == NULL) {
     /* no free list yet */
@@ -86,6 +98,7 @@ void *gMalloc(unsigned nbytes)
     }
     if (p == freep) /* wrapped around free list */
       if ((p = morecore(nunits)) == NULL)
+    pthread_mutex_unlock(&myLock);
 	return NULL;
     /* none left */
   }
