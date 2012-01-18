@@ -28,7 +28,7 @@ static void initGThreadingSystem()
 
 	mainThread->id = counter++;
 	mainThread->next = firstThread;
-	mainThread->stack = malloc(STACK_SIZE);
+	/*mainThread->stack = malloc(STACK_SIZE);*/
 	firstThread = mainThread;
 	currentThread = mainThread;
 
@@ -52,14 +52,12 @@ void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 		initGThreadingSystem();
 	}
 
-	if(stackSize < STACK_SIZE)
-	{
-	  stackSize = STACK_SIZE;
-	}
+	/*if(stackSize < STACK_SIZE)
+	  stackSize = STACK_SIZE;*/
 	newThread->id = counter++;
-	newThread->stack = malloc(stackSize);
-	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, stackSize);
+	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, STACK_SIZE);
 	newThread->next = firstThread;
+	/*newThread->stack = malloc(stackSize);*/
 	firstThread = newThread;
 	itEnabled = TRUE;
 	
@@ -73,7 +71,7 @@ void yield()
 	{
 		toDeletion = threadForDeletion;
 		threadForDeletion = threadForDeletion->next;
-		free(toDeletion->stack);
+		/*free(toDeletion->stack);*/
 		free(toDeletion);
 	}
 	if (itEnabled == TRUE)
@@ -100,41 +98,46 @@ void yield()
 	}
 }
 
-void exitCurrentThread()
+
+int removeGThreadFromActivable(gThread* toRemove)
 {
-	gThread* old = currentThread;
 	gThread* iter = firstThread;
 	disableInterrupt();
-	if (currentThread == firstThread)
+	if (toRemove == firstThread)
 	{
 		firstThread = firstThread->next;
-		currentThread = firstThread;
-	}
-	else
-	{
-		while (iter->next != old)
-		{
-			if (iter->next == NULL)
-			{
-				iter = firstThread;
-			}
-			else
-			{
-				iter = iter->next;
-			}
-		}
-		iter->next = old->next;
-		if (old->next == NULL)
+		if (currentThread == toRemove)
 		{
 			currentThread = firstThread;
 		}
-		else
+		return 1;
+	}
+	else
+	{
+		while (iter->next != toRemove)
 		{
-			currentThread = old->next;
+			iter = iter->next;
+			if (iter->next == NULL)
+			{
+				return -1;
+			}
+		}
+		iter->next = toRemove->next;
+		if (currentThread == toRemove)
+		{
+			currentThread = iter->next;
 		}
 	}
-	old->next = threadForDeletion;
-	threadForDeletion = old;
+}
+
+
+void exitCurrentThread()
+{
+	
+	disableInterrupt();
+	currentThread->next = threadForDeletion;
+	threadForDeletion = currentThread;
+	removeGThreadFromActivable(currentThread);
 	mctx_restore(&(currentThread->context));
 }
 
