@@ -135,26 +135,7 @@ void createGThread(char *name, threadFunc function)
 static void launchGThreads()
 {
     /* Timer */
-    /*
-    timer_t timerid;
-    struct itimerspec value;
-    
-    struct sigevent sev;
-    struct sigaction sa;
 
-    value.it_value.tv_sec = SWITCH_LAPSE_SEC;
-    value.it_value.tv_nsec = SWITCH_LAPSE_MILLI*1000000;
-    value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
-    value.it_interval.tv_nsec = SWITCH_LAPSE_MILLI*1000000;
-    sa.sa_flags = SA_SIGINFO;
-    sa.sa_sigaction = yield;
-    sigemptyset(&sa.sa_mask);
-    sigaction(SIGRTMIN, &sa, NULL);
-    sev.sigev_notify = SIGEV_SIGNAL;
-    sev.sigev_signo = SIGRTMIN;
-    sev.sigev_value.sival_ptr = &timerid;
-    timer_create (CLOCK_REALTIME, &sev, &timerid);
-    */
     static struct sigaction sa;
     struct itimerval value;
 	
@@ -190,10 +171,11 @@ void yield()
 	    longjmp(currentThread->ctx,1);
 	}
     }
-    else
+   /* else
     {
       printf("Timer Tick\n");
     }
+*/
 }
 
 /**

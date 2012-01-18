@@ -4,8 +4,8 @@ static mctx_t  		mctx_caller;
 static sig_atomic_t	mctx_called;
 
 static mctx_t		*mctx_creat;
-static void		   (*mctx_creat_func)(void *);
-static void			*mctx_creat_arg;
+static void	   	(*mctx_creat_func)(void *);
+static void		*mctx_creat_arg;
 static sigset_t		 mctx_creat_sigs;
 
 void mctx_creat_trampoline(int sig);
@@ -91,6 +91,8 @@ void mctx_creat_boot(void)
 {
 	void (*mctx_start_func)(void *);
 	void *mctx_start_arg;
+	mctx_t *context = mctx_creat;
+
 
 	/* step 10 */
 	sigprocmask(SIG_SETMASK, &mctx_creat_sigs, NULL);
@@ -106,7 +108,7 @@ void mctx_creat_boot(void)
 	mctx_start_func(mctx_start_arg);
 
 	/* On dit au scheduler qu'il faudra détruire ce thread */
-	mctx_creat->toDelete = TRUE;
+	context->toDelete = TRUE;
 	for(;;);
 
 	/* NOTREACHED */

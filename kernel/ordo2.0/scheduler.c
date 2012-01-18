@@ -78,22 +78,21 @@ void yield()
 	}
 	if (itEnabled == TRUE)
 	{
-	    if(currentThread->context.toDelete)
-	    {
-            printf("HellO\n");
-            exitCurrentThread();
-        }
+		if(currentThread->context.toDelete)
+	    	{
+			exitCurrentThread();
+		}
 		old = currentThread;
-        if (currentThread->next == NULL)
-        {
-            currentThread = firstThread;
-        }
-        else
-        {
-                currentThread = currentThread->next;
-        }
-	    mctx_switch(&(old->context),&(currentThread->context));
-	    enableInterrupt();
+		if (currentThread->next == NULL)
+		{
+			currentThread = firstThread;
+		}
+		else
+		{
+			currentThread = currentThread->next;
+		}
+		mctx_switch(&(old->context),&(currentThread->context));
+		enableInterrupt();
 	}
 }
 
