@@ -28,7 +28,7 @@ static void initGThreadingSystem()
 
 	mainThread->id = counter++;
 	mainThread->next = firstThread;
-	/*mainThread->stack = malloc(STACK_SIZE);*/
+	mainThread->stack = malloc(STACK_SIZE);
 	firstThread = mainThread;
 	currentThread = mainThread;
 
@@ -52,12 +52,14 @@ void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 		initGThreadingSystem();
 	}
 
-	/*if(stackSize < STACK_SIZE)
-	  stackSize = STACK_SIZE;*/
+	if(stackSize < STACK_SIZE)
+    {
+        stackSize = STACK_SIZE;
+    }
 	newThread->id = counter++;
+    newThread->stack = malloc(stackSize);
 	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, STACK_SIZE);
 	newThread->next = firstThread;
-	/*newThread->stack = malloc(stackSize);*/
 	firstThread = newThread;
 	itEnabled = TRUE;
 	
@@ -71,7 +73,7 @@ void yield()
 	{
 		toDeletion = threadForDeletion;
 		threadForDeletion = threadForDeletion->next;
-		/*free(toDeletion->stack);*/
+		free(toDeletion->stack);
 		free(toDeletion);
 	}
 	if (itEnabled == TRUE)
