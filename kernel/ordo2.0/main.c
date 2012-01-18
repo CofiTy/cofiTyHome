@@ -4,8 +4,8 @@
 
 void child()
 {
-  int i;
-	for (i=0;i< 5;i++)
+	int i;
+	for (i=0;i< 2;i++)
 	{
 		printf("child\n");
 		sleep(1);
@@ -14,7 +14,8 @@ void child()
 }
 void child2()
 {
-	for (;;)
+	int i;
+	for (i=0;i< 5;i++)
 	{
 		printf("child2\n");
 		sleep(1);
@@ -24,9 +25,10 @@ void child2()
 
 int main()
 {
+	int i;
   createGThread(&child,NULL, 0);
   createGThread(&child2,NULL, 0);
-	for (;;)
+	for (i=0;i< 10;i++)
 	{
 		printf("main\n");
 		sleep(1);

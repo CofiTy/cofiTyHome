@@ -78,7 +78,6 @@ void yield()
 	}
 	if (itEnabled == TRUE)
 	{
-	    /*TODO...*/
 	    if(currentThread->context.toDelete)
 	    {
             printf("HellO\n");
@@ -134,11 +133,12 @@ int removeGThreadFromActivable(gThread* toRemove)
 
 void exitCurrentThread()
 {
-	
+	gThread* save;
 	disableInterrupt();
-	currentThread->next = threadForDeletion;
-	threadForDeletion = currentThread;
+	save = currentThread;
 	removeGThreadFromActivable(currentThread);
+	save->next = threadForDeletion;
+	threadForDeletion = save;
 	mctx_restore(&(currentThread->context));
 }
 
