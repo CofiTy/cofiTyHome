@@ -1,7 +1,7 @@
 # Choix du compilateur.
 CC = gcc
 # Options du compilateur (ici on met des options strictes).
-CFLAGS = -Wall -Werror -pedantic
+CFLAGS = -Wall -Werror -pedantic -g
 # Nom de l'exécutable.
 EXEC_NAME = ordoExe
 # Rien à inclure.

@@ -1,23 +1,13 @@
 #include "scheduler.h"
 
-/* Time of IdleLapse, Float or Int in Seconds */
-#define IDLE_LAPSE 0.1
-
 /* Time for RoundRobin, sec in int and milli in int */
 #define SWITCH_LAPSE_SEC 0
 #define SWITCH_LAPSE_MILLI 1
 
-typedef struct gThread
-{
-	struct gThread *next;
-	mctx_t context;
-	int id;
-	char *stack;
-} gThread;
-
 static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
 static gThread *threadForDeletion = NULL;
+/*static gThread *sleepingThread = NULL;*/
 static int counter = 0;
 volatile int itEnabled = FALSE;
 
@@ -63,12 +53,12 @@ void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 	}
 
 	if(stackSize < STACK_SIZE)
-	{
-	  stackSize = STACK_SIZE;
-	}
+    {
+        stackSize = STACK_SIZE;
+    }
 	newThread->id = counter++;
-	newThread->stack = malloc(stackSize);
-	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, stackSize);
+    newThread->stack = malloc(stackSize);
+	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, STACK_SIZE);
 	newThread->next = firstThread;
 	firstThread = newThread;
 	itEnabled = TRUE;
@@ -88,55 +78,69 @@ void yield()
 	}
 	if (itEnabled == TRUE)
 	{
-		old = currentThread;
-		if (currentThread->next == NULL)
-		{
-			currentThread = firstThread;
-		}
-		else
-		{
+	    /*TODO...*/
+	    if(currentThread->context.toDelete)
+	    {
+	         removeGThreadFromActivable(currentThread);
+	    }
+	    else
+	    {
+		  old = currentThread;
+		  if (currentThread->next == NULL)
+		  {
+		        currentThread = firstThread;
+		  }
+		  else
+		  {
 			currentThread = currentThread->next;
-		}
-		mctx_switch(&(old->context),&(currentThread->context));
-		enableInterrupt();
+		  }
+	    }
+	    mctx_switch(&(old->context),&(currentThread->context));
+	    enableInterrupt();
 	}
 }
 
-void exitCurrentThread()
+
+int removeGThreadFromActivable(gThread* toRemove)
 {
-	gThread* old = currentThread;
 	gThread* iter = firstThread;
 	disableInterrupt();
-	if (currentThread == firstThread)
+	if (toRemove == firstThread)
 	{
 		firstThread = firstThread->next;
-		currentThread = firstThread;
-	}
-	else
-	{
-		while (iter->next != old)
-		{
-			if (iter->next == NULL)
-			{
-				iter = firstThread;
-			}
-			else
-			{
-				iter = iter->next;
-			}
-		}
-		iter->next = old->next;
-		if (old->next == NULL)
+		if (currentThread == toRemove)
 		{
 			currentThread = firstThread;
 		}
-		else
+		return 1;
+	}
+	else
+	{
+		while (iter->next != toRemove)
 		{
-			currentThread = old->next;
+			iter = iter->next;
+			if (iter->next == NULL)
+			{
+				return -1;
+			}
+		}
+		iter->next = toRemove->next;
+		if (currentThread == toRemove)
+		{
+			currentThread = iter->next;
 		}
 	}
-	old->next = threadForDeletion;
-	threadForDeletion = old;
+    return 1;
+}
+
+
+void exitCurrentThread()
+{
+	
+	disableInterrupt();
+	currentThread->next = threadForDeletion;
+	threadForDeletion = currentThread;
+	removeGThreadFromActivable(currentThread);
 	mctx_restore(&(currentThread->context));
 }
 
