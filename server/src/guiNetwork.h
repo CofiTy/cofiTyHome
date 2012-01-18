@@ -5,6 +5,6 @@
 
 void guiNetworkStart();
 void guiNetworkStop();
-int guiNetworkSend(const char * msg_ptr, size_t msg_len);
+int guiNetworkSend(const char * msg_ptr, size_t msg_len, mqd_t mqId);
 
 #endif /*GNET*/
