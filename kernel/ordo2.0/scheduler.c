@@ -128,6 +128,7 @@ int removeGThreadFromActivable(gThread* toRemove)
 			currentThread = iter->next;
 		}
 	}
+    return 1;
 }
 
 
