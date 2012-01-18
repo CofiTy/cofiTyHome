@@ -38,7 +38,7 @@ void mctx_create(mctx_t *mctx, void (*sf_addr)(void*),
 	ss.ss_size = sk_size;
 	ss.ss_flags = 0;
 	sigaltstack(&ss, &oss);
-
+	
 	/* step 4 */
 	mctx_creat = mctx;
 	mctx_creat_func = sf_addr;
