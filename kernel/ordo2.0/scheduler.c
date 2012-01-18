@@ -3,6 +3,7 @@
 /* Time for RoundRobin, sec in int and milli in int */
 #define SWITCH_LAPSE_SEC 0
 #define SWITCH_LAPSE_MILLI 1
+/* useless comment*/
 
 static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
