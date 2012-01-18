@@ -78,17 +78,25 @@ void yield()
 	}
 	if (itEnabled == TRUE)
 	{
-		old = currentThread;
-		if (currentThread->next == NULL)
-		{
-			currentThread = firstThread;
-		}
-		else
-		{
+	  /*TODO...*/
+	 if(currentThread->context.toDelete)
+	 {
+	         removeGThreadFromActivable(currentThread);
+	 }
+	 else
+	 {
+		  old = currentThread;
+		  if (currentThread->next == NULL)
+		  {
+		        currentThread = firstThread;
+		  }
+		  else
+		  {
 			currentThread = currentThread->next;
-		}
-		mctx_switch(&(old->context),&(currentThread->context));
-		enableInterrupt();
+		  }
+	   }
+	   mctx_switch(&(old->context),&(currentThread->context));
+	   enableInterrupt();
 	}
 }
 
