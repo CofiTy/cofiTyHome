@@ -5,6 +5,7 @@
 /* un pile d'un mega */
 #define STACK_SIZE 1048576
 
+int removeGThreadFromActivable(gThread* toRemove);
 void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize);
 void disableInterrupt();
 void enableInterrupt();

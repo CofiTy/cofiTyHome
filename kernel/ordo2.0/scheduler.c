@@ -100,6 +100,40 @@ void yield()
 	}
 }
 
+int removeGThreadFromActivable(gThread* toRemove)
+{
+	gThread* iter = firstThread;
+	disableInterrupt();
+	if (toRemove == firstThread)
+	{
+		firstThread = firstThread->next;
+		if (currentThread == toRemove)
+		{
+			currentThread = firstThread;
+
+		}
+		return 1;
+	}
+	else
+	{
+		while (iter->next != toRemove)
+		{
+			iter = iter->next;
+			if (iter->next == NULL)
+			{
+				return -1;
+			}
+
+		}
+		iter->next = toRemove->next;
+		if (currentThread == toRemove)
+		{
+			currentThread = iter->next;
+		}
+		
+	}
+}
+
 void exitCurrentThread()
 {
 	gThread* old = currentThread;
