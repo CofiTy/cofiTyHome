@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <json/json.h>
 
+#include "../libHeaders/json.h"
 #include "guiInterface.h"
 
 typedef enum {

@@ -7,7 +7,7 @@ CCFLAGS=-g -O0 -Wall
 LDFLAGS=
 RMFLAGS=-f
 EXE=CofiTyHome
-LIBS=-lpthread -lrt -ljson
+LIBS=-lpthread -lrt -Llib -ljson
 EFFACE=clean
 OBJ=$(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o $(BUILDDIR)guiInterface.o
 
