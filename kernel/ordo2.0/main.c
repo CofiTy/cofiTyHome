@@ -5,7 +5,7 @@
 void child()
 {
   int i;
-	for (i=0;i< 100;i++)
+	for (i=0;i< 5;i++)
 	{
 		printf("child\n");
 		sleep(1);

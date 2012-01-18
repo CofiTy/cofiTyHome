@@ -1,8 +1,8 @@
 #include "scheduler.h"
 
 /* Time for RoundRobin, sec in int and milli in int */
-#define SWITCH_LAPSE_SEC 0
-#define SWITCH_LAPSE_MILLI 1
+#define SWITCH_LAPSE_SEC 1
+#define SWITCH_LAPSE_MILLI 0
 
 static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
@@ -81,20 +81,18 @@ void yield()
 	    /*TODO...*/
 	    if(currentThread->context.toDelete)
 	    {
-	         removeGThreadFromActivable(currentThread);
-	    }
-	    else
-	    {
-		  old = currentThread;
-		  if (currentThread->next == NULL)
-		  {
-		        currentThread = firstThread;
-		  }
-		  else
-		  {
-			currentThread = currentThread->next;
-		  }
-	    }
+            printf("HellO\n");
+            exitCurrentThread();
+        }
+		old = currentThread;
+        if (currentThread->next == NULL)
+        {
+            currentThread = firstThread;
+        }
+        else
+        {
+                currentThread = currentThread->next;
+        }
 	    mctx_switch(&(old->context),&(currentThread->context));
 	    enableInterrupt();
 	}
