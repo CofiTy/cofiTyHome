@@ -4,29 +4,27 @@
 
 void child()
 {
-	int i;
-	for ( i = 0 ; i < 5 ; i++ )
+	for (;;)
 	{
 		printf("child\n");
 		sleep(1);
 	}
-	exitCurrentThread();
+	/*exitCurrentThread();*/
 }
 void child2()
 {
-	int i;
-	for ( i = 0 ; i < 2 ; i++ )
+	for (;;)
 	{
 		printf("child2\n");
 		sleep(1);
 	}
-	exitCurrentThread();
+	/*exitCurrentThread();*/
 }
 
 int main()
 {
-	createNewThread(&child,NULL);
-	createNewThread(&child2,NULL);
+  createGThread(&child,NULL, 0);
+  createGThread(&child2,NULL, 0);
 	for (;;)
 	{
 		printf("main\n");

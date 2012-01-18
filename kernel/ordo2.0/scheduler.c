@@ -4,24 +4,22 @@
 #define IDLE_LAPSE 0.1
 
 /* Time for RoundRobin, sec in int and milli in int */
-#define SWITCH_LAPSE_SEC 1
-#define SWITCH_LAPSE_MILLI 0
+#define SWITCH_LAPSE_SEC 0
+#define SWITCH_LAPSE_MILLI 1
 
-typedef struct thread
+typedef struct gThread
 {
-	struct thread *next;
+	struct gThread *next;
 	mctx_t context;
 	int id;
 	char stack[STACK_SIZE];
-}thread;
+} gThread;
 
-static thread *firstThread = NULL;
-static thread *currentThread = NULL;
-static thread *threadForDeletion = NULL;
+static gThread *firstThread = NULL;
+static gThread *currentThread = NULL;
+static gThread *threadForDeletion = NULL;
 static int counter = 0;
 volatile int itEnabled = FALSE;
-
-
 
 void disableInterrupt()
 {
@@ -32,14 +30,15 @@ void enableInterrupt()
 	itEnabled = TRUE;
 }
 
-static void initThreadingSystem()
+static void initGThreadingSystem()
 {
-	thread *mainThread = malloc(sizeof(thread));
+	gThread *mainThread = malloc(sizeof(gThread));
 	static struct sigaction sa;
 	struct itimerval value;
 
 	mainThread->id = counter++;
 	mainThread->next = firstThread;
+	/*mainThread->stack = malloc(STACK_SIZE);*/
 	firstThread = mainThread;
 	currentThread = mainThread;
 
@@ -54,30 +53,35 @@ static void initThreadingSystem()
 
 }
 
-void createNewThread(void (*sf_addr)(void*),void *sf_arg)
+void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 {
 
-	thread *newThread = malloc(sizeof(thread));
+	gThread *newThread = malloc(sizeof(gThread));
 	if (counter == 0)
 	{
-		initThreadingSystem();
+		initGThreadingSystem();
 	}
 
+	/*if(stackSize < STACK_SIZE)
+	  stackSize = STACK_SIZE;*/
 	newThread->id = counter++;
 	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, STACK_SIZE);
 	newThread->next = firstThread;
+	/*newThread->stack = malloc(stackSize);*/
 	firstThread = newThread;
 	itEnabled = TRUE;
+	
 }
 
 void yield()
 {
-	thread* old;
-	thread* toDeletion;
+	gThread* old;
+	gThread* toDeletion;
 	while (threadForDeletion != NULL)
 	{
 		toDeletion = threadForDeletion;
 		threadForDeletion = threadForDeletion->next;
+		/*free(toDeletion->stack);*/
 		free(toDeletion);
 	}
 	if (itEnabled == TRUE)
@@ -98,8 +102,8 @@ void yield()
 
 void exitCurrentThread()
 {
-	thread* old = currentThread;
-	thread* iter = firstThread;
+	gThread* old = currentThread;
+	gThread* iter = firstThread;
 	disableInterrupt();
 	if (currentThread == firstThread)
 	{
@@ -133,8 +137,4 @@ void exitCurrentThread()
 	threadForDeletion = old;
 	mctx_restore(&(currentThread->context));
 }
-
-
-
-
 
