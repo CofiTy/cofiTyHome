@@ -78,13 +78,13 @@ void yield()
 	}
 	if (itEnabled == TRUE)
 	{
-	  /*TODO...*/
-	 if(currentThread->context.toDelete)
-	 {
+	    /*TODO...*/
+	    if(currentThread->context.toDelete)
+	    {
 	         removeGThreadFromActivable(currentThread);
-	 }
-	 else
-	 {
+	    }
+	    else
+	    {
 		  old = currentThread;
 		  if (currentThread->next == NULL)
 		  {
@@ -94,9 +94,9 @@ void yield()
 		  {
 			currentThread = currentThread->next;
 		  }
-	   }
-	   mctx_switch(&(old->context),&(currentThread->context));
-	   enableInterrupt();
+	    }
+	    mctx_switch(&(old->context),&(currentThread->context));
+	    enableInterrupt();
 	}
 }
 
