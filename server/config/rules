@@ -1,0 +1,15 @@
+rule:	
+	temperature
+conditions:	
+	cap1>30
+	cap2<=20
+actions:
+	act1
+
+rule:
+	cafe
+conditions:	
+	cap1=30
+	cap2>=20
+actions:
+	act1
