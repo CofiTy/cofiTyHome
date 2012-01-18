@@ -1,6 +1,7 @@
 #if ! defined ( GNET_H_ )
 #define GNET_H_
 
+#include <mqueue.h>
 #include "common.h"
 
 void guiNetworkStart();

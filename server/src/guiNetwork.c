@@ -6,7 +6,6 @@
 #include <errno.h>
 #include <string.h>
 #include <pthread.h>
-#include <mqueue.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -103,9 +102,13 @@ void * guiNetworkConnexion(){
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5003);
 
+  acceptSock = socket(AF_INET, SOCK_STREAM, 0); //Version portable des sockets non bloquants
+  FAIL(acceptSock);
+  
   FAIL(bind(acceptSock, (struct sockaddr *)&saddr, sizeof(saddr)));
 
   FAIL(listen(acceptSock, 10));
+  puts("Listening");
 
   for(;;){
     memset(&saddr, 0, sizeof(struct sockaddr_in));
@@ -113,6 +116,7 @@ void * guiNetworkConnexion(){
 
     tmpSock = accept(acceptSock, (struct sockaddr *)&saddr_client, &size_addr);
     FAIL(tmpSock);
+    puts("gotConnexion");
 
     if(clientList.first == NULL){
       clientList.first = malloc(sizeof(Client));

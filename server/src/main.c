@@ -1,10 +1,10 @@
 #include <unistd.h>
-#include "sensorsNetwork.h"
+#include "guiNetwork.h"
 
 int main(int argc, char ** argv){
-  sensorsNetworkStart();
+  guiNetworkStart();
   sleep(120);
-  sensorsNetworkStop();
+  guiNetworkStop();
   return 0;
 }
 
