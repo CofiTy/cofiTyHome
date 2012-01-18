@@ -4,7 +4,8 @@
 
 void child()
 {
-	for (;;)
+  int i;
+	for (i=0;i< 100;i++)
 	{
 		printf("child\n");
 		sleep(1);

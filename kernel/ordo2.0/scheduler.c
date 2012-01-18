@@ -1,8 +1,5 @@
 #include "scheduler.h"
 
-/* Time of IdleLapse, Float or Int in Seconds */
-#define IDLE_LAPSE 0.1
-
 /* Time for RoundRobin, sec in int and milli in int */
 #define SWITCH_LAPSE_SEC 0
 #define SWITCH_LAPSE_MILLI 1
@@ -18,6 +15,7 @@ typedef struct gThread
 static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
 static gThread *threadForDeletion = NULL;
+static gThread *sleepingThread = NULL;
 static int counter = 0;
 volatile int itEnabled = FALSE;
 
