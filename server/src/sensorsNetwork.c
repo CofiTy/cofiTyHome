@@ -35,7 +35,7 @@ void * sensorsMsgRec(){
     receiving += nb;
 
     /* If enough data we can process */
-    if(total >= 104)
+    if(total >= 27)
     {
       printf("Trame : %s\n", buff);
       puts("recv");
@@ -55,7 +55,8 @@ void * sensorsMsgSend(){
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb= mq_receive(mqSensorsSend, buff, 128, 0);
+    return NULL;
+    nb = mq_receive(mqSensorsSend, buff, 128, 0);
     FAIL(nb);
 
     total = nb;
@@ -80,7 +81,7 @@ void sensorsNetworkStart(){
   struct sockaddr_in saddr;
   memset(&saddr, 0, sizeof(struct sockaddr_in));
 
-  saddr.sin_addr.s_addr = inet_addr("134.214.1.28"); //TODO macro avec les bonnes valeur
+  saddr.sin_addr.s_addr = inet_addr("134.214.105.28"); //TODO macro avec les bonnes valeur
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5000); //TODO macro avec les bonnes valeur
 
