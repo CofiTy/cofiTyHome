@@ -1,23 +1,13 @@
 #include "scheduler.h"
 
-/* Time of IdleLapse, Float or Int in Seconds */
-#define IDLE_LAPSE 0.1
-
 /* Time for RoundRobin, sec in int and milli in int */
 #define SWITCH_LAPSE_SEC 0
 #define SWITCH_LAPSE_MILLI 1
 
-typedef struct gThread
-{
-	struct gThread *next;
-	mctx_t context;
-	int id;
-	char stack[STACK_SIZE];
-} gThread;
-
 static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
 static gThread *threadForDeletion = NULL;
+/*static gThread *sleepingThread = NULL;*/
 static int counter = 0;
 volatile int itEnabled = FALSE;
 
@@ -97,40 +87,6 @@ void yield()
 		}
 		mctx_switch(&(old->context),&(currentThread->context));
 		enableInterrupt();
-	}
-}
-
-int removeGThreadFromActivable(gThread* toRemove)
-{
-	gThread* iter = firstThread;
-	disableInterrupt();
-	if (toRemove == firstThread)
-	{
-		firstThread = firstThread->next;
-		if (currentThread == toRemove)
-		{
-			currentThread = firstThread;
-
-		}
-		return 1;
-	}
-	else
-	{
-		while (iter->next != toRemove)
-		{
-			iter = iter->next;
-			if (iter->next == NULL)
-			{
-				return -1;
-			}
-
-		}
-		iter->next = toRemove->next;
-		if (currentThread == toRemove)
-		{
-			currentThread = iter->next;
-		}
-		
 	}
 }
 
