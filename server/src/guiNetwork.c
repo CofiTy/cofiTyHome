@@ -37,7 +37,7 @@ void * guiMsgRec(void* data){
   int nb, total;
   char* receiving = (char *) buff[0];
   Client* client = (Client*)data;
-  
+
   memset(buff, 0, 128);
   total = 0;
 
@@ -45,8 +45,8 @@ void * guiMsgRec(void* data){
   {
     /* reception form sensors */
     nb = recv(client->sock, receiving, 128, 0);
-    FAIL(nb)
-      total += nb;
+    FAIL(nb);
+    total += nb;
     receiving += nb;
 
     /* If enough data we can process */
@@ -71,16 +71,16 @@ void * guiMsgSend(void* data){
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
     nb = mq_receive(client->mqSend, buff, 128, 0);
-    FAIL(nb)
+    FAIL(nb);
 
-      total = nb;
+    total = nb;
     nbSent = 0;
     while(nbSent < total)
     {
       /* Sending toward sensors */
       nb = send(client->sock, sending, nb, 0);
-      FAIL(nb)
-        nbSent += nb;
+      FAIL(nb);
+      nbSent += nb;
       sending += nb;
     }
     puts("sent");
@@ -98,7 +98,7 @@ void * guiNetworkConnexion(){
   struct sockaddr_in saddr;
   socklen_t size_addr = sizeof(struct sockaddr_in);
   memset(&saddr_client, 0, sizeof(struct sockaddr_in));
-  
+
   saddr.sin_addr.s_addr = htonl(INADDR_ANY);
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5003);
@@ -110,9 +110,9 @@ void * guiNetworkConnexion(){
   for(;;){
     memset(&saddr, 0, sizeof(struct sockaddr_in));
     sprintf(name, "mqMsgSendNb%d", i++);
-    
+
     tmpSock = accept(acceptSock, (struct sockaddr *)&saddr_client, &size_addr);
-    FAIL(tmpSock)
+    FAIL(tmpSock);
 
     if(clientList.first == NULL){
       clientList.first = malloc(sizeof(Client));
@@ -138,9 +138,9 @@ void * guiNetworkConnexion(){
 }
 
 void guiNetworkStart(){
-    clientList.first = NULL;
-    pthread_create(&pthreadConnexion, NULL, guiNetworkConnexion, NULL);
-    pthread_detach(pthreadConnexion);
+  clientList.first = NULL;
+  pthread_create(&pthreadConnexion, NULL, guiNetworkConnexion, NULL);
+  pthread_detach(pthreadConnexion);
 }
 
 void guiNetworkStop(){
@@ -150,8 +150,8 @@ void guiNetworkStop(){
     pthread_kill(clientList.first->pthreadSend, SIGTERM);
     pthread_kill(clientList.first->pthreadRec, SIGTERM);
     close(clientList.first->sock);
-    FAIL(mq_close(clientList.first->mqSend))
-    
+    FAIL(mq_close(clientList.first->mqSend));
+
     clientList.current = clientList.first;
     clientList.first = clientList.first->next;
     free(clientList.current);

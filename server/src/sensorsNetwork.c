@@ -29,9 +29,9 @@ void * sensorsMsgRec(){
   {
     /* reception form sensors */
     nb = recv(sock, buff, 128, 0);
-    FAIL(nb)
+    FAIL(nb);
 
-      total += nb;
+    total += nb;
     receiving += nb;
 
     /* If enough data we can process */
@@ -55,16 +55,16 @@ void * sensorsMsgSend(){
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
     nb= mq_receive(mqSensorsSend, buff, 128, 0);
-    FAIL(nb)
+    FAIL(nb);
 
-      total = nb;
+    total = nb;
     nbSent = 0;
     while(nbSent < total)
     {
       /* Sending toward sensors */
       nb = send(sock, sending, nb, 0);
-      FAIL(nb)
-        nbSent += nb;
+      FAIL(nb);
+      nbSent += nb;
       sending += nb;
     }
     puts("sent");
@@ -102,7 +102,8 @@ void sensorsNetworkStop(){
 
   pthread_kill(pthreadSensorsRec, SIGTERM);
   pthread_kill(pthreadSensorsSend, SIGTERM);
-  close(sock);
+  FAIL(close(sock));
+  FAIL(mq_close(mqSensorsSend));
 }
 
 int sensorsNetworkSend(const char * msg_ptr, size_t msg_len){
