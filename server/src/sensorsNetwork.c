@@ -37,6 +37,7 @@ void * sensorsMsgRec(){
     /* If enough data we can process */
     if(total >= 104)
     {
+      printf("Trame : %s\n", buff);
       puts("recv");
       total = 0;
       receiving = (char *) buff[0];
