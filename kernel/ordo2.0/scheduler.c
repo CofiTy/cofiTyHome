@@ -54,8 +54,6 @@ static void initGThreadingSystem()
 	firstThread = mainThread;
 	currentThread = mainThread;
 
-	createGThread(&idle,NULL,100);
-	itEnabled = FALSE;
 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = yield;
@@ -66,6 +64,7 @@ static void initGThreadingSystem()
 	value.it_value = value.it_interval;
 	setitimer(ITIMER_REAL, &value, (struct itimerval *)0);
 
+	createGThread(&idle,NULL,100);
 }
 
 int createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
