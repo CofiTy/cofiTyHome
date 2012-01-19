@@ -25,11 +25,11 @@ int main()
 {
 	int i;
 	int firstThread = createGThread(&child,NULL, 0);
-	int secondThread = createGThread(&child2,NULL, 0);
+	createGThread(&child2,NULL, 0);
 	for (i=0;i< 10;i++)
 	{
 		printf("main\n");
-		sleep(1);
+		sleepMS(3000);
 		if (i==2)
 		{
 			killThreadById(firstThread);

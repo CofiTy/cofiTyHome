@@ -16,7 +16,7 @@ typedef struct gThread
 static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
 static gThread *threadForDeletion = NULL;
-static gThread *threadInWaitingState = NULL
+static gThread *threadInWaitingState = NULL;
 /*static gThread *sleepingThread = NULL;*/
 static int counter = 0;
 volatile int itEnabled = FALSE;
@@ -79,6 +79,20 @@ void yield()
 {
 	gThread* old;
 	gThread* toDeletion;
+	gThread* iter;
+	gThread* next;
+	iter = threadInWaitingState ;
+	while (iter != NULL)
+	{
+		iter->timeToWait -= (SWITCH_LAPSE_SEC*1000+SWITCH_LAPSE_MILLI );
+		next = iter->next;
+		if (iter->timeToWait <= 0)
+		{
+			iter->next = firstThread;
+			firstThread = iter;
+		}
+		iter = next->next;
+	}
 	while (threadForDeletion != NULL)
 	{
 		toDeletion = threadForDeletion;
@@ -165,6 +179,19 @@ static int removeGThreadFromActivable(gThread* toRemove)
 	enableInterrupt();
 	return 1;
 }
+
+void sleepMS(int time)
+{
+	gThread* tmp;
+	disableInterrupt();
+	currentThread->timeToWait = time;
+	tmp = currentThread;
+	removeGThreadFromActivable(tmp);
+	tmp->next = threadInWaitingState;
+	threadInWaitingState = tmp;
+	mctx_restore(&(currentThread->context));
+}
+
 
 void exitCurrentThread()
 {
