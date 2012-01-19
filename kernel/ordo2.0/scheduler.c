@@ -4,9 +4,19 @@
 #define SWITCH_LAPSE_SEC 1
 #define SWITCH_LAPSE_MILLI 0
 
+typedef struct gThread
+{
+	struct gThread *next;
+	mctx_t context;
+	int id;
+	int timeToWait;
+	char *stack;
+} gThread;
+
 static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
 static gThread *threadForDeletion = NULL;
+static gThread *threadInWaitingState = NULL
 /*static gThread *sleepingThread = NULL;*/
 static int counter = 0;
 volatile int itEnabled = FALSE;
@@ -44,7 +54,7 @@ static void initGThreadingSystem()
 
 }
 
-void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
+int createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 {
 
 	gThread *newThread = malloc(sizeof(gThread));
@@ -62,6 +72,7 @@ void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 	newThread->next = firstThread;
 	firstThread = newThread;
 	itEnabled = TRUE;
+	return newThread->id;
 }
 
 void yield()

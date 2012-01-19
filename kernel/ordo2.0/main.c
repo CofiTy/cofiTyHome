@@ -24,15 +24,15 @@ void child2()
 int main()
 {
 	int i;
-  createGThread(&child,NULL, 0);
-  createGThread(&child2,NULL, 0);
+	int firstThread = createGThread(&child,NULL, 0);
+	int secondThread = createGThread(&child2,NULL, 0);
 	for (i=0;i< 10;i++)
 	{
 		printf("main\n");
 		sleep(1);
 		if (i==2)
 		{
-			killThreadById(1);
+			killThreadById(firstThread);
 		}
 	}
 	return 1;
