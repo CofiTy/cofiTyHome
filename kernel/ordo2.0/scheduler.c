@@ -10,6 +10,7 @@ static gThread *threadForDeletion = NULL;
 /*static gThread *sleepingThread = NULL;*/
 static int counter = 0;
 volatile int itEnabled = FALSE;
+static int removeGThreadFromActivable(gThread* toRemove);
 
 void disableInterrupt()
 {
@@ -51,18 +52,16 @@ void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 	{
 		initGThreadingSystem();
 	}
-
 	if(stackSize < STACK_SIZE)
-    {
-        stackSize = STACK_SIZE;
-    }
+	{
+		stackSize = STACK_SIZE;
+	}
 	newThread->id = counter++;
-    newThread->stack = malloc(stackSize);
+	newThread->stack = malloc(stackSize);
 	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, STACK_SIZE);
 	newThread->next = firstThread;
 	firstThread = newThread;
 	itEnabled = TRUE;
-	
 }
 
 void yield()
@@ -96,8 +95,32 @@ void yield()
 	}
 }
 
+int killThreadById(int id)
+{
+	gThread* iter;
+	iter = firstThread;
+	/* on ne peut pas tuer le thread main */
+	if (id == 0)
+	{
+		return -1;
+	}
+	while (iter->id != id)
+	{
+		iter = iter->next;
+		if (iter == NULL)
+		{
+			return -1;
+		}
+	}
+	removeGThreadFromActivable(iter);
+	free(iter->stack);
+	free(iter);
+	return 1;
 
-int removeGThreadFromActivable(gThread* toRemove)
+
+}
+
+static int removeGThreadFromActivable(gThread* toRemove)
 {
 	gThread* iter = firstThread;
 	disableInterrupt();
@@ -108,6 +131,7 @@ int removeGThreadFromActivable(gThread* toRemove)
 		{
 			currentThread = firstThread;
 		}
+		enableInterrupt();
 		return 1;
 	}
 	else
@@ -117,6 +141,7 @@ int removeGThreadFromActivable(gThread* toRemove)
 			iter = iter->next;
 			if (iter->next == NULL)
 			{
+			enableInterrupt();
 				return -1;
 			}
 		}
@@ -126,9 +151,9 @@ int removeGThreadFromActivable(gThread* toRemove)
 			currentThread = iter->next;
 		}
 	}
-    return 1;
+	enableInterrupt();
+	return 1;
 }
-
 
 void exitCurrentThread()
 {
@@ -140,4 +165,3 @@ void exitCurrentThread()
 	threadForDeletion = save;
 	mctx_restore(&(currentThread->context));
 }
-

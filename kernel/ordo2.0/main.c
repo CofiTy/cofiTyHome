@@ -5,12 +5,11 @@
 void child()
 {
 	int i;
-	for (i=0;i< 2;i++)
+	for (i=0;i< 222;i++)
 	{
 		printf("child\n");
 		sleep(1);
 	}
-	/*exitCurrentThread();*/
 }
 void child2()
 {
@@ -20,7 +19,6 @@ void child2()
 		printf("child2\n");
 		sleep(1);
 	}
-	/*exitCurrentThread();*/
 }
 
 int main()
@@ -32,6 +30,10 @@ int main()
 	{
 		printf("main\n");
 		sleep(1);
+		if (i==2)
+		{
+			killThreadById(1);
+		}
 	}
 	return 1;
 }

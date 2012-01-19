@@ -13,10 +13,10 @@ typedef struct gThread
 	char *stack;
 } gThread;
 
-int removeGThreadFromActivable(gThread* toRemove);
 void createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize);
 void disableInterrupt();
 void enableInterrupt();
+int killThreadById(int id);
 /* Function to exit the current thread, do not use to exit the
  * main thread
  */
