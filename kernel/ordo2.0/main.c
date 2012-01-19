@@ -17,6 +17,7 @@ void child2()
 	for (i=0;i< 5;i++)
 	{
 		printf("child2\n");
+		/*sleepMS(10000);*/
 		sleep(1);
 	}
 }
@@ -26,10 +27,11 @@ int main()
 	int i;
 	int firstThread = createGThread(&child,NULL, 0);
 	createGThread(&child2,NULL, 0);
-	for (i=0;i< 10;i++)
+	for (i=0;i< 110;i++)
 	{
+		enableInterrupt();
 		printf("main\n");
-		sleepMS(3000);
+	/*	sleepMS(10000);*/
 		if (i==2)
 		{
 			killThreadById(firstThread);

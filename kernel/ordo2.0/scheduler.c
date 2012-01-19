@@ -22,6 +22,17 @@ static int counter = 0;
 volatile int itEnabled = FALSE;
 static int removeGThreadFromActivable(gThread* toRemove);
 
+
+/*
+ * TODO: make a garbage collector thread
+ *
+ */
+
+void idle()
+{
+	for(;;);
+}
+
 void disableInterrupt()
 {
 	itEnabled = FALSE;
@@ -43,6 +54,9 @@ static void initGThreadingSystem()
 	firstThread = mainThread;
 	currentThread = mainThread;
 
+	createGThread(&idle,NULL,100);
+	itEnabled = FALSE;
+
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = yield;
 	sa.sa_flags = SA_RESTART | SA_NODEFER;
@@ -58,6 +72,7 @@ int createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 {
 
 	gThread *newThread = malloc(sizeof(gThread));
+	itEnabled = FALSE;
 	if (counter == 0)
 	{
 		initGThreadingSystem();
@@ -80,18 +95,36 @@ void yield()
 	gThread* old;
 	gThread* toDeletion;
 	gThread* iter;
+	gThread* iter2;
 	gThread* next;
 	iter = threadInWaitingState ;
 	while (iter != NULL)
 	{
 		iter->timeToWait -= (SWITCH_LAPSE_SEC*1000+SWITCH_LAPSE_MILLI );
-		next = iter->next;
 		if (iter->timeToWait <= 0)
 		{
+			next = iter->next;
 			iter->next = firstThread;
 			firstThread = iter;
+			if (iter == threadInWaitingState)
+			{
+				threadInWaitingState = next;
+			}
+			else
+			{
+				iter2 = threadInWaitingState;
+				while(iter2->next!=iter)
+				{
+					iter2 = iter2->next;
+				}
+				iter2->next = next;
+			}
+			iter = next;
 		}
-		iter = next->next;
+		else
+		{
+			iter = iter->next;
+		}
 	}
 	while (threadForDeletion != NULL)
 	{
@@ -137,9 +170,11 @@ int killThreadById(int id)
 			return -1;
 		}
 	}
+	disableInterrupt();
 	removeGThreadFromActivable(iter);
 	free(iter->stack);
 	free(iter);
+	enableInterrupt();
 	return 1;
 
 
@@ -148,7 +183,6 @@ int killThreadById(int id)
 static int removeGThreadFromActivable(gThread* toRemove)
 {
 	gThread* iter = firstThread;
-	disableInterrupt();
 	if (toRemove == firstThread)
 	{
 		firstThread = firstThread->next;
@@ -174,9 +208,12 @@ static int removeGThreadFromActivable(gThread* toRemove)
 		if (currentThread == toRemove)
 		{
 			currentThread = iter->next;
+			if (currentThread == NULL)
+			{
+				currentThread = firstThread;
+			}
 		}
 	}
-	enableInterrupt();
 	return 1;
 }
 
@@ -189,7 +226,8 @@ void sleepMS(int time)
 	removeGThreadFromActivable(tmp);
 	tmp->next = threadInWaitingState;
 	threadInWaitingState = tmp;
-	mctx_restore(&(currentThread->context));
+	enableInterrupt();
+	mctx_switch(&(tmp->context),&(currentThread->context));
 }
 
 
@@ -201,5 +239,6 @@ void exitCurrentThread()
 	removeGThreadFromActivable(currentThread);
 	save->next = threadForDeletion;
 	threadForDeletion = save;
+	enableInterrupt();
 	mctx_restore(&(currentThread->context));
 }
