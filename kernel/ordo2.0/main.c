@@ -1,15 +1,14 @@
 #include "scheduler.h"
 
-
-
 void child()
 {
 	int i;
 	for (i=0;i< 222;i++)
 	{
 		printf("child\n");
-		sleep(1);
+		gSleepMs(10000);
 	}
+    exitCurrentThread();
 }
 void child2()
 {
@@ -17,9 +16,9 @@ void child2()
 	for (i=0;i< 5;i++)
 	{
 		printf("child2\n");
-		sleepMS(10000);
-		sleep(1);
+		gSleepMs(10000);
 	}
+    exitCurrentThread();
 }
 
 int main()
@@ -30,8 +29,7 @@ int main()
 	for (i=0;i< 110;i++)
 	{
 		printf("main\n");
-	/*	sleepMS(10000);*/
-		sleep(10);
+        gSleepMs(10000);
 		if (i==2)
 		{
 			killThreadById(firstThread);

@@ -5,12 +5,21 @@
 /* un pile d'un mega */
 #define STACK_SIZE 1048576
 
+#define THREAD_ID int
 
-int createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize);
-void disableInterrupt();
-void enableInterrupt();
-int killThreadById(int id);
-void sleepMS(int time);
+/* Time for RoundRobin, sec in int and milli in int */
+#define SWITCH_LAPSE_SEC 0
+#define SWITCH_LAPSE_MILLI 1
+
+#define ERROR -1
+#define OK 1
+
+THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize);
+
+int killThreadById(THREAD_ID id);
+
+void gSleepMs(int milliseconds);
+
 /* Function to exit the current thread, do not use to exit the
  * main thread
  */

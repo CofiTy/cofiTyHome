@@ -1,14 +1,10 @@
 #include "scheduler.h"
 
-/* Time for RoundRobin, sec in int and milli in int */
-#define SWITCH_LAPSE_SEC 1
-#define SWITCH_LAPSE_MILLI 0
-
 typedef struct gThread
 {
 	struct gThread *next;
 	mctx_t context;
-	int id;
+	THREAD_ID id;
 	int timeToWait;
 	char *stack;
 } gThread;
@@ -17,16 +13,25 @@ static gThread *firstThread = NULL;
 static gThread *currentThread = NULL;
 static gThread *threadForDeletion = NULL;
 static gThread *threadInWaitingState = NULL;
-/*static gThread *sleepingThread = NULL;*/
-static int counter = 0;
+static THREAD_ID counter = 0;
 volatile int itEnabled = FALSE;
+
 static int removeGThreadFromActivable(gThread* toRemove);
 
-
-/*
- * TODO: make a garbage collector thread
- *
- */
+void gc()
+{
+	gThread* toDeletion;
+    for(;;)
+    {
+        while (threadForDeletion != NULL)
+        {
+            toDeletion = threadForDeletion;
+            threadForDeletion = threadForDeletion->next;
+            free(toDeletion->stack);
+            free(toDeletion);
+        }
+    }
+}
 
 void idle()
 {
@@ -54,7 +59,6 @@ static void initGThreadingSystem()
 	firstThread = mainThread;
 	currentThread = mainThread;
 
-
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = yield;
 	sa.sa_flags = SA_RESTART | SA_NODEFER;
@@ -65,9 +69,10 @@ static void initGThreadingSystem()
 	setitimer(ITIMER_REAL, &value, (struct itimerval *)0);
 
 	createGThread(&idle,NULL,100);
+    createGThread(&gc, NULL, 0);
 }
 
-int createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
+THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 {
 
 	gThread *newThread = malloc(sizeof(gThread));
@@ -92,7 +97,6 @@ int createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 void yield()
 {
 	gThread* old;
-	gThread* toDeletion;
 	gThread* iter;
 	gThread* iter2;
 	gThread* next;
@@ -125,17 +129,10 @@ void yield()
 			iter = iter->next;
 		}
 	}
-	while (threadForDeletion != NULL)
-	{
-		toDeletion = threadForDeletion;
-		threadForDeletion = threadForDeletion->next;
-		free(toDeletion->stack);
-		free(toDeletion);
-	}
-	if (itEnabled == TRUE)
+    if (itEnabled == TRUE)
 	{
 		if(currentThread->context.toDelete)
-	    	{
+	    {
 			exitCurrentThread();
 		}
 		old = currentThread;
@@ -152,21 +149,23 @@ void yield()
 	}
 }
 
-int killThreadById(int id)
+int killThreadById(THREAD_ID id)
 {
 	gThread* iter;
 	iter = firstThread;
-	/* on ne peut pas tuer le thread main */
-	if (id == 0)
+	/* Cannot Kill main, idle and gc thread,
+     * the first three ones.
+     */
+	if (id == 0 || id == 1 || id ==2 )
 	{
-		return -1;
+		return ERROR;
 	}
 	while (iter->id != id)
 	{
 		iter = iter->next;
 		if (iter == NULL)
 		{
-			return -1;
+			return ERROR;
 		}
 	}
 	disableInterrupt();
@@ -174,7 +173,7 @@ int killThreadById(int id)
 	free(iter->stack);
 	free(iter);
 	enableInterrupt();
-	return 1;
+	return OK;
 
 
 }
@@ -190,7 +189,7 @@ static int removeGThreadFromActivable(gThread* toRemove)
 			currentThread = firstThread;
 		}
 		enableInterrupt();
-		return 1;
+		return OK;
 	}
 	else
 	{
@@ -199,8 +198,8 @@ static int removeGThreadFromActivable(gThread* toRemove)
 			iter = iter->next;
 			if (iter->next == NULL)
 			{
-			enableInterrupt();
-				return -1;
+			    enableInterrupt();
+				return ERROR;
 			}
 		}
 		iter->next = toRemove->next;
@@ -213,14 +212,14 @@ static int removeGThreadFromActivable(gThread* toRemove)
 			}
 		}
 	}
-	return 1;
+	return OK;
 }
 
-void sleepMS(int time)
+void gSleepMs(int milliseconds)
 {
 	gThread* tmp;
 	disableInterrupt();
-	currentThread->timeToWait = time;
+	currentThread->timeToWait = milliseconds;
 	tmp = currentThread;
 	removeGThreadFromActivable(tmp);
 	tmp->next = threadInWaitingState;
