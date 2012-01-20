@@ -3,10 +3,10 @@
 void child()
 {
 	int i;
-	for (i=0;i< 222;i++)
+	for (i=0;i<3;i++)
 	{
 		printf("child\n");
-		gSleepMs(10000);
+		gSleep(1);
 	}
     exitCurrentThread();
 }
@@ -16,7 +16,7 @@ void child2()
 	for (i=0;i< 5;i++)
 	{
 		printf("child2\n");
-		gSleepMs(10000);
+		gSleep(1);
 	}
     exitCurrentThread();
 }
@@ -24,16 +24,19 @@ void child2()
 int main()
 {
 	int i;
-	int firstThread = createGThread(&child,NULL, 0);
-	createGThread(&child2,NULL, 0);
-	for (i=0;i< 110;i++)
+	/*THREAD_ID firstThread =*/createGThread(&child,NULL, 0);
+	/*THREAD_ID secondThread = createGThread(&child2,NULL, 0);*/
+	for (i = 0;; i++)
 	{
 		printf("main\n");
-        gSleepMs(10000);
-		if (i==2)
+        gSleep(1);
+        exitCurrentThread();
+       /* 
+		if (i==12)
 		{
 			killThreadById(firstThread);
 		}
+        */
 	}
 	return 1;
 }
