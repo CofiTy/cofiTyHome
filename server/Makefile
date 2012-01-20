@@ -7,9 +7,13 @@ CCFLAGS=-g -O0 -Wall
 LDFLAGS=
 RMFLAGS=-f
 EXE=CofiTyHome
-LIBS=-lpthread -lrt -Llib -ljson
+LIBS=-lpthread -lrt -Llib -ljson -lfl
 EFFACE=clean
-OBJ=$(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o $(BUILDDIR)guiInterface.o
+OBJ=$(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o $(BUILDDIR)guiInterface.o $(BUILDDIR)actions.o $(BUILDDIR)sensors.o $(BUILDDIR)rules.o $(BUILDDIR)rules.tab.o 
+FLEX=$(wildcard $(SRCDIR)*.l)
+BISON=$(wildcard $(SRCDIR)*.y)
+
+
 
 $(EXE) : $(OBJ) $(BUILDDIR)main.o
 		$(EDL) $(LDFLAGS) -o $(EXE) $(OBJ) $(LIBS) $(BUILDDIR)main.o
