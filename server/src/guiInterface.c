@@ -13,16 +13,29 @@ typedef enum {
 }MsgTypes;
 
 void processTypeInitialise(){
+  puts("Initialisation detected");
 }
 
 void processTypeConfiguration(){
   puts("Type Configuration Error");
 }
 
-void processTypeCommand(){
+void processTypeCommand(struct json_object* command){
+  char* com = json_object_get_string(command);
+  printf("Commande : %s\n", com);
 }
 
-void processTypeUpdate(){
+void processTypeUpdate(struct json_object* update){
+  
+  char* string;
+  int i,lenght;
+  struct json_object* tmp;
+  lenght = json_object_array_length(update);
+  for(i = 0; i < lenght; i++){
+    tmp = json_object_array_get_idx(update, i);
+    string = json_object_get_string(tmp);
+  }
+
 }
 
 void processTypeData(){
@@ -30,6 +43,7 @@ void processTypeData(){
 }
 
 void processTypeClose(){
+  puts("Close detected!");
 }
 
 void processCommand(char * command){
@@ -41,7 +55,7 @@ void processCommand(char * command){
   objCommand = json_tokener_parse(command);
   objPart = json_object_object_get(objCommand, "type");
 
-  type =  json_object_get_int(objPart);
+  type = json_object_get_int(objPart);
   
   switch(type){
 
@@ -54,11 +68,11 @@ void processCommand(char * command){
       break;
 
     case COMMAND:
-      processTypeCommand();
+      processTypeCommand(objPart);
       break;
 
     case UPDATE:
-      processTypeUpdate();
+      processTypeUpdate(objPart);
       break;
 
     case DATA:

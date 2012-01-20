@@ -1,16 +1,14 @@
 #include "scheduler.h"
 
-
-
 void child()
 {
 	int i;
-	for (i=0;i< 2;i++)
+	for (i=0;i<3;i++)
 	{
 		printf("child\n");
-		sleep(1);
+		gSleep(1);
 	}
-	/*exitCurrentThread();*/
+    /*exitCurrentThread();*/
 }
 void child2()
 {
@@ -18,20 +16,26 @@ void child2()
 	for (i=0;i< 5;i++)
 	{
 		printf("child2\n");
-		sleep(1);
+		gSleep(1);
 	}
-	/*exitCurrentThread();*/
+    exitCurrentThread();
 }
 
 int main()
 {
 	int i;
-  createGThread(&child,NULL, 0);
-  createGThread(&child2,NULL, 0);
-	for (i=0;i< 10;i++)
+	/*THREAD_ID firstThread =*/createGThread(&child,NULL, 0);
+	/*THREAD_ID secondThread = createGThread(&child2,NULL, 0);*/
+	for (i = 0;; i++)
 	{
 		printf("main\n");
-		sleep(1);
+        gSleep(1);
+       /* 
+		if (i==12)
+		{
+			killThreadById(firstThread);
+		}
+        */
 	}
 	return 1;
 }

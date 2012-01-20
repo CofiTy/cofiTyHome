@@ -29,14 +29,15 @@ void * sensorsMsgRec(){
   {
     /* reception form sensors */
     nb = recv(sock, buff, 128, 0);
-    FAIL(nb)
+    FAIL(nb);
 
-      total += nb;
+    total += nb;
     receiving += nb;
 
     /* If enough data we can process */
-    if(total >= 104)
+    if(total >= 27)
     {
+      printf("Trame : %s\n", buff);
       puts("recv");
       total = 0;
       receiving = (char *) buff[0];
@@ -54,17 +55,18 @@ void * sensorsMsgSend(){
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb= mq_receive(mqSensorsSend, buff, 128, 0);
-    FAIL(nb)
+    return NULL;
+    nb = mq_receive(mqSensorsSend, buff, 128, 0);
+    FAIL(nb);
 
-      total = nb;
+    total = nb;
     nbSent = 0;
     while(nbSent < total)
     {
       /* Sending toward sensors */
       nb = send(sock, sending, nb, 0);
-      FAIL(nb)
-        nbSent += nb;
+      FAIL(nb);
+      nbSent += nb;
       sending += nb;
     }
     puts("sent");
@@ -79,7 +81,7 @@ void sensorsNetworkStart(){
   struct sockaddr_in saddr;
   memset(&saddr, 0, sizeof(struct sockaddr_in));
 
-  saddr.sin_addr.s_addr = inet_addr("134.214.1.28"); //TODO macro avec les bonnes valeur
+  saddr.sin_addr.s_addr = inet_addr("134.214.105.28"); //TODO macro avec les bonnes valeur
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5000); //TODO macro avec les bonnes valeur
 
@@ -102,7 +104,8 @@ void sensorsNetworkStop(){
 
   pthread_kill(pthreadSensorsRec, SIGTERM);
   pthread_kill(pthreadSensorsSend, SIGTERM);
-  close(sock);
+  FAIL(close(sock));
+  FAIL(mq_close(mqSensorsSend));
 }
 
 int sensorsNetworkSend(const char * msg_ptr, size_t msg_len){
