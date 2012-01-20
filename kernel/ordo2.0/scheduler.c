@@ -203,7 +203,7 @@ THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 {
 
 	gThread *newThread;
-	itEnabled = FALSE;
+	disableInterrupt();
 	if (counter == 0)
 	{
 		initGThreadingSystem();
@@ -219,6 +219,7 @@ THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
 	newThread->next = firstThread;
 	firstThread = newThread;
 	itEnabled = TRUE;
+    enableInterrupt();
 	return newThread->id;
 }
 
