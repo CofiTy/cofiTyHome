@@ -8,7 +8,7 @@ void child()
 		printf("child\n");
 		gSleep(1);
 	}
-    exitCurrentThread();
+    /*exitCurrentThread();*/
 }
 void child2()
 {
@@ -30,7 +30,6 @@ int main()
 	{
 		printf("main\n");
         gSleep(1);
-        exitCurrentThread();
        /* 
 		if (i==12)
 		{

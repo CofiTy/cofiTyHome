@@ -2,34 +2,59 @@
 
 #include "scheduler.h"
 
+/**
+ * Private thread structure (linked list).
+ */
 typedef struct gThread
 {
-	struct gThread *next;
-	mctx_t context;
-	THREAD_ID id;
-	time_t timeToWait;
-	char *stack;
+	struct gThread *next; /* Next Thread */
+	mctx_t context;       /* Context (see gThread.h) */
+	THREAD_ID id;         /* Thread Id */
+	time_t timeToWait;    /* Timestamp when wake up if sleeping */
+	char *stack;          /* Stack */
 } gThread;
 
+/**
+ * Pointer to the firstThread of the Activable List.
+ */
 static gThread *firstThread = NULL;
+
+/**
+ * Running Thread.
+ */
 static gThread *currentThread = NULL;
+
+/**
+ * List of ended threads to delete.
+ */
 static gThread *threadForDeletion = NULL;
+
+/**
+ * List of sleeping threads.
+ */
 static gThread *threadInWaitingState = NULL;
+
+/**
+ * Thread Id Counter.
+ */
 static THREAD_ID counter = 0;
+
+/**
+ * Tell if interrupts are enabled.
+ */
 volatile int itEnabled = FALSE;
 
-static int removeGThreadFromActivable(gThread* toRemove);
-
-static int removeGThreadFromWaiting(gThread* toRemove);
-
+/**
+ * Garbage Collection Thread,
+ * Remove killed or stopped threads.
+ */
 void gc()
 {
-	gThread* toDeletion;
     for(;;)
     {
         while (threadForDeletion != NULL)
         {
-            toDeletion = threadForDeletion;
+	        gThread* toDeletion = threadForDeletion;
             threadForDeletion = threadForDeletion->next;
             free(toDeletion->stack);
             free(toDeletion);
@@ -37,132 +62,19 @@ void gc()
     }
 }
 
+/**
+ * Idle Thread, used
+ * to get more than one thread.
+ * TODO: I think it's no useful anymore...
+ */
 void idle()
 {
 	for(;;);
 }
 
-void disableInterrupt()
-{
-	itEnabled = FALSE;
-}
-void enableInterrupt()
-{
-	itEnabled = TRUE;
-}
-
-static void initGThreadingSystem()
-{
-	gThread *mainThread = malloc(sizeof(gThread));
-	static struct sigaction sa;
-	struct itimerval value;
-
-	mainThread->id = counter++;
-	mainThread->next = firstThread;
-	mainThread->stack = malloc(STACK_SIZE);
-	firstThread = mainThread;
-	currentThread = mainThread;
-
-	sigemptyset(&sa.sa_mask);
-	sa.sa_handler = yield;
-	sa.sa_flags = SA_RESTART | SA_NODEFER;
-	sigaction(SIGALRM, &sa, (struct sigaction *)0);
-	value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
-	value.it_interval.tv_usec = SWITCH_LAPSE_MILLI*1000;
-	value.it_value = value.it_interval;
-	setitimer(ITIMER_REAL, &value, (struct itimerval *)0);
-
-	createGThread(&idle,NULL,100);
-    createGThread(&gc, NULL, 0);
-}
-
-THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
-{
-
-	gThread *newThread = malloc(sizeof(gThread));
-	itEnabled = FALSE;
-	if (counter == 0)
-	{
-		initGThreadingSystem();
-	}
-	if(stackSize < STACK_SIZE)
-	{
-		stackSize = STACK_SIZE;
-	}
-	newThread->id = counter++;
-	newThread->stack = malloc(stackSize);
-	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, STACK_SIZE);
-	newThread->next = firstThread;
-	firstThread = newThread;
-	itEnabled = TRUE;
-	return newThread->id;
-}
-
-void yield()
-{
-    gThread *old;
-    while(threadInWaitingState != NULL
-            && threadInWaitingState->timeToWait <= time(NULL))
-    {
-        gThread *threadToWakeUp = threadInWaitingState;
-        removeGThreadFromWaiting(threadToWakeUp);            
-        threadToWakeUp->next = firstThread;
-        firstThread = threadToWakeUp;
-    }
-
-    if (itEnabled == TRUE)
-	{
-		if(currentThread->context.toDelete)
-	    {
-			exitCurrentThread();
-		}
-		old = currentThread;
-		if (currentThread->next == NULL)
-		{
-			currentThread = firstThread;
-		}
-		else
-		{
-			currentThread = currentThread->next;
-		}
-		mctx_switch(&(old->context),&(currentThread->context));
-		enableInterrupt();
-	}
-}
-
-int killThreadById(THREAD_ID id)
-{
-	gThread* iter;
-    disableInterrupt();
-	/* Cannot Kill main, idle and gc thread,
-     * the first three ones.
-     */
-	if (id == 0 || id == 1 || id ==2 )
-	{
-        enableInterrupt();
-		return ERROR;
-	}
-
-    iter = firstThread;
-	while (iter != NULL && iter->id != id)
-	{
-		iter = iter->next;
-	}
-    if(iter == NULL)
-    {
-        enableInterrupt();
-        return ERROR;
-    }
-    if(removeGThreadFromActivable(iter) != OK)
-    {
-        removeGThreadFromWaiting(iter);
-    }
-	free(iter->stack);
-	free(iter);
-	enableInterrupt();
-	return OK;
-}
-
+/**
+ * Remove a given thread from waiting thread list.
+ */
 static int removeGThreadFromWaiting(gThread* toRemove)
 {
 	gThread* iter = threadInWaitingState;
@@ -198,6 +110,9 @@ static int removeGThreadFromWaiting(gThread* toRemove)
 	return OK;
 }
 
+/**
+ * Remove a given thread from activable thread list.
+ */
 static int removeGThreadFromActivable(gThread* toRemove)
 {
 	gThread* iter = firstThread;
@@ -233,6 +148,158 @@ static int removeGThreadFromActivable(gThread* toRemove)
 	return OK;
 }
 
+/**
+ * Disable Interrupts.
+ * Basically, its don't do the yield
+ * at each clock top.
+ */
+void disableInterrupt()
+{
+	itEnabled = FALSE;
+}
+
+/**
+ * Enable Interrupts.
+ */
+void enableInterrupt()
+{
+	itEnabled = TRUE;
+}
+
+/**
+ * Initialise the threading system by
+ * creating a main, gc and idle thread.
+ */
+static void initGThreadingSystem()
+{
+	gThread *mainThread = malloc(sizeof(gThread));
+	static struct sigaction sa;
+	struct itimerval value;
+
+	mainThread->id = counter++;
+	mainThread->next = firstThread;
+	mainThread->stack = malloc(STACK_SIZE);
+	firstThread = mainThread;
+	currentThread = mainThread;
+
+	sigemptyset(&sa.sa_mask);
+	sa.sa_handler = yield;
+	sa.sa_flags = SA_RESTART | SA_NODEFER;
+	sigaction(SIGALRM, &sa, (struct sigaction *)0);
+	value.it_interval.tv_sec = SWITCH_LAPSE_SEC;
+	value.it_interval.tv_usec = SWITCH_LAPSE_MILLI*1000;
+	value.it_value = value.it_interval;
+	setitimer(ITIMER_REAL, &value, (struct itimerval *)0);
+
+	createGThread(&idle,NULL,100);
+    createGThread(&gc, NULL, 0);
+}
+
+/**
+ * Create a new thread, 
+ * initialise the threading system if not done before.
+ */
+THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize)
+{
+
+	gThread *newThread;
+	itEnabled = FALSE;
+	if (counter == 0)
+	{
+		initGThreadingSystem();
+	}
+	if(stackSize < STACK_SIZE)
+	{
+		stackSize = STACK_SIZE;
+	}
+    newThread = malloc(sizeof(gThread));
+	newThread->id = counter++;
+	newThread->stack = malloc(stackSize);
+	mctx_create(&(newThread->context), sf_addr,sf_arg, newThread->stack, STACK_SIZE);
+	newThread->next = firstThread;
+	firstThread = newThread;
+	itEnabled = TRUE;
+	return newThread->id;
+}
+
+/**
+ * If interrupts are enabled,
+ * try to wake up the sleeping threads,
+ * switch context with the next thread of the
+ * activable list.
+ */
+void yield()
+{
+    gThread *old;
+    if (itEnabled == TRUE)
+    {
+        while(threadInWaitingState != NULL
+                && threadInWaitingState->timeToWait <= time(NULL))
+        {
+            gThread *threadToWakeUp = threadInWaitingState;
+            removeGThreadFromWaiting(threadToWakeUp);            
+            threadToWakeUp->next = firstThread;
+            firstThread = threadToWakeUp;
+        }
+		if(currentThread->context.toDelete)
+	    {
+			exitCurrentThread();
+		}
+		old = currentThread;
+		if (currentThread->next == NULL)
+		{
+			currentThread = firstThread;
+		}
+		else
+		{
+			currentThread = currentThread->next;
+		}
+		mctx_switch(&(old->context),&(currentThread->context));
+		enableInterrupt();
+	}
+}
+
+/**
+ * Kill a thread by its id.
+ * Try to remove it from the activable list,
+ * and then try the waiting list.
+ */
+int killThreadById(THREAD_ID id)
+{
+	gThread* iter;
+    disableInterrupt();
+	/* Cannot Kill main, idle and gc thread,
+     * the first three ones.
+     */
+	if (id == 0 || id == 1 || id ==2 )
+	{
+        enableInterrupt();
+		return ERROR;
+	}
+
+    iter = firstThread;
+	while (iter != NULL && iter->id != id)
+	{
+		iter = iter->next;
+	}
+    if(iter == NULL)
+    {
+        enableInterrupt();
+        return ERROR;
+    }
+    if(removeGThreadFromActivable(iter) != OK)
+    {
+        removeGThreadFromWaiting(iter);
+    }
+	free(iter->stack);
+	free(iter);
+	enableInterrupt();
+	return OK;
+}
+
+/**
+ * Put a thread in the waiting list for given amount of seconds.
+ */
 void gSleep(int seconds)
 {
 	gThread *toSleep, *iter, *prev;
@@ -266,7 +333,12 @@ void gSleep(int seconds)
 	mctx_switch(&(toSleep->context),&(currentThread->context));
 }
 
-
+/**
+ * Exit current thread, except if threading not initialised,
+ * and if were in the main/gc/idle thread.
+ *
+ * This function is optionnal, a return will do the same thing.
+ */
 void exitCurrentThread()
 {
     gThread *save;
