@@ -1,17 +1,20 @@
 #include "sensors.h"
 
-sensorType * getSensor(char id[8]) {
-    sensorType * current = sensors;
-
+struct sensorType * getSensor(char id[8]) {
+    struct sensorType * current = sensors;
+    
     while (current != 0) {
-        if (memcmp(current->id, id, sizeof (char) *8)) {
+        if (strcmp(current->id, id) == 0) {
             return current;
         }
-
-        return 0;
+        
+        current = current->nextSensor;
     }
+    
+    printf("Sensor not recognized : %s !!!\n", id);
+    return 0;
 }
 
-void decodeTemperature(char* trame, sensorType * capteur) {
+void decodeTemperature(char* trame, struct sensorType * capteur) {
     ((dataTEMPERATURE*) capteur->data)->temp = B0;
 }

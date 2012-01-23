@@ -2,14 +2,20 @@ rule:
 	temperature
 conditions:	
 	cap1>30
+	cap1>=20
+actions:
+	act1
+rule:	
+	pipi
+conditions:	
+	cap1>5
 	cap2<=20
 actions:
 	act1
-
 rule:
 	cafe
-conditions:	
-	cap1=30
-	cap2>=20
+conditions:
+	cap2<=5	
+	cap1==35
 actions:
 	act1
