@@ -18,3 +18,16 @@ struct sensorType * getSensor(char id[8]) {
 void decodeTemperature(char* trame, struct sensorType * capteur) {
     ((dataTEMPERATURE*) capteur->data)->temp = B0;
 }
+
+
+void decodeContact(char* trame, struct sensorType* capteur){
+
+}
+
+void decodePresence(char* trame, struct sensorType* capteur){
+
+}
+
+void decodeInterrupteur(char* trame, struct sensorType* capteur){
+
+}

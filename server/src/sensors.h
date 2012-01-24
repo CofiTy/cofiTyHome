@@ -30,14 +30,14 @@ typedef struct dataTEMPERATURE {
     int temp;
 } dataTEMPERATURE;
 
-void decodeTemperature(char* trame, struct sensorType* capteur);
+extern void decodeTemperature(char* trame, struct sensorType* capteur);
 
 //----- CONTACT ------------------------------------------------------------------------
 typedef struct dataCONTACT {
     char contact;
 } dataCONTACT;
 
-void decodeContact(char* trame, struct sensorType* capteur);
+extern void decodeContact(char* trame, struct sensorType* capteur);
 
 //----- PRESENCE ------------------------------------------------------------------------
 typedef struct dataPRESENCE {
@@ -46,7 +46,7 @@ typedef struct dataPRESENCE {
 } dataPRESENCE;
 
 #
-void decodePresence(char* trame, struct sensorType* capteur);
+extern void decodePresence(char* trame, struct sensorType* capteur);
 
 
 //----- INTERRUPTEUR --------------------------------------------------------------------
@@ -64,4 +64,4 @@ typedef struct dataINTERRUPTEUR {
 } dataINTERRUPTEUR;
 
 
-void decodeInterrupteur(char* trame, struct sensorType* capteur);
+extern void decodeInterrupteur(char* trame, struct sensorType* capteur);

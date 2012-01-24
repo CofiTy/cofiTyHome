@@ -11,8 +11,6 @@
       fprintf(stderr, "%s\n", msg);
     }
 
-    
-
     //-- Lexer prototype required by bison, aka getNextToken()
     int yylex();
 
@@ -25,6 +23,8 @@
 
     struct RULE * currentRule;
     struct CONDITION * currentCondition;
+
+    struct sensorType * currentSensor;
 
 %}
 
@@ -42,14 +42,97 @@
 %token <chaine> LESS  
 %token <chaine> IDENTIFIER
 %token <valeur> NUMBER
+
+%token <valeur> CINTERRUPTEUR
+%token <valeur> CPRESENCE
+%token <valeur> CTEMPERATURE
+%token <valeur> CCONTACT
  
-%type  <chaine> root onerule someconditions someactions operator ruleid onecondition conditionid
+%type <chaine> root 
+%type <chaine> parseSensors oneSensor initSensor
+%type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
  
 %%
- 
+
 root:
+        parseSensors
+        | parseRules
+;
+
+/*************** Capteurs ***************/
+
+parseSensors:
+        oneSensor 
+        | oneSensor parseSensors
+;
+
+oneSensor:
+        initSensor typeSensor IDENTIFIER
+{
+    printf("Sensor %s\n", $3);
+    strcpy(currentSensor->id, $3);
+};
+        | initSensor typeSensor NUMBER
+{
+    printf("Sensor %d\n", $3);
+
+    sprintf(currentSensor->id, "%d", $3);
+
+};
+
+initSensor:
+{
+    struct sensorType * old = currentSensor;
+
+    currentSensor = calloc(1, sizeof(struct sensorType));
+
+    if(sensors == 0){
+        sensors = currentSensor;
+    } else {
+        old->nextSensor = currentSensor;
+    }
+};
+
+typeSensor:
+        CINTERRUPTEUR
+{
+    currentSensor->type = INTERRUPTEUR;
+
+    currentSensor->data = calloc(1, sizeof(dataINTERRUPTEUR));
+
+    currentSensor->decode = decodeInterrupteur;
+};
+        | CPRESENCE
+{
+    currentSensor->type = PRESENCE;
+
+    currentSensor->data = calloc(1, sizeof(dataPRESENCE));
+
+    currentSensor->decode = decodePresence;
+};
+        | CTEMPERATURE
+{
+    currentSensor->type = TEMPERATURE;
+
+    currentSensor->data = calloc(1, sizeof(dataTEMPERATURE));
+
+    currentSensor->decode = decodeTemperature;
+};
+        | CCONTACT
+{
+    currentSensor->type = CONTACT;
+
+    currentSensor->data = calloc(1, sizeof(dataCONTACT));
+
+    currentSensor->decode = decodeContact;
+};
+
+
+/*************** Règles ***************/
+
+parseRules:
     onerule
-    | root onerule
+    | parseRules onerule
 ;
 
 onerule:
@@ -102,7 +185,11 @@ conditionid:
 };
 
 numberid:
-    NUMBER
+    IDENTIFIER
+{
+    currentCondition->value = atoi($1);
+};
+    | NUMBER
 {
     currentCondition->value = $1;
 };
@@ -136,15 +223,28 @@ someactions:
 };
 	| IDENTIFIER someactions
 
-
  
 %%
 
-parse() {
-	printf("%s\n", "start");
+parseSensors() {
+	printf("%s\n", "Parsing Sensors..");
+
+	yyin = fopen( "config/sensors", "r" );
+
+	yyparse();
+}
+
+parseRules() {
+	printf("%s\n", "Parsing Rules..");
 
 	yyin = fopen( "config/rules", "r" );
-	//yylex();
 	yyparse();
+}
+
+parseAll() {
+	printf("%s\n", "Start Parsing..");
+
+	parseSensors();
+        parseRules();
 }
 

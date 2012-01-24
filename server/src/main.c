@@ -11,6 +11,7 @@ int main(int argc, char ** argv){
     guiNetworkStop();
 */
     
+/*
     sensors = calloc(1, sizeof(struct sensorType));
 
     sensors->data = calloc(1, sizeof(dataTEMPERATURE));
@@ -25,9 +26,10 @@ int main(int argc, char ** argv){
 
     ((dataTEMPERATURE*)sensors->nextSensor->data)->temp = 5;
     strcpy(sensors->nextSensor->id, "cap2");
+*/
 
     
-    parse();
+    parseAll();
 
     applyRules();
 
