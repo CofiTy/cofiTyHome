@@ -1,0 +1,18 @@
+######################################################
+#
+#  Fichier de règles.
+#
+#  Format:
+#
+#  rule:
+#  	nomRegle
+#  conditions:
+#  	idCapteur operateur valeur
+#  	nomCapteur operateur valeur
+#  actions:
+#  	nomAction
+#  ...
+#  
+#####################################################
+
+
