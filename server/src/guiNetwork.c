@@ -33,12 +33,14 @@ List clientList;
 void * guiMsgRec(void* data){
 
   char buff[128];
-  int nb, total;
+  int i, nb, total, blocs;
+  int over = 0;
   char* receiving = (char *) buff[0];
   Client* client = (Client*)data;
 
   memset(buff, 0, 128);
   total = 0;
+  blocs = 0;
 
   for(;;)
   {
@@ -48,13 +50,28 @@ void * guiMsgRec(void* data){
     total += nb;
     receiving += nb;
 
+    i = 0;
+    while(!over && i < strlen(buff)){
+      if(buff[i] == '{'){
+        ++blocs;
+      } else if(buff[i] == '}'){
+        --blocs;
+      }
+      if(blocs == 0){
+        over = 1;
+      }
+      ++i;
+    }
+
     /* If enough data we can process */
-    if(buff[total - 1] == '#')
+    if(over)
     {
       puts("recv");
       total = 0;
+      blocs = 0;
+      over = 0;
       receiving = (char *) buff[0];
-      memset(buff, 0, 128);
+      memset(buff, '\0', 128);
     }
   }
 }
@@ -102,7 +119,7 @@ void * guiNetworkConnexion(){
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5003);
 
-  acceptSock = socket(AF_INET, SOCK_STREAM, 0); //Version portable des sockets non bloquants
+  acceptSock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(acceptSock);
   
   FAIL(bind(acceptSock, (struct sockaddr *)&saddr, sizeof(saddr)));
