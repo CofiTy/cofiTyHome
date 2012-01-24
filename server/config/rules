@@ -1,3 +1,21 @@
+######################################################
+#
+#  Fichier de règles.
+#
+#  Format:
+#
+#  rule:
+#  	nomRegle
+#  conditions:
+#  	idCapteur operateur valeur
+#  	nomCapteur operateur valeur
+#  actions:
+#  	nomAction
+#  ...
+#  
+#####################################################
+
+
 rule:	
 	temperature
 conditions:	
@@ -5,6 +23,7 @@ conditions:
 	00053F44>=20
 actions:
 	act1
+	
 rule:	
 	pipi
 conditions:	
@@ -12,6 +31,7 @@ conditions:
 	0021CBE2<=20
 actions:
 	act1
+	
 rule:
 	cafe
 conditions:

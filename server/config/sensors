@@ -1,3 +1,21 @@
+######################################################
+#
+#  Fichier de capteurs.
+#
+#  Types de capteurs disponibles actuellement :
+#  INTERRUPTEUR
+#  PRESENCE
+#  TEMPERATURE
+#  CONTACT
+#  
+#  Format:
+#
+#  typeCapteur idCapteur [nomCapteur]
+#  typeCapteur idCapteur [nomCapteur]
+#  ...
+#
+#####################################################
+
 INTERRUPTEUR 0021CBE2
 PRESENCE 00053F44
 TEMPERATURE 10020024

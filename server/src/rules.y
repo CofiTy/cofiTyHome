@@ -8,7 +8,7 @@
     #include "sensors.h"
 
     void yyerror(char * msg) {
-      fprintf(stderr, "%s\n", msg);
+      fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()

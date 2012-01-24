@@ -8,6 +8,8 @@
 
 %%
 
+^"#".*$                 {;/*Ligne de commentaires, on ignore !*/}
+
 "INTERRUPTEUR"		{ strcpy(yylval.chaine, yytext); return CINTERRUPTEUR; }
 "PRESENCE"		{ strcpy(yylval.chaine, yytext); return CPRESENCE; }
 "TEMPERATURE"		{ strcpy(yylval.chaine, yytext); return CTEMPERATURE; }
