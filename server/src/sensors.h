@@ -1,53 +1,67 @@
+#include "stdio.h"
+#include "string.h"
 
 // ########################### Capteurs ##############################
-enum buttonPressed {
-    A0,
-    A1,
-    B0,
-    B1,
-    NOONE
-} button;
 
-enum typeCapteur {
+typedef enum typeCapteur {
     TEMPERATURE,
     CONTACT,
     INTERRUPTEUR,
     PRESENCE
 } typeCapteur;
 
-//----- TEMPERATURE
+typedef struct sensorType {
+ typeCapteur type;
+ char id[8];
+ void *data;
+ struct sensorType* nextSensor;
+ void (*decode)(char* trame, struct sensorType*);
+};
+
+struct sensorType * sensors;
+
+struct sensorType * getSensor(char id[8]);
+
+//sensorType sensorList;
+
+
+//----- TEMPERATURE --------------------------------------------------------------------
 typedef struct dataTEMPERATURE {
     int temp;
 } dataTEMPERATURE;
 
-//----- CONTACT
+extern void decodeTemperature(char* trame, struct sensorType* capteur);
+
+//----- CONTACT ------------------------------------------------------------------------
 typedef struct dataCONTACT {
     char contact;
 } dataCONTACT;
 
-//----- PRESENCE
+extern void decodeContact(char* trame, struct sensorType* capteur);
+
+//----- PRESENCE ------------------------------------------------------------------------
 typedef struct dataPRESENCE {
-    char presence1;
-    char presence2;
+    char presence;
+    char luminosite;
 } dataPRESENCE;
 
-
-//----- TEMPERATURE
-typedef struct  {
-    int temp;
-    char presence;
-    char contact;
-    enum buttonPressed switchButton;
-} output;
+#
+extern void decodePresence(char* trame, struct sensorType* capteur);
 
 
+//----- INTERRUPTEUR --------------------------------------------------------------------
 
- struct sensorType {
- typeCapteur type;
- char id[8];
- char *data;
- struct sensorType* nextSensor;
- void (*decode)(char*, struct sensorType*);
-};
+typedef enum buttonPressed {
+    A0,
+    A1,
+    B0,
+    B1,
+    NONE
+} buttonPressed;
 
-typedef struct sensorType sensorList;
+typedef struct dataINTERRUPTEUR {
+    buttonPressed switchButton;
+} dataINTERRUPTEUR;
+
+
+extern void decodeInterrupteur(char* trame, struct sensorType* capteur);

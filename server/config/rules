@@ -1,0 +1,21 @@
+rule:	
+	temperature
+conditions:	
+	0021CBE2>30
+	00053F44>=20
+actions:
+	act1
+rule:	
+	pipi
+conditions:	
+	10020024>5
+	0021CBE2<=20
+actions:
+	act1
+rule:
+	cafe
+conditions:
+	0001B292<=5	
+	0001B291==35
+actions:
+	act1
