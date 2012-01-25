@@ -3,4 +3,6 @@
 
 #include "common.h"
 
+void processCommand(char * command);
+
 #endif /*GINT*/

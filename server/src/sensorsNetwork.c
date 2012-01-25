@@ -41,7 +41,6 @@ void * sensorsMsgRec(){
     while(i < (strlen(buff) - 1)){
       data[j++] = buff[i++];
       if(j == 26){
-        puts("recv");
         /*Traiter data*/
         printf("Trame : %s\n", data);
         j = 0;
@@ -49,7 +48,6 @@ void * sensorsMsgRec(){
       }
     }
 
-      puts("recv");
       total = 0;
       receiving = (char *) buff[0];
       memset(buff, 0, 128);

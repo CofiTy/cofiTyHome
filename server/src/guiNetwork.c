@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -10,6 +11,7 @@
 #include <unistd.h>
 
 #include "guiNetwork.h"
+#include "guiInterface.h"
 
 typedef struct Client *PClient;
 
@@ -47,6 +49,7 @@ void * guiMsgRec(void* data){
   {
     /* reception form sensors */
     nb = recv(client->sock, receiving, 128, 0);
+    puts("recv");
     FAIL(nb);
     total += nb;
     receiving += nb;
@@ -63,6 +66,7 @@ void * guiMsgRec(void* data){
       if(blocs == 0){ /* If enough data we can process */
         puts("recv");
         /*Traiter traite*/
+        processCommand(traite);
         j = 0;
         memset(traite, '\0', 128);
       }
@@ -87,7 +91,8 @@ void * guiMsgSend(void* data){
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb = mq_receive(client->mqSend, buff, 128, 0);
+    nb = mq_receive(client->mqSend, buff, 128, NULL);
+    puts("mq rec");
     FAIL(nb);
 
     total = nb;
@@ -110,6 +115,7 @@ void * guiNetworkConnexion(){
   int acceptSock, tmpSock;
   int i = 0;
   char name[32];
+  struct mq_attr attr;
 
   struct sockaddr_in saddr_client;
   struct sockaddr_in saddr;
@@ -130,7 +136,7 @@ void * guiNetworkConnexion(){
 
   for(;;){
     memset(&saddr, 0, sizeof(struct sockaddr_in));
-    sprintf(name, "mqMsgSendNb%d", i++);
+    sprintf(name, "/mqMsgSendNb%d", i++);
 
     tmpSock = accept(acceptSock, (struct sockaddr *)&saddr_client, &size_addr);
     FAIL(tmpSock);
@@ -149,8 +155,14 @@ void * guiNetworkConnexion(){
 
     clientList.current->sock = tmpSock;
 
-    clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT);
-
+    puts(name);
+    memset(&attr, 0, sizeof(struct mq_attr));
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 32;
+    attr.mq_msgsize = 64;
+    clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT, S_IRWXU, &attr);
+    FAIL(clientList.current->mqSend);
+    
     pthread_create(&clientList.current->pthreadRec, NULL, guiMsgRec, (void*)clientList.current);
     pthread_detach(clientList.current->pthreadRec);
 
