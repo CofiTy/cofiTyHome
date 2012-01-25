@@ -4,8 +4,10 @@
     #include <string.h>
     #include <stdlib.h>
 
-    #include "rules.h"
-    #include "sensors.h"
+    #include "../src/rules.h"
+    #include "../src/sensors.h"
+    #include "../src/actionneurs.h"
+    #include "../src/actions.h"
 
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
@@ -21,48 +23,64 @@
     extern int yyparse(void); /* Parser function. */
 
 
-    struct RULE * currentRule;
-    struct CONDITION * currentCondition;
+    struct rule_t * currentRule;
+    struct condition_t * currentCondition;
 
     struct sensorType * currentSensor;
+
+    struct actionneur_t * currentActionneur;
+
+    struct action_t * currentAction;
+    struct actionFct_t * currentActionFct;
 
 %}
 
 %union  { char chaine[256]; int valeur; }
 
 %start root
- 
-%token <chaine> RULE  
-%token <chaine> CONDITIONS  
-%token <chaine> ACTIONS
-%token <chaine> EQUAL  
-%token <chaine> GREATEROREQUAL  
-%token <chaine> LESSOREQUAL  
-%token <chaine> GREATER  
-%token <chaine> LESS  
-%token <chaine> IDENTIFIER
-%token <valeur> NUMBER
 
 %token <valeur> CINTERRUPTEUR
 %token <valeur> CPRESENCE
 %token <valeur> CTEMPERATURE
 %token <valeur> CCONTACT
+
+%token <valeur> CCOURRANT
+
+%token <valeur> NOMACTION
+%token <valeur> ACTIONNEURS
+%token <valeur> POINT
+
+%token <chaine> RULE
+%token <chaine> CONDITIONS
+%token <chaine> ACTIONS
+%token <chaine> EQUAL
+%token <chaine> GREATEROREQUAL
+%token <chaine> LESSOREQUAL
+%token <chaine> GREATER
+%token <chaine> LESS
+%token <chaine> IDENTIFIER
+%token <valeur> NUMBER
+
  
 %type <chaine> root 
-%type <chaine> parseSensors oneSensor initSensor
+%type <chaine> parseSensors oneSensor initSensor typeSensor
+%type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur
+%type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
  
 %%
 
 root:
         parseSensors
+        | parseActionneurs
+        | parseActions
         | parseRules
 ;
 
 /*************** Capteurs ***************/
 
 parseSensors:
-        oneSensor 
+        oneSensor
         | oneSensor parseSensors
 ;
 
@@ -127,6 +145,84 @@ typeSensor:
     currentSensor->decode = decodeContact;
 };
 
+/*************** Actionneurs ***************/
+
+parseActionneurs:
+        oneActionneur
+        | oneActionneur parseActionneurs
+;
+
+oneActionneur:
+        initActionneur typeActionneur IDENTIFIER
+{
+    printf("Actionneur %s\n", $3);
+    strcpy(currentActionneur->id, $3);
+};
+        | initActionneur typeActionneur NUMBER
+{
+    printf("Actionneur %d\n", $3);
+    sprintf(currentActionneur->id, "%d", $3);
+};
+
+initActionneur:
+{
+    struct actionneur_t * old = currentActionneur;
+
+    currentActionneur = calloc(1, sizeof(struct actionneur_t));
+
+    if(actionneurs == 0){
+        actionneurs = currentActionneur;
+    } else {
+        old->nextActionneur = currentActionneur;
+    }
+};
+
+typeActionneur:
+        CCOURRANT
+{
+    currentSensor->type = COURRANT;
+};
+
+/*************** Actions ***************/
+
+parseActions:
+        oneAction
+        | oneAction parseActions
+;
+
+oneAction:
+        NOMACTION actionId ACTIONNEURS someActionneursFct
+{
+    printf("Action %s\n", $2);
+};
+
+actionId:
+        IDENTIFIER
+{
+    struct action_t * old = currentAction;
+
+    currentAction = calloc(1, sizeof(struct action_t));
+
+    if(actions == 0){
+        actions = currentAction;
+    } else {
+        old->nextAction = currentAction;
+    }
+
+    strcpy(currentAction->nom, $1);
+};
+
+someActionneursFct:
+    oneActionneurFct
+    | oneActionneurFct someActionneursFct
+;
+
+oneActionneurFct:
+    IDENTIFIER POINT IDENTIFIER
+{
+    //TODO
+};
+
 
 /*************** Règles ***************/
 
@@ -146,9 +242,9 @@ ruleid:
 {
     printf("rule  %s\n", $2);
 
-    struct RULE * old = currentRule;
+    struct rule_t * old = currentRule;
 
-    currentRule = calloc(1, sizeof(RULE));
+    currentRule = calloc(1, sizeof(struct rule_t));
 
     if(startRule == 0){
         startRule = currentRule;
@@ -169,9 +265,9 @@ conditionid:
 {
     printf("\tcond  %s\n", $1);
 
-    struct CONDITION * old = currentCondition;
+    struct condition_t * old = currentCondition;
 
-    currentCondition = calloc(1, sizeof(struct CONDITION));
+    currentCondition = calloc(1, sizeof(struct condition_t));
 
     if(currentRule->conditions == 0){
             currentRule->conditions = currentCondition;
@@ -219,7 +315,7 @@ operator:
 someactions:
 	IDENTIFIER
 {
-
+    //currentRule->action = getAction($1);
 };
 	| IDENTIFIER someactions
 
@@ -234,10 +330,19 @@ parseSensors() {
 	yyparse();
 }
 
+parseActionneurs() {
+	printf("%s\n", "Parsing Actionneurs..");
+
+	yyin = fopen( "config/actionneurs", "r" );
+
+	yyparse();
+}
+
 parseRules() {
 	printf("%s\n", "Parsing Rules..");
 
 	yyin = fopen( "config/rules", "r" );
+
 	yyparse();
 }
 

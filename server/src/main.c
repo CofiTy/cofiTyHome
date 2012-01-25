@@ -1,15 +1,20 @@
 #include <unistd.h>
 
 #include "guiNetwork.h"
-#include "rules.tab.h"
+#include "../parse/rules.tab.h"
 #include "sensors.h"
 
 int main(int argc, char ** argv){
 /*
+    sensorsNetworkStart();
+    sleep(120);
+    sensorsNetworkStop();
+*/
+
     guiNetworkStart();
     sleep(120);
     guiNetworkStop();
-*/
+
     
 /*
     sensors = calloc(1, sizeof(struct sensorType));
@@ -28,11 +33,11 @@ int main(int argc, char ** argv){
     strcpy(sensors->nextSensor->id, "cap2");
 */
 
-    
+/*    
     parseAll();
 
     applyRules();
-
+*/
   return 0;
 }
 
