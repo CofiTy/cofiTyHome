@@ -11,14 +11,14 @@ RMFLAGS=-f
 EXE=CofiTyHome
 LIBS=-lpthread -lrt -Llib -ljson
 EFFACE=clean
-OBJ=$(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o $(BUILDDIR)guiInterface.o $(BUILDDIR)actions.o $(BUILDDIR)sensors.o 
+OBJ=$(BUILDDIR)rules.o $(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o $(BUILDDIR)guiInterface.o $(BUILDDIR)actions.o $(BUILDDIR)sensors.o 
 PARSEOBJ=$(PARSEBUILDDIR)rules.tab.o $(PARSEBUILDDIR)lex.yy.o
 
 FLEX=flex -o$(PARSEDIR)lex.yy.c
 BISON=bison -o$(PARSEDIR)rules.tab.c -d
 
 $(EXE) : $(PARSEOBJ) $(OBJ) $(BUILDDIR)main.o
-		$(EDL) $(LDFLAGS) -o $(EXE) $(PARSEOBJ) $(OBJ) $(LIBS) $(BUILDDIR)main.o
+		$(EDL) $(LDFLAGS) -o $(EXE) $(OBJ) $(PARSEOBJ) $(LIBS) $(BUILDDIR)main.o
 
 $(BUILDDIR)%.o : $(SRCDIR)%.c $(SRCDIR)%.h
 		$(CC) $(CCFLAGS) -c $< -o $@
