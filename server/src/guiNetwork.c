@@ -91,7 +91,7 @@ void * guiMsgSend(void* data){
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb = mq_receive(client->mqSend, buff, 128, 0);
+    nb = mq_receive(client->mqSend, buff, 128, NULL);
     puts("mq rec");
     FAIL(nb);
 
