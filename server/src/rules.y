@@ -21,8 +21,8 @@
     extern int yyparse(void); /* Parser function. */
 
 
-    struct RULE * currentRule;
-    struct CONDITION * currentCondition;
+    struct rule_t * currentRule;
+    struct condition_t * currentCondition;
 
     struct sensorType * currentSensor;
 
@@ -146,9 +146,9 @@ ruleid:
 {
     printf("rule  %s\n", $2);
 
-    struct RULE * old = currentRule;
+    struct rule_t * old = currentRule;
 
-    currentRule = calloc(1, sizeof(RULE));
+    currentRule = calloc(1, sizeof(struct rule_t));
 
     if(startRule == 0){
         startRule = currentRule;
@@ -169,9 +169,9 @@ conditionid:
 {
     printf("\tcond  %s\n", $1);
 
-    struct CONDITION * old = currentCondition;
+    struct condition_t * old = currentCondition;
 
-    currentCondition = calloc(1, sizeof(struct CONDITION));
+    currentCondition = calloc(1, sizeof(struct condition_t));
 
     if(currentRule->conditions == 0){
             currentRule->conditions = currentCondition;

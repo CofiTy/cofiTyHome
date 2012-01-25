@@ -10,21 +10,21 @@ extern int testGreater(int * data, int value);
 extern int testLess(int * data, int value);
 
 //Premier element liste regles
-struct RULE * startRule;
+struct rule_t * startRule;
 
 //Une condition
-typedef struct CONDITION {
+typedef struct condition_t {
 	int (*conditionOK)(int *, int); //Fonction a appeler avec leux deux paramètres du dessous. Retourne vrai si la condition est verifiée
 	int * data; //Pointeur vers la donnée du capteur a tester
 	int value; //Valeur a tester
-	struct CONDITION * nextCondition; //Pointeur vers la condition suivante
+	struct condition_t * nextCondition; //Pointeur vers la condition suivante
 };
 
 //Une règle
-typedef struct RULE{
-	struct CONDITION * conditions;
+typedef struct rule_t{
+	struct condition_t * conditions;
 	void * action;
-	struct RULE * nextRule;
+	struct rule_t * nextRule;
 };
 
 

@@ -1,8 +1,8 @@
 #include "rules.h"
 
 void applyRules(){
-    struct RULE * currentRule = startRule;
-    struct CONDITION * currentCondition;
+    struct rule_t * currentRule = startRule;
+    struct condition_t * currentCondition;
     int b = 1;
 
     while(currentRule != 0){
