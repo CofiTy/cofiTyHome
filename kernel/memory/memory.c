@@ -80,7 +80,9 @@ void *gMalloc(unsigned nbytes)
         up = (Header *) heap; 
         /*up->s.size = (SIZE_ALLOC+sizeof(Header)-1)/sizeof(Header) + 1;*/
         up->s.size = SIZE_ALLOC/sizeof(Header);
+        /*up->s.size = SIZE_ALLOC - sizeof(Header);*/
         gFree((void *)(up+1));
+        prevp = freep;
     }
 
     pthread_mutex_lock(&myLock);
@@ -88,6 +90,7 @@ void *gMalloc(unsigned nbytes)
     printf("nBytes: %d\n", nbytes);
 
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
+    /*nunits = nbytes+sizeof(Header);*/
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) 
     {
         /* Chunk is big enough */
@@ -98,7 +101,7 @@ void *gMalloc(unsigned nbytes)
             {
 	            prevp->s.ptr = p->s.ptr;
             }
-            /* Chunk is too big */
+            /* Chunk is too big, Cut it */
             else 
             {
                 printf("Taille: %d et Retire: %d\n", p->s.size, nunits);
@@ -111,8 +114,9 @@ void *gMalloc(unsigned nbytes)
             freep = prevp;
             return (void *)(p+1);
         }
-        if (p == NULL) /* wrapped around free list */
+        if (p == freep) /* wrapped around free list */
         {
+
             /* System is not dynamic... */
             /*if ((p = morecore(nunits)) == NULL)*/
             {
