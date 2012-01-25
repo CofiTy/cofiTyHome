@@ -7,6 +7,11 @@
    Remplacer sbrk par nmap
  */
 
+#define OK 1
+#define ERROR -1
+
+#define SIZE_ALLOC 5000000
+
 void initMemory();
 
 void *gMalloc(unsigned nbytes);
