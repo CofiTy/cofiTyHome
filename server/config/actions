@@ -1,0 +1,23 @@
+######################################################
+#
+#  Fichier de règles.
+#
+#  Format:
+#
+#  rule:
+#  	nomRegle
+#  conditions:
+#  	idCapteur operateur valeur
+#  	nomCapteur operateur valeur
+#  actions:
+#  	nomAction
+#  ...
+#  
+#####################################################
+
+nomAction:
+	ToutFermer
+actionneurs:
+	0021CBE2
+	courrant1.open
+	courrant2.close

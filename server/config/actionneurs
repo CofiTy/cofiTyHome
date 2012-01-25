@@ -1,0 +1,17 @@
+######################################################
+#
+#  Fichier des actionneurs.
+#
+#  Types d'actionneurs disponibles actuellement :
+#  COURRANT
+#  
+#  Format:
+#
+#  typeActionneur idActionneur [nomActionneur]
+#  typeActionneur idActionneur [nomActionneur]
+#  ...
+#
+#####################################################
+
+#TODO: Changer valeur id
+COURRANT 12345678
