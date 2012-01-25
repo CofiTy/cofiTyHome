@@ -1,7 +1,7 @@
 #include <unistd.h>
 
 #include "guiNetwork.h"
-#include "rules.tab.h"
+#include "../parse/rules.tab.h"
 #include "sensors.h"
 
 int main(int argc, char ** argv){

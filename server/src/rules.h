@@ -3,11 +3,11 @@
 
 void applyRules();
 
-extern int testEqual(int * data, int value);
-extern int testGreaterOrEqual(int * data, int value);
-extern int testLessOrEqual(int * data, int value);
-extern int testGreater(int * data, int value);
-extern int testLess(int * data, int value);
+int testEqual(int * data, int value);
+int testGreaterOrEqual(int * data, int value);
+int testLessOrEqual(int * data, int value);
+int testGreater(int * data, int value);
+int testLess(int * data, int value);
 
 //Premier element liste regles
 struct rule_t * startRule;
