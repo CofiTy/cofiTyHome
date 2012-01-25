@@ -12,13 +12,14 @@
 
 #include "sensorsNetwork.h"
 
-int sock;
+int i, j, sock;
 pthread_t pthreadSensorsRec, pthreadSensorsSend;
 mqd_t mqSensorsSend;
 
 void * sensorsMsgRec(){
 
   char buff[128];
+  char data[32];
   int nb, total;
   char* receiving = (char *) buff[0];
 
@@ -35,14 +36,23 @@ void * sensorsMsgRec(){
     receiving += nb;
 
     /* If enough data we can process */
-    if(total >= 27)
-    {
-      printf("Trame : %s\n", buff);
+    i = 0;
+    j = 0;
+    while(i < (strlen(buff) - 1)){
+      data[j++] = buff[i++];
+      if(j == 26){
+        puts("recv");
+        /*Traiter data*/
+        printf("Trame : %s\n", data);
+        j = 0;
+        memset(data, '\0', 32);
+      }
+    }
+
       puts("recv");
       total = 0;
       receiving = (char *) buff[0];
       memset(buff, 0, 128);
-    }
   }
 }
 

@@ -4,8 +4,8 @@
     #include <string.h>
     #include <stdlib.h>
 
-    #include "rules.h"
-    #include "sensors.h"
+    #include "../src/rules.h"
+    #include "../src/sensors.h"
 
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
