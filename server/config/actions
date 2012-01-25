@@ -15,7 +15,7 @@
 #  
 #####################################################
 
-action:
+nomAction:
 	ToutFermer
 actionneurs:
 	0021CBE2

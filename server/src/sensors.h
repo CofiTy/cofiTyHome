@@ -1,3 +1,7 @@
+#if ! defined ( SENSORS_H_ )
+#define SENSORS_H_
+
+
 #include "stdio.h"
 #include "string.h"
 
@@ -65,3 +69,5 @@ typedef struct dataINTERRUPTEUR {
 
 
 void decodeInterrupteur(char* trame, struct sensorType* capteur);
+
+#endif /*SENSORS_H_*/

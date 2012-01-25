@@ -1,6 +1,7 @@
+#if ! defined ( ACTIONS_H_ )
+#define ACTIONS_H_
 
-// ########################### Actionneurs ###########################
-
+// ########################### Actions ###########################
 
 struct actionFct_t{
     void (*fct)(char[8]);
@@ -15,3 +16,10 @@ struct action_t{
 };
 
 struct action_t * actions;
+
+struct action_t * getAction(char nom[20]);
+
+void applyAction(struct action_t * action);
+
+
+#endif /*ACTIONS_H_*/

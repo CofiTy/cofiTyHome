@@ -1,3 +1,8 @@
+#if ! defined ( RULES_H_ )
+#define RULES_H_
+
+
+#include "actions.h"
 // ########################### Règles ################################
 
 
@@ -23,13 +28,13 @@ typedef struct condition_t {
 //Une règle
 typedef struct rule_t{
 	struct condition_t * conditions;
-	void * action;
+	struct action_t * action;
 	struct rule_t * nextRule;
 };
 
 
 
-
+#endif /*RULES_H_*/
 
 
 

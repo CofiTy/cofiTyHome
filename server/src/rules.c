@@ -21,8 +21,7 @@ void applyRules(){
         if(b == 1){
 
             printf("TOUT OK!!!\n");
-            //TODO:Actions
-            //currentRule->action;
+            //applyAction(currentRule->action);
         } else {
             printf("FAIL\n");
         }
