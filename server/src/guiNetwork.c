@@ -38,11 +38,8 @@ void * guiMsgRec(void* data){
   char traite[128];
   int i, j, nb, total, blocs;
   int over = 0;
-  char* receiving;
-  Client* client;
-  
-  receiving = (char *) buff[0];
-  client = (Client*)data;
+  char* receiving = (char *) buff;
+  Client* client = (Client*)data;
 
   memset(buff, 0, 128);
   total = 0;
@@ -80,7 +77,7 @@ void * guiMsgRec(void* data){
     total = 0;
     blocs = 0;
     over = 0;
-    receiving = (char *) buff[0];
+    receiving = (char *) buff;
     memset(buff, '\0', 128);
   }
 }
@@ -89,7 +86,7 @@ void * guiMsgSend(void* data){
 
   char buff[8192];
   int nb, nbSent, total;
-  char* sending = (char *) buff[0];
+  char* sending = (char *) buff;
   Client* client = (Client*)data;
 
   for(;;)
@@ -110,6 +107,7 @@ void * guiMsgSend(void* data){
       sending += nb;
     }
     puts("sent");
+    sending = (char *) buff;
   }
 
 }
@@ -119,7 +117,6 @@ void * guiNetworkConnexion(){
   int acceptSock, tmpSock;
   int i = 0;
   char name[32];
-  struct mq_attr attr;
 
   struct sockaddr_in saddr_client;
   struct sockaddr_in saddr;

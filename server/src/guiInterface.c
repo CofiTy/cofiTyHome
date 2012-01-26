@@ -21,13 +21,13 @@ void processTypeConfiguration(){
 }
 
 void processTypeCommand(struct json_object* command){
-  char* com = json_object_get_string(command);
+  const char* com = json_object_get_string(command);
   printf("Commande : %s\n", com);
 }
 
 void processTypeUpdate(struct json_object* update){
   
-  char* string;
+  const char* string;
   int i,lenght;
   struct json_object* tmp;
   lenght = json_object_array_length(update);
