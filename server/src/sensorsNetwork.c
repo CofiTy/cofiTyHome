@@ -21,7 +21,7 @@ void * sensorsMsgRec(){
   char buff[128];
   char data[32];
   int nb, total;
-  char* receiving = (char *) buff[0];
+  char* receiving = (char *) buff;
 
   memset(buff, 0, 128);
   total = 0;
@@ -49,22 +49,21 @@ void * sensorsMsgRec(){
     }
 
       total = 0;
-      receiving = (char *) buff[0];
+      receiving = (char *) buff;
       memset(buff, 0, 128);
   }
 }
 
 void * sensorsMsgSend(){
 
-  char buff[128];
+  char buff[8192];
   int nb, nbSent, total;
-  char* sending = (char *) buff[0];
+  char* sending = (char *) buff;
 
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    return NULL;
-    nb = mq_receive(mqSensorsSend, buff, 128, 0);
+    nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
 
     total = nb;
@@ -78,6 +77,7 @@ void * sensorsMsgSend(){
       sending += nb;
     }
     puts("sent");
+    sending = (char *) buff;
   }
 
 }
