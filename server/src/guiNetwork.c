@@ -38,8 +38,11 @@ void * guiMsgRec(void* data){
   char traite[128];
   int i, j, nb, total, blocs;
   int over = 0;
-  char* receiving = (char *) buff[0];
-  Client* client = (Client*)data;
+  char* receiving;
+  Client* client;
+  
+  receiving = (char *) buff[0];
+  client = (Client*)data;
 
   memset(buff, 0, 128);
   total = 0;
@@ -47,6 +50,7 @@ void * guiMsgRec(void* data){
 
   for(;;)
   {
+    printf("Sock: %d\n", client->sock);
     /* reception form sensors */
     nb = recv(client->sock, receiving, 128, 0);
     puts("recv");
@@ -83,7 +87,7 @@ void * guiMsgRec(void* data){
 
 void * guiMsgSend(void* data){
 
-  char buff[128];
+  char buff[8192];
   int nb, nbSent, total;
   char* sending = (char *) buff[0];
   Client* client = (Client*)data;
@@ -91,7 +95,7 @@ void * guiMsgSend(void* data){
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb = mq_receive(client->mqSend, buff, 128, NULL);
+    nb = mq_receive(client->mqSend, buff, 8192, NULL);
     puts("mq rec");
     FAIL(nb);
 
@@ -154,15 +158,11 @@ void * guiNetworkConnexion(){
     }
 
     clientList.current->sock = tmpSock;
-
-    puts(name);
-    memset(&attr, 0, sizeof(struct mq_attr));
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 32;
-    attr.mq_msgsize = 64;
-    clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT, S_IRWXU, &attr);
-    FAIL(clientList.current->mqSend);
     
+    clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT, S_IRWXU, NULL);
+    FAIL(clientList.current->mqSend);
+
+    printf("Sock: %d\n", clientList.current->sock);
     pthread_create(&clientList.current->pthreadRec, NULL, guiMsgRec, (void*)clientList.current);
     pthread_detach(clientList.current->pthreadRec);
 
