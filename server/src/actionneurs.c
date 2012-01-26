@@ -14,3 +14,15 @@ struct actionneur_t * getActionneur(char id[8]) {
     printf("Actionneur not recognized : %s !!!\n", id);
     return 0;
 }
+
+void caca(){
+    
+}
+
+void openCOURRANT(char id[8]){
+
+}
+
+void closeCOURRANT(char id[8]){
+    
+}
