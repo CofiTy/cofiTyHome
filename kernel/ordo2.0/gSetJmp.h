@@ -4,6 +4,6 @@
 
 typedef int gBuffer[6];
 int gSetJmp(gBuffer buffer)__attribute__ ((returns_twice));
-void gLongJmp(gBuffer buffer,int value);
+void gLongJmp(gBuffer buffer,int value)__attribute__ ((noreturn));
 
 #endif /* GSETJMP_H_ */

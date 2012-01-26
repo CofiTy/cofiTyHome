@@ -1,6 +1,6 @@
 #include "gSetJmp.h"
 
-int  gSetJmp(gBuffer buffer)
+int gSetJmp(gBuffer buffer)
 {
 	volatile char* ebp;
 	asm("mov %%ebp, %0" : "=r" (ebp));
