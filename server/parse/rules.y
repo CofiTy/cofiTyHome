@@ -6,8 +6,8 @@
 
     #include "../src/rules.h"
     #include "../src/sensors.h"
-    #include "../src/actionneurs.h"
     #include "../src/actions.h"
+    #include "../src/actionneurs.h"
 
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
@@ -175,6 +175,7 @@ initActionneur:
     } else {
         old->nextActionneur = currentActionneur;
     }
+
 };
 
 typeActionneur:
@@ -220,7 +221,20 @@ someActionneursFct:
 oneActionneurFct:
     IDENTIFIER POINT IDENTIFIER
 {
-    //TODO
+    struct actionFct_t * old = currentActionFct;
+
+    currentActionFct = calloc(1, sizeof(struct actionFct_t));
+
+    if(currentAction->actionFcts == 0){
+        currentAction->actionFcts = currentActionFct;
+    } else {
+        old->nextActionFct = currentActionFct;
+    }
+
+    //struct actionneur_t * tmp = getActionneur($1);
+
+    //strcpy(currentActionFct->id, tmp->id);
+
 };
 
 
