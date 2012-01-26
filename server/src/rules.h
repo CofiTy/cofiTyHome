@@ -1,6 +1,7 @@
 #if ! defined ( RULES_H_ )
 #define RULES_H_
 
+#include <stdio.h>
 
 #include "actions.h"
 // ########################### Règles ################################
@@ -23,14 +24,14 @@ typedef struct condition_t {
 	int * data; //Pointeur vers la donnée du capteur a tester
 	int value; //Valeur a tester
 	struct condition_t * nextCondition; //Pointeur vers la condition suivante
-};
+} condition_t;
 
 //Une règle
 typedef struct rule_t{
 	struct condition_t * conditions;
 	struct action_t * action;
 	struct rule_t * nextRule;
-};
+} rule_t;
 
 
 

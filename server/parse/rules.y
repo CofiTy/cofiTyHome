@@ -336,7 +336,7 @@ someactions:
  
 %%
 
-parseSensors() {
+void parseSensors() {
 	printf("%s\n", "Parsing Sensors..");
 
 	yyin = fopen( "config/sensors", "r" );
@@ -344,7 +344,7 @@ parseSensors() {
 	yyparse();
 }
 
-parseActionneurs() {
+void parseActionneurs() {
 	printf("%s\n", "Parsing Actionneurs..");
 
 	yyin = fopen( "config/actionneurs", "r" );
@@ -352,7 +352,7 @@ parseActionneurs() {
 	yyparse();
 }
 
-parseRules() {
+void parseRules() {
 	printf("%s\n", "Parsing Rules..");
 
 	yyin = fopen( "config/rules", "r" );
@@ -360,7 +360,7 @@ parseRules() {
 	yyparse();
 }
 
-parseAll() {
+void parseAll() {
 	printf("%s\n", "Start Parsing..");
 
 	parseSensors();

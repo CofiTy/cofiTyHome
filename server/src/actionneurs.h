@@ -11,7 +11,7 @@ typedef struct actionneur_t {
  typeActionneur type;
  char id[8];
  struct actionneur_t* nextActionneur;
-};
+} actionneur_t;
 
 struct actionneur_t * actionneurs;
 
