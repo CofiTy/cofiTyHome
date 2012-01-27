@@ -1,6 +1,10 @@
 #if ! defined ( ACTIONNEURS_H_ )
 #define ACTIONNEURS_H_
 
+#include <stdio.h>
+#include <string.h>
+
+
 // ########################### Actionneurs ###########################
 
 typedef enum typeActionneur {

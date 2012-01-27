@@ -1,7 +1,7 @@
 #include "actionneurs.h"
 
 struct actionneur_t * getActionneur(char id[8]) {
-    struct actionneur_t * current = sensors;
+    struct actionneur_t * current = actionneurs;
 
     while (current != 0) {
         if (strcmp(current->id, id) == 0) {
