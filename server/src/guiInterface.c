@@ -31,6 +31,7 @@ void processTypeUpdate(struct json_object* update){
   int i,lenght;
   struct json_object* tmp;
   lenght = json_object_array_length(update);
+  
   for(i = 0; i < lenght; i++){
     tmp = json_object_array_get_idx(update, i);
     string = json_object_get_string(tmp);

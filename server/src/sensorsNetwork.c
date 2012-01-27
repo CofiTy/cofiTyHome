@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -84,7 +85,8 @@ void * sensorsMsgSend(){
 
 void sensorsNetworkStart(){
 
-  mqSensorsSend = mq_open("SensorsMsgSend", O_RDWR | O_CREAT);
+  mqSensorsSend = mq_open("/SensorsMsgSend", O_RDWR | O_CREAT, S_IRWXU, NULL);
+  FAIL(mqSensorsSend);
 
   struct sockaddr_in saddr;
   memset(&saddr, 0, sizeof(struct sockaddr_in));
