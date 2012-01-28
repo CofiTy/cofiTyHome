@@ -1,6 +1,7 @@
 #include <unistd.h>
 
 #include "guiNetwork.h"
+#include "sensorsNetwork.h"
 #include "../parse/rules.tab.h"
 #include "sensors.h"
 

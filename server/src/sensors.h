@@ -20,7 +20,7 @@ typedef struct sensorType {
  void *data;
  struct sensorType* nextSensor;
  void (*decode)(char* trame, struct sensorType*);
-};
+} sensorType;
 
 struct sensorType * sensors;
 

@@ -11,6 +11,7 @@ typedef struct gThread
 	mctx_t context;       /* Context (see gThread.h) */
 	THREAD_ID id;         /* Thread Id */
 	time_t timeToWait;    /* Timestamp when wake up if sleeping */
+	int toDelete;
 	char *stack;          /* Stack */
 } gThread;
 

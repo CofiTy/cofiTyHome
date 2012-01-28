@@ -1,6 +1,9 @@
 #if ! defined ( ACTIONS_H_ )
 #define ACTIONS_H_
 
+#include <stdio.h>
+#include <string.h>
+
 // ########################### Actions ###########################
 
 struct actionFct_t{
