@@ -87,7 +87,7 @@ void *gMalloc(unsigned nbytes)
 
     pthread_mutex_lock(&myLock);
 
-    printf("nBytes: %d\n", nbytes);
+    /*printf("nBytes: %d\n", nbytes);*/
 
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
     /*nunits = nbytes+sizeof(Header);*/
@@ -104,10 +104,10 @@ void *gMalloc(unsigned nbytes)
             /* Chunk is too big, Cut it */
             else 
             {
-                printf("Taille: %d et Retire: %d\n", p->s.size, nunits);
+                /*printf("Taille: %d et Retire: %d\n", p->s.size, nunits);*/
 	            /* allocate tail end */
             	p->s.size -= nunits;
-                printf("New Taille: %d\n", p->s.size);
+                /*printf("New Taille: %d\n", p->s.size);*/
             	p += p->s.size;
             	p->s.size = nunits;
             }
@@ -125,4 +125,27 @@ void *gMalloc(unsigned nbytes)
             }
         }
     }
+}
+
+int getGMemTotal()
+{
+    return SIZE_ALLOC;
+}
+
+int getGMemFree()
+{
+    Header *p, *prevp;
+    int sum = 0;
+    pthread_mutex_lock(&myLock);
+    prevp = freep;
+    for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) 
+    {
+        sum += p->s.size*sizeof(Header);
+        if (p == freep) /* wrapped around free list */
+        {
+            break;
+        }
+    }
+    pthread_mutex_unlock(&myLock);
+    return sum;
 }
