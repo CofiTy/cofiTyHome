@@ -88,12 +88,13 @@ oneSensor:
         initSensor typeSensor IDENTIFIER
 {
     printf("Sensor %s\n", $3);
+    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
     strcpy(currentSensor->id, $3);
 };
         | initSensor typeSensor NUMBER
 {
     printf("Sensor %d\n", $3);
-
+    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
     sprintf(currentSensor->id, "%d", $3);
 
 };
@@ -156,11 +157,13 @@ oneActionneur:
         initActionneur typeActionneur IDENTIFIER
 {
     printf("Actionneur %s\n", $3);
+    memcpy(currentActionneur->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
     strcpy(currentActionneur->id, $3);
 };
         | initActionneur typeActionneur NUMBER
 {
     printf("Actionneur %d\n", $3);
+    memcpy(currentActionneur->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
     sprintf(currentActionneur->id, "%d", $3);
 };
 
@@ -231,10 +234,8 @@ oneActionneurFct:
         old->nextActionFct = currentActionFct;
     }
 
-    //struct actionneur_t * tmp = getActionneur($1);
-
-    //strcpy(currentActionFct->id, tmp->id);
-
+    currentActionFct->actionneur = getActionneur($1);
+    setActionneurFct(currentActionFct, $3);
 };
 
 
@@ -288,8 +289,8 @@ conditionid:
     } else {
             old->nextCondition = currentCondition;
     }
-    char t[8];
-    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * 8);
+    char t[9];
+    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * 9);
     strcpy(t, $1);
     currentCondition->data = getSensor(t)->data;
 };
@@ -329,7 +330,7 @@ operator:
 someactions:
 	IDENTIFIER
 {
-    //currentRule->action = getAction($1);
+    currentRule->action = getAction($1);
 };
 	| IDENTIFIER someactions
 
@@ -345,15 +346,23 @@ void parseSensors() {
 }
 
 void parseActionneurs() {
-	printf("%s\n", "Parsing Actionneurs..");
+	printf("\n%s\n", "Parsing Actionneurs..");
 
 	yyin = fopen( "config/actionneurs", "r" );
 
 	yyparse();
 }
 
+void parseActions() {
+	printf("\n%s\n", "Parsing Actions..");
+
+	yyin = fopen( "config/actions", "r" );
+
+	yyparse();
+}
+
 void parseRules() {
-	printf("%s\n", "Parsing Rules..");
+	printf("\n%s\n", "Parsing Rules..");
 
 	yyin = fopen( "config/rules", "r" );
 
@@ -361,9 +370,11 @@ void parseRules() {
 }
 
 void parseAll() {
-	printf("%s\n", "Start Parsing..");
+	printf("\n%s\n", "Start Parsing..");
 
 	parseSensors();
+        parseActionneurs();
+        parseActions();
         parseRules();
 }
 

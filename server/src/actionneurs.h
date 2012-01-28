@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "actions.h"
+
 
 // ########################### Actionneurs ###########################
 
@@ -13,17 +15,19 @@ typedef enum typeActionneur {
 
 typedef struct actionneur_t {
  typeActionneur type;
- char id[8];
+ char id[9];
  struct actionneur_t* nextActionneur;
 } actionneur_t;
 
 struct actionneur_t * actionneurs;
 
-struct actionneur_t * getActionneur(char id[8]);
+struct actionneur_t * getActionneur(char id[9]);
 
-void caca();
+void setActionneurFct(struct actionFct_t * a, char fctName[20]);
+
+
 //----- COURRANT --------------------------------------------------------------------
-void openCOURRANT(char id[8]);
-void closeCOURRANT(char id[8]);
+void openCOURRANT(char id[9]);
+void closeCOURRANT(char id[9]);
 
 #endif /*ACTIONNEURS_H_*/

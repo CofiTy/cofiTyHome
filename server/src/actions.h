@@ -7,8 +7,8 @@
 // ########################### Actions ###########################
 
 struct actionFct_t{
-    void (*fct)(char[8]);
-    char id[8];
+    void (*fct)(char[9]);
+    struct actionneur_t * actionneur;
     struct actionFct_t * nextActionFct;
 };
 

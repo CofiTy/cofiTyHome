@@ -1,4 +1,5 @@
 #include "actions.h"
+#include "actionneurs.h"
 
 struct action_t * getAction(char nom[20]) {
     struct action_t * current = actions;
@@ -17,9 +18,9 @@ struct action_t * getAction(char nom[20]) {
 
 void applyAction(struct action_t * action){
     struct actionFct_t * current = action->actionFcts;
-
+    
     while (current != 0) {
-        current->fct(current->id);
+        current->fct(current->actionneur->id);
 
         current = current->nextActionFct;
     }
