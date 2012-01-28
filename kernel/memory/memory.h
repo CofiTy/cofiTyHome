@@ -18,4 +18,8 @@ void *gMalloc(unsigned nbytes);
 
 void gFree(void *ap);
 
+int getGMemTotal();
+
+int getGMemFree();
+
 #endif
