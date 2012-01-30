@@ -12,9 +12,11 @@ int main(int argc, char ** argv){
     sensorsNetworkStop();
 */
 
+/*
     guiNetworkStart();
     sleep(120);
     guiNetworkStop();
+*/
 
     
 /*
@@ -34,11 +36,9 @@ int main(int argc, char ** argv){
     strcpy(sensors->nextSensor->id, "cap2");
 */
 
-/*    
     parseAll();
 
     applyRules();
-*/
   return 0;
 }
 

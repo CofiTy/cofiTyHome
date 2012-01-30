@@ -18,6 +18,11 @@
 nomAction:
 	ToutFermer
 actionneurs:
-	0021CBE2
-	courrant1.open
-	courrant2.close
+	12345678.close
+	87654321.close
+	
+nomAction:
+	ToutOuvrir
+actionneurs:
+	12345678.open
+	87654321.open

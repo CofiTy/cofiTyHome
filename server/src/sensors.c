@@ -1,6 +1,6 @@
 #include "sensors.h"
 
-struct sensorType * getSensor(char id[8]) {
+struct sensorType * getSensor(char id[9]) {
     struct sensorType * current = sensors;
     
     while (current != 0) {

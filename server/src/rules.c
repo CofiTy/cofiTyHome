@@ -1,6 +1,9 @@
 #include "rules.h"
 
 void applyRules(){
+
+    printf("\nApplying rules..\n");
+
     struct rule_t * currentRule = startRule;
     struct condition_t * currentCondition;
     int b = 1;
@@ -21,7 +24,7 @@ void applyRules(){
         if(b == 1){
 
             printf("TOUT OK!!!\n");
-            //applyAction(currentRule->action);
+            applyAction(currentRule->action);
         } else {
             printf("FAIL\n");
         }
