@@ -1,5 +1,7 @@
 #include "scheduler.h"
 
+semaphore *sem1;
+
 void child()
 {
 	int i;
@@ -8,34 +10,32 @@ void child()
 		printf("child\n");
 		gSleep(1);
 	}
-    /*exitCurrentThread();*/
 }
 void child2()
 {
 	int i;
-	for (i=0;i< 5;i++)
+	for (i=0;;i++)
 	{
-		printf("child2\n");
-		gSleep(1);
+		semTake(sem1);
+		printf("child2 a pris un jeton\n");
+		/*gSleep(1);*/
 	}
-    exitCurrentThread();
 }
 
 int main()
 {
 	int i;
-	/*THREAD_ID firstThread =*/createGThread(&child,NULL, 0);
-	/*THREAD_ID secondThread = createGThread(&child2,NULL, 0);*/
-	for (i = 0;; i++)
+	/*THREAD_ID firstThread =*/createGThread(&child2,NULL, 0);
+	/*THREAD_ID secondThread = */createGThread(&child2,NULL, 0);
+	sem1 = newSemaphore(3);
+	for (i=0;;i++)
 	{
 		printf("main\n");
-        gSleep(1);
-       /* 
-		if (i==12)
+		gSleep(1);
+		if ((i%2) == 0)
 		{
-			killThreadById(firstThread);
+			semGive(sem1);
 		}
-        */
 	}
 	return 1;
 }

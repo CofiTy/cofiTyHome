@@ -26,6 +26,28 @@
 #define ERROR -1
 #define OK 1
 
+typedef struct gThread
+{
+	struct gThread *next; /* Next Thread */
+	mctx_t context;       /* Context (see gThread.h) */
+	THREAD_ID id;         /* Thread Id */
+	time_t timeToWait;    /* Timestamp when wake up if sleeping */
+	int toDelete;
+	char *stack;          /* Stack */
+} gThread;
+
+typedef struct semaphore
+{
+	int counter;
+	gThread* inWait;
+}semaphore;
+
+
+void semTake(semaphore *sem);
+void semGive(semaphore *sem);
+semaphore* newSemaphore(int init);
+
+
 /**
  * Launch a new thread.
  *
