@@ -10,7 +10,7 @@ typedef long Align;    /* for alignment to long boundary */
 union header {         /* block header */
   struct {
     union header *ptr; /* next block if on free list */
-    unsigned int size;     /* size of this block */
+    unsigned long size;     /* size of this block */
   } s;
   Align x;             /* force alignment of blocks */
 };
@@ -24,13 +24,33 @@ static char heap[SIZE_ALLOC];
 
 static pthread_mutex_t myLock;
 
+void initMemory()
+{
+    if(freep == NULL)
+    { 
+        Header *up;
+        base.s.ptr = freep = &base;
+        base.s.size = 0;
+        pthread_mutex_init (&myLock, NULL);
+
+        up = (Header *) heap; 
+        /*up->s.size = (SIZE_ALLOC+sizeof(Header)-1)/sizeof(Header) + 1;*/
+        up->s.size = SIZE_ALLOC/sizeof(Header);
+        /*up->s.size = SIZE_ALLOC - sizeof(Header);*/
+        gFree((void *)(up+1));    
+    }
+}
+
 /* free: put block ap in free list */
 void gFree(void *ap)
 {
     Header *bp, *p;
-    bp = (Header *)ap - 1;
+
+    if(freep == NULL)
+        return;
 
     pthread_mutex_lock(&myLock);
+    bp = (Header *)ap - 1;
     /* point to block header */
     for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
     {
@@ -64,25 +84,15 @@ void gFree(void *ap)
 }
 
 /* malloc: general-purpose storage allocator */
-void *gMalloc(unsigned nbytes)
+void *gMalloc(unsigned long nbytes)
 {
     Header *p, *prevp;
-    unsigned nunits;
+    unsigned long nunits;
 
     /* No Free List Yet, Need to Initialise */
-    if ((prevp = freep) == NULL) 
-    {  
-        Header *up;
-        base.s.ptr = freep = prevp = &base;
-        base.s.size = 0;
-        pthread_mutex_init (&myLock, NULL);
-
-        up = (Header *) heap; 
-        /*up->s.size = (SIZE_ALLOC+sizeof(Header)-1)/sizeof(Header) + 1;*/
-        up->s.size = SIZE_ALLOC/sizeof(Header);
-        /*up->s.size = SIZE_ALLOC - sizeof(Header);*/
-        gFree((void *)(up+1));
-        prevp = freep;
+    if ((prevp = freep) == NULL || nbytes > SIZE_ALLOC) 
+    {
+        return NULL;
     }
 
     pthread_mutex_lock(&myLock);
@@ -127,17 +137,21 @@ void *gMalloc(unsigned nbytes)
     }
 }
 
-int getGMemTotal()
+unsigned long getGMemTotal()
 {
     return SIZE_ALLOC;
 }
 
-int getGMemFree()
+unsigned long getGMemFree()
 {
     Header *p, *prevp;
-    int sum = 0;
+    unsigned long sum;
+    if(freep == NULL)
+        return 0;
+
     pthread_mutex_lock(&myLock);
     prevp = freep;
+    sum = 0;
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) 
     {
         sum += p->s.size*sizeof(Header);
