@@ -18,11 +18,9 @@
 nomAction:
 	ToutFermer
 actionneurs:
-	12345678.close
-	87654321.close
+	FF9F1E05.close
 	
 nomAction:
 	ToutOuvrir
 actionneurs:
-	12345678.open
-	87654321.open
+	FF9F1E05.open
