@@ -52,6 +52,7 @@ void decodePresence(char* trame, struct sensorType* capteur)
     float lumin = ((float)(510.0/255.0))*(float)valDec;
     ((dataPRESENCE*)capteur->data)->presence = presence;
     ((dataPRESENCE*)capteur->data)->luminosite = lumin;
+    printf("decode presence!");
    
 }
 
@@ -63,31 +64,31 @@ void decodeInterrupteur(char* trame, struct sensorType* capteur)
         case '7':
         {
            ((dataINTERRUPTEUR*)capteur->data)->switchButton = B0;
-           printf("decode!");
+           printf("decode interrupteur!");
             break;
         }
         case '5':
         {
            ((dataINTERRUPTEUR*)capteur->data)->switchButton  = B1;
-           printf("decode!");
+           printf("decode interrupteur!");
             break;
         }
         case '3':
         {
            ((dataINTERRUPTEUR*)capteur->data)->switchButton  = A0;
-           printf("decode!");
+           printf("decode interrupteur!");
             break;
         }
         case '1':
         {
           ((dataINTERRUPTEUR*)capteur->data)->switchButton  = A1;
-          printf("decode!");
+          printf("decode interrupteur!");
             break;
         }
         default:
         {
             ((dataINTERRUPTEUR*)capteur->data)->switchButton  = NONE;
-            printf("decode!");
+            printf("decode interrupteur!");
             break;
             
         }
@@ -103,6 +104,7 @@ void decodeContact(char* trame, struct sensorType* capteur)
     }
     else
        ((dataCONTACT*)capteur->data)->contact = 0;
+    printf("decode contact fenetre!");
 }
 
 void decodeTemperature(char* trame, struct sensorType* capteur)
@@ -114,4 +116,5 @@ void decodeTemperature(char* trame, struct sensorType* capteur)
     int valDec = strtol(data, &valHex, 16);
     int temp = ((float)(40.0/255.0))*valDec;
     ((dataTEMPERATURE*)capteur->data)->temp = temp;
+    printf("decode Teperature!");
 }
