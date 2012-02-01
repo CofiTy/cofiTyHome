@@ -96,7 +96,7 @@ void sensorsNetworkStart(){
   memset(&saddr, 0, sizeof(struct sockaddr_in));
 
   saddr.sin_addr.s_addr = inet_addr("134.214.105.28"); //TODO macro avec les bonnes valeur
-  /*saddr.sin_addr.s_addr = inet_addr("127.0.0.1");*/
+  //saddr.sin_addr.s_addr = inet_addr("127.0.0.1");
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5000); //TODO macro avec les bonnes valeur
 
