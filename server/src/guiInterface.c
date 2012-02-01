@@ -21,7 +21,6 @@ void processTypeInitialise(mqd_t mqSend){
     struct json_object* configObj;
     struct json_object* sensorsList;
     struct json_object* commandsList;
-    struct json_object* commandObj;
     struct json_object* commandValue;
     struct json_object* sensorObj;
     struct json_object* id;
@@ -36,9 +35,10 @@ void processTypeInitialise(mqd_t mqSend){
     
     configObj = json_object_new_object();
     sensorsList = json_object_new_array();
+    commandsList = json_object_new_array();
     configuration = json_object_new_object();
 
-    messType = json_object_new_int(2);
+    messType = json_object_new_int(CONFIGURATION);
     json_object_object_add(configuration, "type", messType);
 
     while (current != NULL) {
@@ -88,12 +88,16 @@ void processTypeInitialise(mqd_t mqSend){
 
   json_object_object_add(configObj, "sensors", sensorsList);
 
-    struct action_t * currentAction = actions;
+  struct action_t * currentAction = actions;
     
-    /*while (currentAction != 0) {
-
-        currentAction = currentAction->nextAction;
-    }*/
+  while (currentAction != 0) {
+    commandValue = json_object_new_string(currentAction->nom);
+    json_object_array_add(commandsList, commandValue);
+    currentAction = currentAction->nextAction;
+  } 
+  
+  json_object_object_add(configObj, "commands", commandsList);
+  
   json_object_object_add(configuration, "message", configObj);
   message = json_object_to_json_string(configuration);
   guiNetworkSend(message, strlen(message), mqSend);
@@ -110,20 +114,57 @@ void processTypeCommand(struct json_object* command){
 
 void processTypeUpdate(struct json_object* update, mqd_t mqSend){
   
-  const char* id;
+  char* id;
+  const char * sending;
   int i,lenght;
   struct json_object* tmp;
   struct json_object* dataObj;
+  struct json_object* message;
+  struct json_object* value;
+  struct json_object* messType;
+  struct json_object* response;
+  struct sensorType * current;
+  struct dataPRESENCE dataPres;
+  struct dataTEMPERATURE dataTemp;
   lenght = json_object_array_length(update);
  
-  dataObj = json_object_new_array();
+  message = json_object_new_array();
+  response = json_object_new_object();
 
   for(i = 0; i < lenght; i++){
     tmp = json_object_array_get_idx(update, i);
     id = json_object_get_string(tmp);
+    current = getSensor(id); 
+    
+    if(current->type != PRESENCE){
+      dataTemp = *(struct dataTEMPERATURE*)(current->data);
+      value = json_object_new_int(dataTemp.temp);
+    } else{
+      dataPres = *(struct dataPRESENCE*)(current->data);
+      value = json_object_new_int(dataPres.presence);
+    }
+    
+    dataObj = json_object_new_object();
+    json_object_object_add(dataObj, "id", tmp);
+    json_object_object_add(dataObj, "value", value);
 
+    json_object_array_add(message, dataObj);
+
+    if(current->type != PRESENCE){
+      dataObj = json_object_new_object();
+      json_object_object_add(dataObj, "id", tmp);
+      value = json_object_new_int(dataPres.luminosite);
+      json_object_object_add(dataObj, "value", value);
+      json_object_array_add(message, dataObj);
+    }
   }
 
+  messType = json_object_new_int(CONFIGURATION);
+  json_object_object_add(response, "type", messType);
+  json_object_object_add(response, "message", message);
+
+  sending = json_object_to_json_string(response);
+  guiNetworkSend(sending, strlen(sending), mqSend);
 }
 
 void processTypeData(){
