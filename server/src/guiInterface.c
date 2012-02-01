@@ -110,6 +110,7 @@ void processTypeConfiguration(){
 void processTypeCommand(struct json_object* command){
   const char* com = json_object_get_string(command);
   printf("Commande : %s\n", com);
+  applyActionByName(com);
 }
 
 void processTypeUpdate(struct json_object* update, mqd_t mqSend){
