@@ -1,6 +1,10 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 #include <unistd.h> //Pour STDIN_FILENO
+#include <stdio.h>
+#include <string.h>
+
+#include "common.h"
 
 #include "init.h"
 

@@ -8,6 +8,7 @@
 
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdlib.h>
 
 #define FAIL(x) if(x == -1) {\
 	perror(#x);exit(-1);}
