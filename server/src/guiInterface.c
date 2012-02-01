@@ -40,6 +40,7 @@ void processTypeInitialise(mqd_t mqSend){
     messType = json_object_new_int(CONFIGURATION);
     json_object_object_add(configuration, "type", messType);
 
+    pthread_mutex_lock(&sensorsMutex);
     while (current != NULL) {
         switch(current->type){
           
@@ -84,6 +85,7 @@ void processTypeInitialise(mqd_t mqSend){
         
         current = current->nextSensor;
     }
+    pthread_mutex_unlock(&sensorsMutex);
 
   json_object_object_add(configObj, "sensors", sensorsList);
 
@@ -132,6 +134,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
   for(i = 0; i < lenght; i++){
     tmp = json_object_array_get_idx(update, i);
     id = json_object_get_string(tmp);
+    pthread_mutex_lock(&sensorsMutex);
     current = getSensor(id); 
     
     if(current->type != PRESENCE){
@@ -142,6 +145,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
       value = json_object_new_int(dataPres.presence);
     }
     
+    pthread_mutex_unlock(&sensorsMutex);
     dataObj = json_object_new_object();
     json_object_object_add(dataObj, "id", tmp);
     json_object_object_add(dataObj, "value", value);
