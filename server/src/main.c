@@ -15,15 +15,17 @@ int main(int argc, char ** argv){
     sleep(120);
     sensorsNetworkStop();
 */
-/*
+
 	printf("MemTotale: %ld\n", getGMemTotal());
 	printf("MemFree: %ld\n", getGMemFree());
 
+    sensorsNetworkStart();
     guiNetworkStart();
-    sleep(20);
+    sleep(120);
     guiNetworkStop();
+    sensorsNetworkStop();
 
-*/
+
     
 /*
     sensors = calloc(1, sizeof(struct sensorType));
