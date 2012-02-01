@@ -27,8 +27,6 @@ struct sensorType * sensors;
 
 struct sensorType * getSensor(char id[9]);
 
-//sensorType sensorList;
-
 
 //----- TEMPERATURE --------------------------------------------------------------------
 typedef struct dataTEMPERATURE {
@@ -70,5 +68,7 @@ typedef struct dataINTERRUPTEUR {
 
 
 void decodeInterrupteur(char* trame, struct sensorType* capteur);
+
+void decodeTrame(char* trame);
 
 #endif /*SENSORS_H_*/

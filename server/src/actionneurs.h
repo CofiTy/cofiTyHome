@@ -6,8 +6,11 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "actions.h"
+#include "sensorsNetwork.h"
+#include "../../kernel/memory/memory.h"
 
 
 // ########################### Actionneurs ###########################

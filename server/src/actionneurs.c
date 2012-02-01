@@ -1,5 +1,4 @@
 #include "actionneurs.h"
-#include <stdlib.h>
 
 struct trame{ 
         char* SYNC;//SYNC = "A55A";
@@ -16,7 +15,7 @@ struct trame{
 void itochar(int toBeTrans, char* buffer, int radix )
 {
     int i=0, n, reste,j,k=0;
-    char* reverseBuffer=(char*)malloc((sizeof(buffer)+1));
+    char* reverseBuffer=(char*)gMalloc((sizeof(buffer)+1));
     n = toBeTrans;
     while(n>0)
     {
@@ -26,31 +25,165 @@ void itochar(int toBeTrans, char* buffer, int radix )
         
     }
     reverseBuffer[i]='\0';
-    for(j=i-1;j>=0;j--)
+
+    for(j=0;j<i;j++)
     {
-        buffer[k] = reverseBuffer[j];
+        buffer[j] = reverseBuffer[j];
         k++;
     }
-    buffer[k]='\0';
-    free(reverseBuffer);
-}
 
-void CalculateCheckSum(struct trame* trameAEnv)
+    buffer[j] = reverseBuffer[j];
+    gFree(reverseBuffer);
+}
+int oneCharHexToInt(char hex)
 {
-    char* checkSum = (char*)malloc(sizeof(char[2]));
-    int sum =0;
-    sum+= atoi(trameAEnv->DATA);
-    sum+= atoi(trameAEnv->HEADER);
-    sum+= atoi(trameAEnv->ID);
-    sum+= atoi(trameAEnv->LENGHT);
-    sum+= atoi(trameAEnv->ORG);
-    sum+= atoi(trameAEnv->STATUS);
-    sum = sum%100;
-    itochar(sum, checkSum, 10);
-    trameAEnv->CHECKSUM = checkSum;
+    int result;
+    switch (hex)
+    {
+            case 'A':
+            {
+                result = 10;
+                break;
+            }
+            case 'B':
+            {
+                result = 11;
+                break;
+            }
+            case 'C':
+            {
+                result = 12;
+                break;
+            }
+            case 'D':
+            {
+                result = 13;
+                break;
+            }
+            case 'E':
+            {
+                result = 14;
+                break;
+            }
+            case 'F':
+            {
+                result = 15;
+                break;
+            }
+            case '0':
+            {
+                result = 0;
+                break;
+            }
+            case '1':
+            {
+                result = 1;
+                break;
+            }
+            case '2':
+            {
+                result = 2;
+                break;
+            }
+            case '3':
+            {
+                result = 3;
+                break;
+            }
+            case '4':
+            {
+                result = 4;
+                break;
+            }
+            case '5':
+            {
+                result = 5;
+                break;
+            }
+            case '6':
+            {
+                result = 6;
+                break;
+            }
+            case '7':
+            {
+                result = 7;
+                break;
+            }
+            case '8':
+            {
+                result = 8;
+                break;
+            }
+            case '9':
+            {
+                result = 9;
+                break;
+            }
+            default:
+            {
+                
+                break;
+            }
+    }; 
+    return result;
+}
+int hexToInt(char* hex)
+{
+    int result=0,i,pow=1,j=0, cont=0;
+    for(i=1;i>=0;i--)
+    {
+        
+        for(j=0;j<cont;j++)
+        {
+            pow = pow*16;
+        }
+        cont++;
+        result += pow* oneCharHexToInt(hex[i]);
+    }
+    return result;         
+}
+void calculateCheckSum(struct trame* trameAEnv)
+{
+    char* checkSum = (char*)gMalloc(sizeof(char[2]));
+    char lSB[2];
+    int sum =0, i;
+    for(i=0;i<8;i=i+2)
+    {
+        checkSum[0] = trameAEnv->DATA[i];
+        checkSum[1] = trameAEnv->DATA[i+1];
+        sum+= hexToInt(checkSum);
+    }
+
+    for(i=0;i<8;i=i+2)
+    {
+        checkSum[0] = trameAEnv->ID[i];
+        checkSum[1] = trameAEnv->ID[i+1];
+        sum+= hexToInt(checkSum);
+    }
+    checkSum[0] = trameAEnv->HEADER[0];
+    checkSum[1] = trameAEnv->LENGHT[0];
+    sum+= hexToInt(checkSum);
+    for(i=0;i<2;i=i+2)
+    {
+        checkSum[0] = trameAEnv->ORG[i];
+        checkSum[1] = trameAEnv->ORG[i+1];
+        sum+= hexToInt(checkSum);
+    }
+    for(i=0;i<2;i=i+2)
+    {
+        checkSum[0] = trameAEnv->STATUS[i];
+        checkSum[1] = trameAEnv->STATUS[i+1];
+        sum+= hexToInt(checkSum);
+    }    
+    itochar(sum, checkSum, 16);  
+    lSB[0] = checkSum[1];
+    lSB[1] = checkSum[0];
+    trameAEnv->CHECKSUM = lSB;
+    gFree(checkSum);
 }
 
-void CreateMessageOpen(char id[8], char* trameToSend)
+void createMessageOpen(char id[8], char* trameToSend)
 {
     /*
 //SYNC: A55A
@@ -61,7 +194,7 @@ void CreateMessageOpen(char id[8], char* trameToSend)
 //ID= FF9F1E05
 //STATUS : 0
 //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
-    struct trame* trameAEnvoyer = (struct trame*)malloc(sizeof(struct trame));
+    struct trame* trameAEnvoyer = (struct trame*)gMalloc(sizeof(struct trame));
    // char* checkSum = (char*)malloc(sizeof(char[2]));
     //char* trameToSend;
     trameAEnvoyer->DATA = "40000000";
@@ -70,9 +203,9 @@ void CreateMessageOpen(char id[8], char* trameToSend)
     trameAEnvoyer->LENGHT = "B";
     trameAEnvoyer->STATUS = "00";    
     trameAEnvoyer->ORG = "05";
-    trameAEnvoyer->STATUS = "30";
+    trameAEnvoyer->STATUS = "00";
     trameAEnvoyer->SYNC = "A55A";
-    CalculateCheckSum(trameAEnvoyer);
+    calculateCheckSum(trameAEnvoyer);
     //trameAEnvoyer.CHECKSUM = checkSum;
     strcpy(trameToSend, trameAEnvoyer->SYNC);
     strcat(trameToSend, trameAEnvoyer->HEADER);
@@ -82,10 +215,12 @@ void CreateMessageOpen(char id[8], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->ID);
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
+
+    gFree(trameAEnvoyer);
     //return trameToSend;
 }
 
-void CreateMessageClose(char id[9], char* trameToSend)
+void createMessageClose(char id[9], char* trameToSend)
 {
     /*
 //SYNC: A55A
@@ -96,18 +231,18 @@ void CreateMessageClose(char id[9], char* trameToSend)
 //ID= FF9F1E05
 //STATUS : 0
 //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
-    struct trame* trameAEnvoyer = (struct trame*)malloc(sizeof(struct trame));
+    struct trame* trameAEnvoyer = (struct trame*)gMalloc(sizeof(struct trame));
    // char* checkSum = (char*)malloc(sizeof(char[2]));
     //char* trameToSend;
     trameAEnvoyer->DATA = "60000000";
     trameAEnvoyer->HEADER = "3";
     trameAEnvoyer->ID =id;
     trameAEnvoyer->LENGHT = "B";
-    trameAEnvoyer->STATUS = "00";    
+       
     trameAEnvoyer->ORG = "05";
-    trameAEnvoyer->STATUS = "30";
+    trameAEnvoyer->STATUS = "00";
     trameAEnvoyer->SYNC = "A55A";
-    CalculateCheckSum(trameAEnvoyer);
+    calculateCheckSum(trameAEnvoyer);
     //trameAEnvoyer.CHECKSUM = checkSum;
     strcpy(trameToSend, trameAEnvoyer->SYNC);
     strcat(trameToSend, trameAEnvoyer->HEADER);
@@ -117,6 +252,7 @@ void CreateMessageClose(char id[9], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->ID);
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
+    gFree(trameAEnvoyer);
     //return trameToSend;
 }
 
@@ -151,15 +287,17 @@ void setActionneurFct(struct actionFct_t * a, char fctName[20]){
 }
 
 void openCOURRANT(char id[9]){
-    char* trame = (char*)malloc(sizeof(char[29]));
-    CreateMessageOpen("FF9F1E05", trame);
-    printf("la trame cree: %s \n", trame);
-    free(trame);
+    char* trame = (char*)gMalloc(sizeof(char[29]));
+    createMessageOpen(id, trame);
+    printf("trame a envoyer: %s \n", trame);
+    sensorsNetworkSend(trame, sizeof(trame));
+    gFree(trame);
 }
 
 void closeCOURRANT(char id[9]){
-    char* trame = (char*)malloc(sizeof(char[29]));
-    CreateMessageClose("FF9F1E05", trame);
-    printf("la trame cree: %s \n", trame);
-    free(trame);
+    char* trame = (char*)gMalloc(sizeof(char[29]));
+    createMessageClose("FF9F1E05", trame);
+    printf("trame a envoyer: %s \n", trame);
+    sensorsNetworkSend(trame, sizeof(trame));
+    gFree(trame);
 }

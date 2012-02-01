@@ -1,10 +1,13 @@
 #include <stdlib.h>
 
 #include "rules.h"
+#include "common.h"
 
 void applyRules() {
 
     printf("\nApplying rules..\n");
+
+    pthread_mutex_lock(&sensorsMutex);
 
     struct rule_t * currentRule = startRule;
     struct condition_t * currentCondition;
@@ -33,6 +36,8 @@ void applyRules() {
 
         currentRule = currentRule->nextRule;
     }
+
+    pthread_mutex_unlock(&sensorsMutex);
 }
 
 int testEqual(int * data, int value) {
@@ -99,7 +104,7 @@ void setConditionName(struct condition_t * c, char sensorId[9], char cndName[20]
         }
     } else if (sensor->type == INTERRUPTEUR) {
         if (strcmp(cndName, "switchButton") == 0) {
-            c->data = &(((dataINTERRUPTEUR*)sensor->data)->switchButton);
+            c->data = ((int*)&(((dataINTERRUPTEUR*)sensor->data)->switchButton));
         } else {
             ok = 1;
         }
