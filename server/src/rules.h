@@ -4,16 +4,8 @@
 #include <stdio.h>
 
 #include "actions.h"
+#include "sensors.h"
 // ########################### Règles ################################
-
-
-void applyRules();
-
-int testEqual(int * data, int value);
-int testGreaterOrEqual(int * data, int value);
-int testLessOrEqual(int * data, int value);
-int testGreater(int * data, int value);
-int testLess(int * data, int value);
 
 //Premier element liste regles
 struct rule_t * startRule;
@@ -33,6 +25,16 @@ typedef struct rule_t{
 	struct rule_t * nextRule;
 } rule_t;
 
+
+void applyRules();
+
+int testEqual(int * data, int value);
+int testGreaterOrEqual(int * data, int value);
+int testLessOrEqual(int * data, int value);
+int testGreater(int * data, int value);
+int testLess(int * data, int value);
+
+void setConditionName(struct condition_t * c, char sensorId[9], char cndName[20]);
 
 
 #endif /*RULES_H_*/

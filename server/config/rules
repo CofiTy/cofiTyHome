@@ -19,23 +19,24 @@
 rule:	
 	temperature
 conditions:	
-	0021CBE2<30
-	00053F44<=20
+	0021CBE2.switchButton<30
 actions:
 	ToutFermer
 	
 rule:	
 	pipi
 conditions:	
+	00053F44.presence<=20
+	00053F44.luminosite<=20
 	10020024>5
-	0021CBE2<=20
+	0021CBE2>=20
 actions:
 	ToutOuvrir
 	
 rule:
 	cafe
 conditions:
-	0001B292<=5	
+	0001B292>=5	
 	0001B291==35
 actions:
 	ToutOuvrir

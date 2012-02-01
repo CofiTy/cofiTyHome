@@ -25,3 +25,7 @@ void applyAction(struct action_t * action){
         current = current->nextActionFct;
     }
 }
+
+void applyActionByName(char nom[20]){
+    
+}
