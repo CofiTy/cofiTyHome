@@ -42,7 +42,7 @@ void initMemory()
         up->s.sCode = SECRET_CODE;
         /*up->s.size = SIZE_ALLOC - sizeof(Header);*/
         gFree((void *)(up+1));   
-        printf("Début : %p, Fin: %p\n", (void *)heap, (void *)(heap+SIZE_ALLOC));
+        /*printf("Début : %p, Fin: %p\n", (void *)heap, (void *)(heap+SIZE_ALLOC));*/
     }
 }
 

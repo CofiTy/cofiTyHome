@@ -288,17 +288,17 @@ void setActionneurFct(struct actionFct_t * a, char fctName[20]){
 }
 
 void openCOURRANT(char id[9]){
-    char* trame = (char*)gMalloc(sizeof(char[29]));
+    char* trame = (char*)gMalloc(sizeof(char[28]));
+    memset(trame, '\0', 28);
     createMessageOpen(id, trame);
-    printf("trame a envoyer: %s \n", trame);
-    sensorsNetworkSend(trame, sizeof(trame));
+    sensorsNetworkSend(trame, 28);
     gFree(trame);
 }
 
 void closeCOURRANT(char id[9]){
-    char* trame = (char*)gMalloc(sizeof(char[29]));
+    char* trame = (char*)gMalloc(sizeof(char[28]));
+    memset(trame, '\0', 28);
     createMessageClose(id, trame);
-    printf("trame a envoyer: %s \n", trame);
-    sensorsNetworkSend(trame, sizeof(trame));
+    sensorsNetworkSend(trame, 28);
     gFree(trame);
 }

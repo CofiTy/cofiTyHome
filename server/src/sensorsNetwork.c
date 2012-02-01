@@ -25,7 +25,7 @@ void * sensorsMsgRec(){
   int nb, total;
   char* receiving = (char *) buff;
 
-  memset(buff, 0, 128);
+  memset(buff, '\0', 128);
   total = 0;
 
   for(;;)
@@ -40,12 +40,12 @@ void * sensorsMsgRec(){
     /* If enough data we can process */
     i = 0;
     j = 0;
-    while(i < (strlen(buff) - 1)){
+    while(i < (strlen(buff))){
       data[j++] = buff[i++];
-      if(j == 26){
+      if(j == 28){
         /*Traiter data*/
-        decodeTrame(data);
         printf("Trame : %s\n", data);
+        decodeTrame(data);
         j = 0;
         memset(data, '\0', 32);
       }
@@ -53,7 +53,7 @@ void * sensorsMsgRec(){
 
       total = 0;
       receiving = (char *) buff;
-      memset(buff, 0, 128);
+      memset(buff, '\0', 128);
   }
 }
 
@@ -68,6 +68,8 @@ void * sensorsMsgSend(){
     /* Recuperation des messages de la boite au lettre "Envoi" */
     nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
+    
+    printf("Sending toward Gateway: %s\n", buff);
 
     total = nb;
     nbSent = 0;
@@ -94,6 +96,7 @@ void sensorsNetworkStart(){
   memset(&saddr, 0, sizeof(struct sockaddr_in));
 
   saddr.sin_addr.s_addr = inet_addr("134.214.105.28"); //TODO macro avec les bonnes valeur
+  //saddr.sin_addr.s_addr = inet_addr("127.0.0.1");
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(5000); //TODO macro avec les bonnes valeur
 
@@ -103,7 +106,8 @@ void sensorsNetworkStart(){
   FAIL(sock);
 
   FAIL(connect(sock, (struct sockaddr *)&saddr, len));
-
+  
+  puts("Connected to gateway");
   pthread_create(&pthreadSensorsRec, NULL, sensorsMsgRec, NULL);
   pthread_detach(pthreadSensorsRec);
 
