@@ -46,7 +46,10 @@ void gFree(void *ap)
 {
     Header *bp, *p;
 
-    if(freep == NULL || ap == NULL)
+    if(freep == NULL 
+            || ap == NULL
+            || ap < heap
+            || ap >= (heap + SIZE_ALLOC))
         return;
 
     pthread_mutex_lock(&myLock);
