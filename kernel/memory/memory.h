@@ -14,6 +14,11 @@
 void initMemory();
 
 /**
+ * Stop all memory management.
+ */
+void destroyMemory();
+
+/**
  * Allocate a chunk of memory. NULL if too big
  * for remaining memory.
  */

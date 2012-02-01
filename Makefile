@@ -13,7 +13,7 @@ RMFLAGS=-f
 EXE=CofiTyHome
 LIBS=-lpthread -lrt -Lserver/lib -ljson
 EFFACE=clean
-OBJ=$(BUILDDIR)rules.o $(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o $(BUILDDIR)guiInterface.o $(BUILDDIR)actions.o $(BUILDDIR)sensors.o $(BUILDDIR)actionneurs.o
+OBJ=$(BUILDDIR)rules.o $(BUILDDIR)initCheckRules.o $(BUILDDIR)init.o $(BUILDDIR)guiNetwork.o $(BUILDDIR)sensorsNetwork.o $(BUILDDIR)guiInterface.o $(BUILDDIR)actions.o $(BUILDDIR)sensors.o $(BUILDDIR)actionneurs.o
 PARSEOBJ=$(PARSEBUILDDIR)rules.tab.o $(PARSEBUILDDIR)lex.yy.o
 MEMORYOBJ=$(MEMORYBUILDDIR)memory.o
 

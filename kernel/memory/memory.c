@@ -168,6 +168,12 @@ void *gMalloc(unsigned long nbytes)
     }
 }
 
+void destroyMemory()
+{
+	freep = NULL;
+	pthread_mutex_destroy(&myLock);
+}
+
 unsigned long getGMemTotal()
 {
     return SIZE_ALLOC;
