@@ -1,3 +1,6 @@
+
+//------------------ACTIONNEUR--------------
+
 #if ! defined ( ACTIONNEURS_H_ )
 #define ACTIONNEURS_H_
 
@@ -31,3 +34,4 @@ void openCOURRANT(char id[9]);
 void closeCOURRANT(char id[9]);
 
 #endif /*ACTIONNEURS_H_*/
+
