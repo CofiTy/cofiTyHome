@@ -20,10 +20,10 @@ struct action_t{
 
 struct action_t * actions;
 
-struct action_t * getAction(char nom[20]);
+struct action_t * getAction(const char nom[20]);
 
 void applyAction(struct action_t * action);
 
-void applyActionByName(char nom[20]);
+void applyActionByName(const char nom[20]);
 
 #endif /*ACTIONS_H_*/

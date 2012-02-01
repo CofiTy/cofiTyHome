@@ -104,7 +104,7 @@ void setConditionName(struct condition_t * c, char sensorId[9], char cndName[20]
         }
     } else if (sensor->type == INTERRUPTEUR) {
         if (strcmp(cndName, "switchButton") == 0) {
-            c->data = &(((dataINTERRUPTEUR*)sensor->data)->switchButton);
+            c->data = ((int*)&(((dataINTERRUPTEUR*)sensor->data)->switchButton));
         } else {
             ok = 1;
         }
