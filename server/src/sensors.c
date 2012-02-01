@@ -1,4 +1,5 @@
 #include "sensors.h"
+#include "common.h"
 
 struct sensorType * getSensor(char id[9]) {
     struct sensorType * current = sensors;
@@ -17,6 +18,8 @@ struct sensorType * getSensor(char id[9]) {
 
 void decodeTrame(char* trame)
 {
+    printf("Searching for corresponding sensor...\n");
+    pthread_mutex_lock(&sensorsMutex);
     int i;
     char id[9];
     for(i=0;i<8;i++)
@@ -26,8 +29,12 @@ void decodeTrame(char* trame)
     id[8]='\0';
     sensorType* capteur = getSensor(id);
     if(capteur!=NULL)
+    {
         capteur->decode(trame,capteur);
-    //printf("result: %d", )
+        sem_post(&checkRules);
+    }
+    pthread_mutex_unlock(&sensorsMutex);
+    printf("Done searching" );
 }
 void decodePresence(char* trame, struct sensorType* capteur)
 {
@@ -45,6 +52,7 @@ void decodePresence(char* trame, struct sensorType* capteur)
     float lumin = ((float)(510.0/255.0))*(float)valDec;
     ((dataPRESENCE*)capteur->data)->presence = presence;
     ((dataPRESENCE*)capteur->data)->luminosite = lumin;
+   
 }
 
 void decodeInterrupteur(char* trame, struct sensorType* capteur)
@@ -55,6 +63,7 @@ void decodeInterrupteur(char* trame, struct sensorType* capteur)
         case '7':
         {
            ((dataINTERRUPTEUR*)capteur->data)->switchButton = B0;
+           printf("decode!");
             break;
         }
         case '5':
@@ -66,16 +75,19 @@ void decodeInterrupteur(char* trame, struct sensorType* capteur)
         case '3':
         {
            ((dataINTERRUPTEUR*)capteur->data)->switchButton  = A0;
+           printf("decode!");
             break;
         }
         case '1':
         {
           ((dataINTERRUPTEUR*)capteur->data)->switchButton  = A1;
+          printf("decode!");
             break;
         }
         default:
         {
             ((dataINTERRUPTEUR*)capteur->data)->switchButton  = NONE;
+            printf("decode!");
             break;
             
         }
