@@ -184,13 +184,11 @@ void guiNetworkStart(){
 
 void guiNetworkStop(){
 
-  puts("closing");
-  pthread_kill(pthreadConnexion, SIGKILL);
+  FAIL(pthread_cancel(pthreadConnexion));
 
-  puts("loop");
   while(clientList.first != NULL){
-    pthread_kill(clientList.first->pthreadSend, SIGTERM);
-    pthread_kill(clientList.first->pthreadRec, SIGTERM);
+    FAIL(pthread_cancel(clientList.first->pthreadSend));
+    FAIL(pthread_cancel(clientList.first->pthreadRec));
     close(clientList.first->sock);
     FAIL(mq_close(clientList.first->mqSend));
 
