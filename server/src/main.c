@@ -53,7 +53,6 @@ int main(int argc, char ** argv){
         {
           puts("Commande invalide\nUsage: exit, quit, q");
         }
-        done = 1;
       }
     }
   }
