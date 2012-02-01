@@ -183,7 +183,7 @@ void calculateCheckSum(struct trame* trameAEnv)
     gFree(checkSum);
 }
 
-void createMessageOpen(char id[8], char* trameToSend)
+void createMessageOpen(char id[9], char* trameToSend)
 {
     /*
 //SYNC: A55A
@@ -215,7 +215,7 @@ void createMessageOpen(char id[8], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->ID);
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
-
+    strcat(trameToSend, '\0');
     gFree(trameAEnvoyer);
     //return trameToSend;
 }
@@ -252,6 +252,7 @@ void createMessageClose(char id[9], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->ID);
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
+    strcat(trameToSend, '\0');
     gFree(trameAEnvoyer);
     //return trameToSend;
 }
@@ -296,7 +297,7 @@ void openCOURRANT(char id[9]){
 
 void closeCOURRANT(char id[9]){
     char* trame = (char*)gMalloc(sizeof(char[29]));
-    createMessageClose("FF9F1E05", trame);
+    createMessageClose(id, trame);
     printf("trame a envoyer: %s \n", trame);
     sensorsNetworkSend(trame, sizeof(trame));
     gFree(trame);
