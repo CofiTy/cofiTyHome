@@ -1,15 +1,37 @@
-//------------------ACTIONNEUR--------------
-struct trame{ 
-        char* SYNC;//SYNC = "A55A";
-        char* HEADER;// (TX MESSAGE): 3
-        char* LENGHT;//LENGHT: B
-        char* ORG;//ORG : 05
-        char* DATA;//DATA : DB3: 0100 0000, le reste a zero => DATA: 40000000 B1
-//DATA : DB3: 0110 0000, le reste a zero => DATA: 60000000 B0
-        char* ID;//ID= FF9F1E05
-        char* STATUS;//STATUS : doc
-        char* CHECKSUM;//CHECKSUM:least significant byte from addition of all bytes except for sync and checksum
-};
 
-void OpenCourrant(char id[8]);
-void CloseCourrant(char id[8]);
+//------------------ACTIONNEUR--------------
+
+#if ! defined ( ACTIONNEURS_H_ )
+#define ACTIONNEURS_H_
+
+#include <stdio.h>
+#include <string.h>
+
+#include "actions.h"
+
+
+// ########################### Actionneurs ###########################
+
+typedef enum typeActionneur {
+    COURRANT
+} typeActionneur;
+
+typedef struct actionneur_t {
+ typeActionneur type;
+ char id[9];
+ struct actionneur_t* nextActionneur;
+} actionneur_t;
+
+struct actionneur_t * actionneurs;
+
+struct actionneur_t * getActionneur(char id[9]);
+
+void setActionneurFct(struct actionFct_t * a, char fctName[20]);
+
+
+//----- COURRANT --------------------------------------------------------------------
+void openCOURRANT(char id[9]);
+void closeCOURRANT(char id[9]);
+
+#endif /*ACTIONNEURS_H_*/
+

@@ -15,4 +15,14 @@
 #  
 #####################################################
 
-
+nomAction:
+	ToutFermer
+actionneurs:
+	12345678.close
+	87654321.close
+	
+nomAction:
+	ToutOuvrir
+actionneurs:
+	12345678.open
+	87654321.open

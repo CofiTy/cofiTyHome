@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -12,15 +13,16 @@
 
 #include "sensorsNetwork.h"
 
-int sock;
+int i, j, sock;
 pthread_t pthreadSensorsRec, pthreadSensorsSend;
 mqd_t mqSensorsSend;
 
 void * sensorsMsgRec(){
 
   char buff[128];
+  char data[32];
   int nb, total;
-  char* receiving = (char *) buff[0];
+  char* receiving = (char *) buff;
 
   memset(buff, 0, 128);
   total = 0;
@@ -35,28 +37,34 @@ void * sensorsMsgRec(){
     receiving += nb;
 
     /* If enough data we can process */
-    if(total >= 27)
-    {
-      printf("Trame : %s\n", buff);
-      puts("recv");
-      total = 0;
-      receiving = (char *) buff[0];
-      memset(buff, 0, 128);
+    i = 0;
+    j = 0;
+    while(i < (strlen(buff) - 1)){
+      data[j++] = buff[i++];
+      if(j == 26){
+        /*Traiter data*/
+        printf("Trame : %s\n", data);
+        j = 0;
+        memset(data, '\0', 32);
+      }
     }
+
+      total = 0;
+      receiving = (char *) buff;
+      memset(buff, 0, 128);
   }
 }
 
 void * sensorsMsgSend(){
 
-  char buff[128];
+  char buff[8192];
   int nb, nbSent, total;
-  char* sending = (char *) buff[0];
+  char* sending = (char *) buff;
 
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    return NULL;
-    nb = mq_receive(mqSensorsSend, buff, 128, 0);
+    nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
 
     total = nb;
@@ -70,13 +78,15 @@ void * sensorsMsgSend(){
       sending += nb;
     }
     puts("sent");
+    sending = (char *) buff;
   }
 
 }
 
 void sensorsNetworkStart(){
 
-  mqSensorsSend = mq_open("SensorsMsgSend", O_RDWR | O_CREAT);
+  mqSensorsSend = mq_open("/SensorsMsgSend", O_RDWR | O_CREAT, S_IRWXU, NULL);
+  FAIL(mqSensorsSend);
 
   struct sockaddr_in saddr;
   memset(&saddr, 0, sizeof(struct sockaddr_in));

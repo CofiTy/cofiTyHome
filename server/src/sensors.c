@@ -1,6 +1,6 @@
 #include "sensors.h"
 
-struct sensorType * getSensor(char id[8]) {
+struct sensorType * getSensor(char id[9]) {
     struct sensorType * current = sensors;
     
     while (current != 0) {
@@ -15,9 +15,10 @@ struct sensorType * getSensor(char id[8]) {
     return 0;
 }
 
-void decodePresence(char* trame, sensorList* capteur)
+void decodePresence(char* trame, struct sensorType* capteur)
 {char presence;
-    if(trame[15]&'1'=='1')
+    char and = '1';
+    if(((trame[15])&(and))==and)
          presence ='1';
     else
         presence = '0';
@@ -31,7 +32,7 @@ void decodePresence(char* trame, sensorList* capteur)
     ((dataPRESENCE*)capteur->data)->luminosite = lumin;
 }
 
-void decodeSwitch(char* trame, sensorList* capteur)
+void decodeInterrupteur(char* trame, struct sensorType* capteur)
 {
     char db3 = trame[8];
     switch (db3)
@@ -65,10 +66,10 @@ void decodeSwitch(char* trame, sensorList* capteur)
     }       
 }
 
-void decodeContact(char* trame, sensorList* capteur)
+void decodeContact(char* trame, struct sensorType* capteur)
 {
     char and = '1';
-    if(trame[15]&and==and)
+    if(((trame[15])&(and))==and)
     {
         ((dataCONTACT*)capteur->data)->contact = and;
     }
@@ -76,7 +77,7 @@ void decodeContact(char* trame, sensorList* capteur)
        ((dataCONTACT*)capteur->data)->contact = '0';
 }
 
-void decodeTemperature(char* trame, sensorList* capteur)
+void decodeTemperature(char* trame, struct sensorType* capteur)
 {
     char data[2];
     data[0] = trame[12];

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -10,6 +11,7 @@
 #include <unistd.h>
 
 #include "guiNetwork.h"
+#include "guiInterface.h"
 
 typedef struct Client *PClient;
 
@@ -33,9 +35,10 @@ List clientList;
 void * guiMsgRec(void* data){
 
   char buff[128];
-  int i, nb, total, blocs;
+  char traite[128];
+  int i, j, nb, total, blocs;
   int over = 0;
-  char* receiving = (char *) buff[0];
+  char* receiving = (char *) buff;
   Client* client = (Client*)data;
 
   memset(buff, 0, 128);
@@ -44,49 +47,53 @@ void * guiMsgRec(void* data){
 
   for(;;)
   {
+    printf("Sock: %d\n", client->sock);
     /* reception form sensors */
     nb = recv(client->sock, receiving, 128, 0);
+    puts("recv");
     FAIL(nb);
     total += nb;
     receiving += nb;
 
     i = 0;
-    while(!over && i < strlen(buff)){
+    j = 0;
+    while(i < (strlen(buff) - 1)){
+      traite[j++] = buff[i];
       if(buff[i] == '{'){
         ++blocs;
       } else if(buff[i] == '}'){
         --blocs;
       }
-      if(blocs == 0){
-        over = 1;
+      if(blocs == 0){ /* If enough data we can process */
+        puts("recv");
+        /*Traiter traite*/
+        processCommand(traite);
+        j = 0;
+        memset(traite, '\0', 128);
       }
       ++i;
     }
 
-    /* If enough data we can process */
-    if(over)
-    {
-      puts("recv");
-      total = 0;
-      blocs = 0;
-      over = 0;
-      receiving = (char *) buff[0];
-      memset(buff, '\0', 128);
-    }
+    total = 0;
+    blocs = 0;
+    over = 0;
+    receiving = (char *) buff;
+    memset(buff, '\0', 128);
   }
 }
 
 void * guiMsgSend(void* data){
 
-  char buff[128];
+  char buff[8192];
   int nb, nbSent, total;
-  char* sending = (char *) buff[0];
+  char* sending = (char *) buff;
   Client* client = (Client*)data;
 
   for(;;)
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
-    nb = mq_receive(client->mqSend, buff, 128, 0);
+    nb = mq_receive(client->mqSend, buff, 8192, NULL);
+    puts("mq rec");
     FAIL(nb);
 
     total = nb;
@@ -100,6 +107,7 @@ void * guiMsgSend(void* data){
       sending += nb;
     }
     puts("sent");
+    sending = (char *) buff;
   }
 
 }
@@ -121,7 +129,7 @@ void * guiNetworkConnexion(){
 
   acceptSock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(acceptSock);
-  
+
   FAIL(bind(acceptSock, (struct sockaddr *)&saddr, sizeof(saddr)));
 
   FAIL(listen(acceptSock, 10));
@@ -129,7 +137,7 @@ void * guiNetworkConnexion(){
 
   for(;;){
     memset(&saddr, 0, sizeof(struct sockaddr_in));
-    sprintf(name, "mqMsgSendNb%d", i++);
+    sprintf(name, "/mqMsgSendNb%d", i++);
 
     tmpSock = accept(acceptSock, (struct sockaddr *)&saddr_client, &size_addr);
     FAIL(tmpSock);
@@ -147,9 +155,11 @@ void * guiNetworkConnexion(){
     }
 
     clientList.current->sock = tmpSock;
+    
+    clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT, S_IRWXU, NULL);
+    FAIL(clientList.current->mqSend);
 
-    clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT);
-
+    printf("Sock: %d\n", clientList.current->sock);
     pthread_create(&clientList.current->pthreadRec, NULL, guiMsgRec, (void*)clientList.current);
     pthread_detach(clientList.current->pthreadRec);
 

@@ -5,19 +5,11 @@
 /**
  * Private thread structure (linked list).
  */
-typedef struct gThread
-{
-	struct gThread *next; /* Next Thread */
-	mctx_t context;       /* Context (see gThread.h) */
-	THREAD_ID id;         /* Thread Id */
-	time_t timeToWait;    /* Timestamp when wake up if sleeping */
-	char *stack;          /* Stack */
-} gThread;
 
 /**
  * Pointer to the firstThread of the Activable List.
  */
-static gThread *firstThread = NULL;
+static gThread *firstThread;
 
 /**
  * Running Thread.
@@ -183,6 +175,7 @@ static void initGThreadingSystem()
 	static struct sigaction sa;
 	struct itimerval value;
 
+	firstThread = NULL;
 	mainThread->id = counter++;
 	mainThread->next = firstThread;
 	mainThread->stack = malloc(STACK_SIZE);
@@ -373,4 +366,50 @@ void exitCurrentThread()
 	threadForDeletion = save;
 	enableInterrupt();
 	mctx_restore(&(currentThread->context));
+}
+
+
+semaphore* newSemaphore(int init)
+{
+	semaphore *sem = malloc(sizeof(semaphore));
+	sem->counter = init;
+	sem->inWait = NULL;
+	return sem;
+}
+
+
+void semTake(semaphore *sem)
+{
+	gThread *save;
+	disableInterrupt();
+	if (sem->counter == 0)
+	{
+		save = currentThread;
+		removeGThreadFromActivable(currentThread);
+		save->next = sem->inWait;
+		sem->inWait = save;
+		enableInterrupt();
+		mctx_switch(&(save->context),&(currentThread->context));
+	}
+	else
+	{
+	sem->counter--;
+	}
+}
+
+void semGive(semaphore *sem)
+{
+	gThread *save;
+	disableInterrupt();
+	if (sem->inWait != NULL)
+	{
+		save = sem->inWait;;
+		sem->inWait = sem->inWait->next;
+		save->next = firstThread;
+		firstThread = save;
+	}
+	else
+	{
+		sem->counter++;
+	}
 }

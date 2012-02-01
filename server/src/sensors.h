@@ -1,5 +1,10 @@
+#if ! defined ( SENSORS_H_ )
+#define SENSORS_H_
+
+
 #include "stdio.h"
 #include "string.h"
+#include <stdlib.h>
 
 // ########################### Capteurs ##############################
 
@@ -12,15 +17,15 @@ typedef enum typeCapteur {
 
 typedef struct sensorType {
  typeCapteur type;
- char id[8];
+ char id[9];
  void *data;
  struct sensorType* nextSensor;
  void (*decode)(char* trame, struct sensorType*);
-};
+} sensorType;
 
 struct sensorType * sensors;
 
-struct sensorType * getSensor(char id[8]);
+struct sensorType * getSensor(char id[9]);
 
 //sensorType sensorList;
 
@@ -30,14 +35,14 @@ typedef struct dataTEMPERATURE {
     int temp;
 } dataTEMPERATURE;
 
-extern void decodeTemperature(char* trame, struct sensorType* capteur);
+void decodeTemperature(char* trame, struct sensorType* capteur);
 
 //----- CONTACT ------------------------------------------------------------------------
 typedef struct dataCONTACT {
     char contact;
 } dataCONTACT;
 
-extern void decodeContact(char* trame, struct sensorType* capteur);
+void decodeContact(char* trame, struct sensorType* capteur);
 
 //----- PRESENCE ------------------------------------------------------------------------
 typedef struct dataPRESENCE {
@@ -45,8 +50,8 @@ typedef struct dataPRESENCE {
     char luminosite;
 } dataPRESENCE;
 
-#
-extern void decodePresence(char* trame, struct sensorType* capteur);
+
+void decodePresence(char* trame, struct sensorType* capteur);
 
 
 //----- INTERRUPTEUR --------------------------------------------------------------------
@@ -64,4 +69,6 @@ typedef struct dataINTERRUPTEUR {
 } dataINTERRUPTEUR;
 
 
-extern void decodeInterrupteur(char* trame, struct sensorType* capteur);
+void decodeInterrupteur(char* trame, struct sensorType* capteur);
+
+#endif /*SENSORS_H_*/
