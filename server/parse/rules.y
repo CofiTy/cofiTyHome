@@ -135,6 +135,7 @@ typeSensor:
 {
     currentSensor->type = PRESENCE;
 
+
     if((currentSensor->data = gMalloc(sizeof(dataPRESENCE))) == NULL)
     {
 		printf("No Memory\n");
@@ -332,9 +333,29 @@ conditionid:
             old->nextCondition = currentCondition;
     }
     char t[9];
-    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * 9);
+    memset(t, '\0', sizeof (char) * 9);
     strcpy(t, $1);
     currentCondition->data = getSensor(t)->data;
+};
+        | IDENTIFIER POINT IDENTIFIER
+{
+    printf("\tcond  %s\n", $1);
+
+    struct condition_t * old = currentCondition;
+
+    currentCondition = calloc(1, sizeof(struct condition_t));
+
+    if(currentRule->conditions == 0){
+            currentRule->conditions = currentCondition;
+    } else {
+            old->nextCondition = currentCondition;
+    }
+    /*char t[9];
+    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * 9);
+    strcpy(t, $1);
+    currentCondition->data = getSensor(t)->data;*/
+
+    setConditionName(currentCondition, $1, $3);
 };
 
 numberid:

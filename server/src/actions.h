@@ -24,5 +24,6 @@ struct action_t * getAction(char nom[20]);
 
 void applyAction(struct action_t * action);
 
+void applyActionByName(char nom[20]);
 
 #endif /*ACTIONS_H_*/
