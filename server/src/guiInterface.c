@@ -177,7 +177,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
 
     json_object_array_add(message, dataObj);
 
-    if(currentType != PRESENCE){
+    if(currentType == PRESENCE){
       type = json_object_new_string("Luminosite");
       dataObj = json_object_new_object();
       json_object_object_add(dataObj, "id", tmp);
