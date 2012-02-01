@@ -11,46 +11,19 @@
 int main(int argc, char ** argv){
 	
 	initMemory();
-/*
-    sensorsNetworkStart();
-    sleep(120);
-    sensorsNetworkStop();
-*/
-/*
+  parseAll();
+
+
 	printf("MemTotale: %ld\n", getGMemTotal());
 	printf("MemFree: %ld\n", getGMemFree());
 
+    sensorsNetworkStart();
     guiNetworkStart();
-    sleep(20);
+    sleep(120);
     guiNetworkStop();
-
-*/
-    
-/*
-    sensors = calloc(1, sizeof(struct sensorType));
-
-    sensors->data = calloc(1, sizeof(dataTEMPERATURE));
-
-    ((dataTEMPERATURE*)sensors->data)->temp = 35;
-    strcpy(sensors->id, "cap1");
+    sensorsNetworkStop();
 
 
-    sensors->nextSensor = calloc(1, sizeof(struct sensorType));
-
-    sensors->nextSensor->data = calloc(1, sizeof(dataTEMPERATURE));
-
-    ((dataTEMPERATURE*)sensors->nextSensor->data)->temp = 5;
-    strcpy(sensors->nextSensor->id, "cap2");
-*/
-
-    parseAll();
-
-    applyRules();
-    
-    //decodeTrame("A55A0B05500000000021CBE2305E");
-    char id[9] = "FF9F1E05";
-    printf("id as declared %s \n", id);
-    closeCOURRANT(id);
 
   return 0;
 }

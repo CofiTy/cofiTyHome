@@ -101,6 +101,8 @@ void * guiMsgSend(void* data){
     nb = mq_receive(client->mqSend, buff, 8192, NULL);
     puts("mq rec");
     FAIL(nb);
+    
+    printf("Sending: %s\n", buff);
 
     total = nb;
     nbSent = 0;
@@ -182,8 +184,10 @@ void guiNetworkStart(){
 
 void guiNetworkStop(){
 
-  pthread_kill(pthreadConnexion, SIGTERM);
+  puts("closing");
+  pthread_kill(pthreadConnexion, SIGKILL);
 
+  puts("loop");
   while(clientList.first != NULL){
     pthread_kill(clientList.first->pthreadSend, SIGTERM);
     pthread_kill(clientList.first->pthreadRec, SIGTERM);
@@ -194,6 +198,7 @@ void guiNetworkStop(){
     clientList.first = clientList.first->next;
     gFree(clientList.current);
   }
+  puts("Closed");
 }
 
 int guiNetworkSend(const char * msg_ptr, size_t msg_len, mqd_t mqId){
