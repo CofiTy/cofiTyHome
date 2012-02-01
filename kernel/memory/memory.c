@@ -74,14 +74,19 @@ void gFree(void *ap)
         return;
     }
 
-    /* point to block header */
+    /* We search the preceding free block in memory */
     for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
     {
+		/* Freelist is circular, we break if were at the 
+		 * beginning or end of freelist.
+		 */
         if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
         {
-             break; /* freed block at start or end of arena */
+             break;
         }
     }
+    
+    /* Try to merge with next block. */
     if (bp + bp->s.size == p->s.ptr) 
     {
         /* join to upper nbr */
@@ -92,9 +97,10 @@ void gFree(void *ap)
     {
         bp->s.ptr = p->s.ptr;
     }
+    
+    /* Try to merge with previous block */
     if (p + p->s.size == bp) 
     {
-        /* join to lower nbr */
         p->s.size += bp->s.size;
         p->s.ptr = bp->s.ptr;
     } 
