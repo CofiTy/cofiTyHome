@@ -15,13 +15,27 @@ struct sensorType * getSensor(char id[9]) {
     return 0;
 }
 
+void decodeTrame(char* trame)
+{
+    int i;
+    char id[9];
+    for(i=0;i<8;i++)
+    {
+        id[i]=trame[i+16];
+    }
+    id[8]='\0';
+    sensorType* capteur = getSensor(id);
+    if(capteur!=NULL)
+        capteur->decode(trame,capteur);
+}
 void decodePresence(char* trame, struct sensorType* capteur)
-{char presence;
+{
+    int presence;
     char and = '1';
     if(((trame[15])&(and))==and)
-         presence ='1';
+         presence =1;
     else
-        presence = '0';
+        presence = 0;
     char data[2];
     data[0] = trame[10];
     data[1] = trame[11];
@@ -71,10 +85,10 @@ void decodeContact(char* trame, struct sensorType* capteur)
     char and = '1';
     if(((trame[15])&(and))==and)
     {
-        ((dataCONTACT*)capteur->data)->contact = and;
+        ((dataCONTACT*)capteur->data)->contact = 1;
     }
     else
-       ((dataCONTACT*)capteur->data)->contact = '0';
+       ((dataCONTACT*)capteur->data)->contact = 0;
 }
 
 void decodeTemperature(char* trame, struct sensorType* capteur)
@@ -84,6 +98,6 @@ void decodeTemperature(char* trame, struct sensorType* capteur)
     data[1] = trame[13];
     char* valHex;
     int valDec = strtol(data, &valHex, 16);
-    float temp = ((float)(40.0/255.0))*(float)valDec;
+    int temp = ((float)(40.0/255.0))*valDec;
     ((dataTEMPERATURE*)capteur->data)->temp = temp;
 }
