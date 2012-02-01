@@ -46,7 +46,7 @@ void gFree(void *ap)
 {
     Header *bp, *p;
 
-    if(freep == NULL)
+    if(freep == NULL || ap == NULL)
         return;
 
     pthread_mutex_lock(&myLock);
@@ -122,6 +122,7 @@ void *gMalloc(unsigned long nbytes)
             	p->s.size = nunits;
             }
             freep = prevp;
+            pthread_mutex_unlock(&myLock);
             return (void *)(p+1);
         }
         if (p == freep) /* wrapped around free list */

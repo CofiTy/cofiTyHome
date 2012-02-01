@@ -8,6 +8,8 @@
     #include "../src/sensors.h"
     #include "../src/actions.h"
     #include "../src/actionneurs.h"
+    
+    #include "../../kernel/memory/memory.h"
 
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
@@ -103,7 +105,11 @@ initSensor:
 {
     struct sensorType * old = currentSensor;
 
-    currentSensor = calloc(1, sizeof(struct sensorType));
+    if((currentSensor = gMalloc(sizeof(struct sensorType))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor, 0, sizeof(struct sensorType));
 
     if(sensors == 0){
         sensors = currentSensor;
@@ -117,7 +123,11 @@ typeSensor:
 {
     currentSensor->type = INTERRUPTEUR;
 
-    currentSensor->data = calloc(1, sizeof(dataINTERRUPTEUR));
+    if((currentSensor->data = gMalloc(sizeof(dataINTERRUPTEUR))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataINTERRUPTEUR));
 
     currentSensor->decode = decodeInterrupteur;
 };
@@ -125,7 +135,11 @@ typeSensor:
 {
     currentSensor->type = PRESENCE;
 
-    currentSensor->data = calloc(1, sizeof(dataPRESENCE));
+    if((currentSensor->data = gMalloc(sizeof(dataPRESENCE))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataPRESENCE));
 
     currentSensor->decode = decodePresence;
 };
@@ -133,7 +147,11 @@ typeSensor:
 {
     currentSensor->type = TEMPERATURE;
 
-    currentSensor->data = calloc(1, sizeof(dataTEMPERATURE));
+    if((currentSensor->data = gMalloc(sizeof(dataTEMPERATURE))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataTEMPERATURE));
 
     currentSensor->decode = decodeTemperature;
 };
@@ -141,7 +159,11 @@ typeSensor:
 {
     currentSensor->type = CONTACT;
 
-    currentSensor->data = calloc(1, sizeof(dataCONTACT));
+    if((currentSensor->data = gMalloc(sizeof(dataCONTACT))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataCONTACT));
 
     currentSensor->decode = decodeContact;
 };
@@ -171,7 +193,11 @@ initActionneur:
 {
     struct actionneur_t * old = currentActionneur;
 
-    currentActionneur = calloc(1, sizeof(struct actionneur_t));
+    if((currentActionneur = gMalloc(sizeof(struct actionneur_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentActionneur, 0, sizeof(struct actionneur_t));
 
     if(actionneurs == 0){
         actionneurs = currentActionneur;
@@ -205,7 +231,11 @@ actionId:
 {
     struct action_t * old = currentAction;
 
-    currentAction = calloc(1, sizeof(struct action_t));
+    if((currentAction = gMalloc(sizeof(struct action_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentAction, 0, sizeof(struct action_t));
 
     if(actions == 0){
         actions = currentAction;
@@ -226,7 +256,11 @@ oneActionneurFct:
 {
     struct actionFct_t * old = currentActionFct;
 
-    currentActionFct = calloc(1, sizeof(struct actionFct_t));
+    if((currentActionFct = gMalloc(sizeof(struct actionFct_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentActionFct, 0, sizeof(struct actionFct_t));
 
     if(currentAction->actionFcts == 0){
         currentAction->actionFcts = currentActionFct;
@@ -259,7 +293,11 @@ ruleid:
 
     struct rule_t * old = currentRule;
 
-    currentRule = calloc(1, sizeof(struct rule_t));
+    if((currentRule = gMalloc(sizeof(struct rule_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentRule, 0, sizeof(struct rule_t));
 
     if(startRule == 0){
         startRule = currentRule;
@@ -282,7 +320,11 @@ conditionid:
 
     struct condition_t * old = currentCondition;
 
-    currentCondition = calloc(1, sizeof(struct condition_t));
+    if((currentCondition = gMalloc(sizeof(struct condition_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentCondition, 0, sizeof(struct condition_t));
 
     if(currentRule->conditions == 0){
             currentRule->conditions = currentCondition;
@@ -340,7 +382,7 @@ someactions:
 void parseSensors() {
 	printf("%s\n", "Parsing Sensors..");
 
-	yyin = fopen( "config/sensors", "r" );
+	yyin = fopen( "server/config/sensors", "r" );
 
 	yyparse();
 }
@@ -348,7 +390,7 @@ void parseSensors() {
 void parseActionneurs() {
 	printf("\n%s\n", "Parsing Actionneurs..");
 
-	yyin = fopen( "config/actionneurs", "r" );
+	yyin = fopen( "server/config/actionneurs", "r" );
 
 	yyparse();
 }
@@ -356,7 +398,7 @@ void parseActionneurs() {
 void parseActions() {
 	printf("\n%s\n", "Parsing Actions..");
 
-	yyin = fopen( "config/actions", "r" );
+	yyin = fopen( "server/config/actions", "r" );
 
 	yyparse();
 }
@@ -364,7 +406,7 @@ void parseActions() {
 void parseRules() {
 	printf("\n%s\n", "Parsing Rules..");
 
-	yyin = fopen( "config/rules", "r" );
+	yyin = fopen( "server/config/rules", "r" );
 
 	yyparse();
 }

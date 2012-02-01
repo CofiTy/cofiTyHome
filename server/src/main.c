@@ -5,19 +5,25 @@
 #include "../parse/rules.tab.h"
 #include "sensors.h"
 
+#include "../../kernel/memory/memory.h"
+
 int main(int argc, char ** argv){
+	
+	initMemory();
 /*
     sensorsNetworkStart();
     sleep(120);
     sensorsNetworkStop();
 */
-
 /*
-    guiNetworkStart();
-    sleep(120);
-    guiNetworkStop();
-*/
+	printf("MemTotale: %ld\n", getGMemTotal());
+	printf("MemFree: %ld\n", getGMemFree());
 
+    guiNetworkStart();
+    sleep(20);
+    guiNetworkStop();
+
+*/
     
 /*
     sensors = calloc(1, sizeof(struct sensorType));
@@ -39,6 +45,7 @@ int main(int argc, char ** argv){
     parseAll();
 
     applyRules();
+
   return 0;
 }
 

@@ -13,6 +13,12 @@
 #include "guiNetwork.h"
 #include "guiInterface.h"
 
+#include "../../kernel/memory/memory.h"
+
+/**
+ * TODO: guiNetworkStop: On rentre dans kill thread et on sort pas: Pas de close
+ */
+
 typedef struct Client *PClient;
 
 typedef struct Client {
@@ -144,12 +150,12 @@ void * guiNetworkConnexion(){
     puts("gotConnexion");
 
     if(clientList.first == NULL){
-      clientList.first = malloc(sizeof(Client));
+      clientList.first = gMalloc(sizeof(Client));
       clientList.first->next = NULL;
       clientList.current = clientList.first;
     } 
     else{
-      clientList.current = malloc(sizeof(Client));
+      clientList.current = gMalloc(sizeof(Client));
       clientList.current->next = clientList.first;
       clientList.first = clientList.current;
     }
@@ -177,6 +183,7 @@ void guiNetworkStart(){
 void guiNetworkStop(){
 
   pthread_kill(pthreadConnexion, SIGTERM);
+
   while(clientList.first != NULL){
     pthread_kill(clientList.first->pthreadSend, SIGTERM);
     pthread_kill(clientList.first->pthreadRec, SIGTERM);
@@ -185,7 +192,7 @@ void guiNetworkStop(){
 
     clientList.current = clientList.first;
     clientList.first = clientList.first->next;
-    free(clientList.current);
+    gFree(clientList.current);
   }
 }
 
