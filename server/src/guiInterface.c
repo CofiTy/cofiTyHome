@@ -122,7 +122,9 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
   struct sensorType * current;
   struct dataPRESENCE dataPres;
   struct dataTEMPERATURE dataTemp;
+  puts("geting lenght");
   lenght = json_object_array_length(update);
+  puts("got lenght");
  
   message = json_object_new_array();
   response = json_object_new_object();
@@ -155,7 +157,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
     }
   }
 
-  messType = json_object_new_int(CONFIGURATION);
+  messType = json_object_new_int(DATA);
   json_object_object_add(response, "type", messType);
   json_object_object_add(response, "message", message);
 
@@ -171,11 +173,12 @@ void processCommand(char * command, mqd_t mqSend){
   
   struct json_object* objCommand;
   struct json_object* objPart;
+  struct json_object* message;
   int type;
 
   objCommand = json_tokener_parse(command);
   objPart = json_object_object_get(objCommand, "type");
-
+  message = json_object_object_get(objCommand, "message");
   type = json_object_get_int(objPart);
   
   switch(type){
@@ -191,12 +194,12 @@ void processCommand(char * command, mqd_t mqSend){
 
     case COMMAND:
       puts("Command detected");
-      processTypeCommand(objPart);
+      processTypeCommand(message);
       break;
 
     case UPDATE:
       puts("Update detected");
-      processTypeUpdate(objPart, mqSend);
+      processTypeUpdate(message, mqSend);
       break;
 
     case DATA:

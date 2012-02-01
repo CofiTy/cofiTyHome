@@ -184,8 +184,10 @@ void guiNetworkStart(){
 
 void guiNetworkStop(){
 
+  puts("closing");
   pthread_kill(pthreadConnexion, SIGTERM);
 
+  puts("loop");
   while(clientList.first != NULL){
     pthread_kill(clientList.first->pthreadSend, SIGTERM);
     pthread_kill(clientList.first->pthreadRec, SIGTERM);
@@ -196,6 +198,7 @@ void guiNetworkStop(){
     clientList.first = clientList.first->next;
     gFree(clientList.current);
   }
+  puts("Closed");
 }
 
 int guiNetworkSend(const char * msg_ptr, size_t msg_len, mqd_t mqId){
