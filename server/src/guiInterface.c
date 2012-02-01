@@ -31,7 +31,6 @@ void processTypeInitialise(mqd_t mqSend){
     const char * message;
     struct sensorType * current = sensors;
 
-    puts("Initialisation detected");
     
     configObj = json_object_new_object();
     sensorsList = json_object_new_array();
@@ -61,7 +60,7 @@ void processTypeInitialise(mqd_t mqSend){
             break;
 
           default:
-            puts("Unkown type");
+            puts("Sensor: Unkown type");
         }
         name = json_object_new_string(current->id); 
         id = json_object_new_string(current->id); 
@@ -101,10 +100,6 @@ void processTypeInitialise(mqd_t mqSend){
   json_object_object_add(configuration, "message", configObj);
   message = json_object_to_json_string(configuration);
   guiNetworkSend(message, strlen(message), mqSend);
-}
-
-void processTypeConfiguration(){
-  puts("Type Configuration Error");
 }
 
 void processTypeCommand(struct json_object* command){
@@ -168,10 +163,6 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
   guiNetworkSend(sending, strlen(sending), mqSend);
 }
 
-void processTypeData(){
-  puts("type Data Error");
-}
-
 void processTypeClose(){
   puts("Close detected!");
 }
@@ -190,31 +181,35 @@ void processCommand(char * command, mqd_t mqSend){
   switch(type){
 
     case INITIALISE: 
+      puts("Initialisation detected");
       processTypeInitialise(mqSend);
       break;
 
     case CONFIGURATION:
-      processTypeConfiguration();
+      puts("Type Configuration Error");
       break;
 
     case COMMAND:
+      puts("Command detected");
       processTypeCommand(objPart);
       break;
 
     case UPDATE:
+      puts("Update detected");
       processTypeUpdate(objPart, mqSend);
       break;
 
     case DATA:
-      processTypeData();
+      puts("type Data Error");
       break;
 
     case CLOSE:
+      puts("Close detected");
       processTypeClose();
       break;
 
     default:
-      puts("Unknown Type");
+      puts("Command: Unknown Type");
 
   }
 

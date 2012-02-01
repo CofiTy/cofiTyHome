@@ -101,6 +101,8 @@ void * guiMsgSend(void* data){
     nb = mq_receive(client->mqSend, buff, 8192, NULL);
     puts("mq rec");
     FAIL(nb);
+    
+    printf("Sending: %s\n", buff);
 
     total = nb;
     nbSent = 0;
