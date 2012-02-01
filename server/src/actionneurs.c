@@ -1,6 +1,5 @@
 #include "actionneurs.h"
 #include <stdlib.h>
-#include <math.h>
 
 struct trame{ 
         char* SYNC;//SYNC = "A55A";
@@ -127,29 +126,22 @@ int oneCharHexToInt(char hex)
                 
                 break;
             }
-    };
-    printf("hex to int %d \n", result);  
+    }; 
     return result;
 }
 int hexToInt(char* hex)
 {
     int result=0,i,pow=1,j=0, cont=0;
-   // printf("zise of hex: %d", (int)sizeof(hex)/2);
     for(i=1;i>=0;i--)
     {
         
         for(j=0;j<cont;j++)
         {
             pow = pow*16;
-        printf("cont1 = %d \n", cont);
-        printf("pow1 = %d \n", pow);
         }
         cont++;
         result += pow* oneCharHexToInt(hex[i]);
     }
-    printf("cont = %d \n", cont);
-    printf("pow = %d \n", pow);
-    printf("octet = %d \n", result);
     return result;         
 }
 void calculateCheckSum(struct trame* trameAEnv)
@@ -157,28 +149,22 @@ void calculateCheckSum(struct trame* trameAEnv)
     char* checkSum = (char*)gMalloc(sizeof(char[2]));
     char lSB[2];
     int sum =0, i;
-    printf("hello \n");
-   // printf("zise of data: %d", (int)sizeof(trameAEnv->DATA));
     for(i=0;i<8;i=i+2)
     {
         checkSum[0] = trameAEnv->DATA[i];
         checkSum[1] = trameAEnv->DATA[i+1];
         sum+= hexToInt(checkSum);
     }
-    printf("sumtest DATA %d \n", sum);
-    //printf("zise of id: %d", (int)sizeof(trameAEnv->ID));
+
     for(i=0;i<8;i=i+2)
     {
         checkSum[0] = trameAEnv->ID[i];
         checkSum[1] = trameAEnv->ID[i+1];
         sum+= hexToInt(checkSum);
     }
-    printf("sumtest ID %d \n", sum);
-
-        checkSum[0] = trameAEnv->HEADER[0];
-        checkSum[1] = trameAEnv->LENGHT[0];
-        printf("checksum: %s \n", checkSum);
-        sum+= hexToInt(checkSum);
+    checkSum[0] = trameAEnv->HEADER[0];
+    checkSum[1] = trameAEnv->LENGHT[0];
+    sum+= hexToInt(checkSum);
     for(i=0;i<2;i=i+2)
     {
         checkSum[0] = trameAEnv->ORG[i];
@@ -187,26 +173,13 @@ void calculateCheckSum(struct trame* trameAEnv)
     }
     for(i=0;i<2;i=i+2)
     {
-        printf("status %s \n", trameAEnv->STATUS);
         checkSum[0] = trameAEnv->STATUS[i];
         checkSum[1] = trameAEnv->STATUS[i+1];
         sum+= hexToInt(checkSum);
-    }
-/*
-    sum+= hexToInt(trameAEnv->HEADER);
-    sum+= hexToInt(trameAEnv->ID);
-    sum+= hexToInt(trameAEnv->LENGHT);
-    sum+= hexToInt(trameAEnv->ORG);
-    sum+= hexToInt(trameAEnv->STATUS);
-*/
-    printf("sum1 %d \n", sum);
-    //sum = sum%100;
-    
-    itochar(sum, checkSum, 16);
-    printf("sum2 %s \n", checkSum);  
+    }    
+    itochar(sum, checkSum, 16);  
     lSB[0] = checkSum[1];
     lSB[1] = checkSum[0];
-    printf("lsb %s \n", lSB);
     trameAEnv->CHECKSUM = lSB;
     gFree(checkSum);
 }
@@ -243,8 +216,7 @@ void createMessageOpen(char id[8], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->ID);
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
-    printf("trame to send: %c \n", trameToSend);
-    printf("id: %c \n", trameAEnvoyer->ID);
+
     gFree(trameAEnvoyer);
     //return trameToSend;
 }
@@ -317,7 +289,6 @@ void setActionneurFct(struct actionFct_t * a, char fctName[20]){
 
 void openCOURRANT(char id[9]){
     char* trame = (char*)gMalloc(sizeof(char[29]));
-    printf("id recu %s \n", id);
     createMessageOpen(id, trame);
     printf("trame a envoyer: %s \n", trame);
     sensorsNetworkSend(trame, sizeof(trame));
