@@ -73,7 +73,7 @@ void * guiMsgRec(void* data){
       if(blocs == 0){ /* If enough data we can process */
         puts("recv");
         /*Traiter traite*/
-        processCommand(traite);
+        processCommand(traite, client->mqSend);
         j = 0;
         memset(traite, '\0', 128);
       }
