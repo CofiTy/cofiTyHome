@@ -3,7 +3,7 @@
 struct sensorType * getSensor(char id[9]) {
     struct sensorType * current = sensors;
     
-    while (current != 0) {
+    while (current != NULL) {
         if (strcmp(current->id, id) == 0) {
             return current;
         }
