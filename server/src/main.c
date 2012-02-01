@@ -10,7 +10,7 @@
 int main(int argc, char ** argv){
 	
 	initMemory();
-  parseAll();
+	parseAll();
 /*
     sensorsNetworkStart();
     sleep(120);
