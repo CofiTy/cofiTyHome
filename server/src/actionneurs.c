@@ -1,6 +1,7 @@
 #include "actionneurs.h"
 #include <stdlib.h>
 #include <math.h>
+#include "../../kernel/memory/memory.h"
 
 struct trame{ 
         char* SYNC;//SYNC = "A55A";
