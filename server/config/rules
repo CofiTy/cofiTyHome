@@ -1,6 +1,6 @@
 ######################################################
 #
-#  Fichier de règles.
+#  Fichier de règles. Si vous ne specifiez pas d'attribut pour un capteur, prend le 1er.
 #
 #  Format:
 #
@@ -8,7 +8,7 @@
 #  	nomRegle
 #  conditions:
 #  	idCapteur operateur valeur
-#  	nomCapteur operateur valeur
+#  	nomCapteur.attributCapteur operateur valeur
 #  actions:
 #  	nomAction
 #  ...

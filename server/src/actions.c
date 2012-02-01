@@ -27,5 +27,5 @@ void applyAction(struct action_t * action){
 }
 
 void applyActionByName(char nom[20]){
-    
+    applyAction(getAction(nom));
 }
