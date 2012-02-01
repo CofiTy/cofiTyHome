@@ -68,6 +68,8 @@ void * sensorsMsgSend(){
     /* Recuperation des messages de la boite au lettre "Envoi" */
     nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
+    
+    printf("Sending toward Gateway: %s\n", buff);
 
     total = nb;
     nbSent = 0;
