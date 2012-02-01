@@ -5,12 +5,15 @@
 
 #include "memory.h"
 
+#define SECRET_CODE 42
+
 typedef long Align;    /* for alignment to long boundary */
 
 union header {         /* block header */
   struct {
     union header *ptr; /* next block if on free list */
     unsigned long size;     /* size of this block */
+    unsigned char sCode;
   } s;
   Align x;             /* force alignment of blocks */
 };
@@ -36,8 +39,10 @@ void initMemory()
         up = (Header *) heap; 
         /*up->s.size = (SIZE_ALLOC+sizeof(Header)-1)/sizeof(Header) + 1;*/
         up->s.size = SIZE_ALLOC/sizeof(Header);
+        up->s.sCode = SECRET_CODE;
         /*up->s.size = SIZE_ALLOC - sizeof(Header);*/
-        gFree((void *)(up+1));    
+        gFree((void *)(up+1));   
+        printf("Début : %p, Fin: %p\n", (void *)heap, (void *)(heap+SIZE_ALLOC));
     }
 }
 
@@ -46,14 +51,29 @@ void gFree(void *ap)
 {
     Header *bp, *p;
 
-    if(freep == NULL 
-            || ap == NULL
-            || ap < heap
-            || ap >= (heap + SIZE_ALLOC))
+    /* Test if memory is initialised */
+    if(freep == NULL)
         return;
 
     pthread_mutex_lock(&myLock);
+ 
+    /* Test if pointer is within our memory */
+    if(ap == NULL
+            || (void *)ap < (void *)heap
+            || (void *)ap >= (void *)(heap + SIZE_ALLOC))
+    {
+        pthread_mutex_unlock(&myLock);
+        return;
+    }
     bp = (Header *)ap - 1;
+
+    /* Test if it's a valid Header */
+    if(bp->s.sCode != SECRET_CODE)
+    {
+        pthread_mutex_unlock(&myLock);
+        return;
+    }
+
     /* point to block header */
     for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
     {
@@ -123,6 +143,7 @@ void *gMalloc(unsigned long nbytes)
                 /*printf("New Taille: %d\n", p->s.size);*/
             	p += p->s.size;
             	p->s.size = nunits;
+                p->s.sCode = SECRET_CODE;
             }
             freep = prevp;
             pthread_mutex_unlock(&myLock);
