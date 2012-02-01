@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "sensorsNetwork.h"
+#include "sensors.h"
 
 int i, j, sock;
 pthread_t pthreadSensorsRec, pthreadSensorsSend;
@@ -43,6 +44,7 @@ void * sensorsMsgRec(){
       data[j++] = buff[i++];
       if(j == 26){
         /*Traiter data*/
+        decodeTrame(data);
         printf("Trame : %s\n", data);
         j = 0;
         memset(data, '\0', 32);
