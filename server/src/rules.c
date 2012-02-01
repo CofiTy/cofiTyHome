@@ -36,7 +36,7 @@ void applyRules() {
 }
 
 int testEqual(int * data, int value) {
-    printf("testEqual %d  :  %d\n", *data, value);
+    //printf("testEqual %d  :  %d\n", *data, value);
     if (*data == value)
         return 1;
     else
@@ -44,7 +44,7 @@ int testEqual(int * data, int value) {
 }
 
 int testGreaterOrEqual(int * data, int value) {
-    printf("testGreaterOrEqual %d  :  %d\n", *data, value);
+    //printf("testGreaterOrEqual %d  :  %d\n", *data, value);
     if (*data >= value)
         return 1;
     else
@@ -52,7 +52,7 @@ int testGreaterOrEqual(int * data, int value) {
 }
 
 int testLessOrEqual(int * data, int value) {
-    printf("testLessOrEqual %d  :  %d\n", *data, value);
+    //printf("testLessOrEqual %d  :  %d\n", *data, value);
     if (*data <= value)
         return 1;
     else
@@ -60,7 +60,7 @@ int testLessOrEqual(int * data, int value) {
 }
 
 int testGreater(int * data, int value) {
-    printf("testGreater %d  :  %d\n", *data, value);
+    //printf("testGreater %d  :  %d\n", *data, value);
     if (*data > value) {
         return 1;
     } else {
@@ -69,7 +69,7 @@ int testGreater(int * data, int value) {
 }
 
 int testLess(int * data, int value) {
-    printf("testLess %d  :  %d\n", *data, value);
+    //printf("testLess %d  :  %d\n", *data, value);
     if (*data < value)
         return 1;
     else
