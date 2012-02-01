@@ -39,15 +39,15 @@ void decodeTemperature(char* trame, struct sensorType* capteur);
 
 //----- CONTACT ------------------------------------------------------------------------
 typedef struct dataCONTACT {
-    char contact;
+    int contact;
 } dataCONTACT;
 
 void decodeContact(char* trame, struct sensorType* capteur);
 
 //----- PRESENCE ------------------------------------------------------------------------
 typedef struct dataPRESENCE {
-    char presence;
-    char luminosite;
+    int presence;
+    int luminosite;
 } dataPRESENCE;
 
 

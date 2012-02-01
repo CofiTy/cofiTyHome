@@ -117,7 +117,8 @@ typeSensor:
 {
     currentSensor->type = INTERRUPTEUR;
 
-    currentSensor->data = calloc(1, sizeof(dataINTERRUPTEUR));
+    currentSensor->data = malloc(sizeof(dataINTERRUPTEUR));
+    memset(currentSensor->data, 0, sizeof(dataINTERRUPTEUR));
 
     currentSensor->decode = decodeInterrupteur;
 };
@@ -125,7 +126,8 @@ typeSensor:
 {
     currentSensor->type = PRESENCE;
 
-    currentSensor->data = calloc(1, sizeof(dataPRESENCE));
+    currentSensor->data = malloc(sizeof(dataPRESENCE));
+    memset(currentSensor->data, 0, sizeof(dataPRESENCE));
 
     currentSensor->decode = decodePresence;
 };
@@ -133,7 +135,8 @@ typeSensor:
 {
     currentSensor->type = TEMPERATURE;
 
-    currentSensor->data = calloc(1, sizeof(dataTEMPERATURE));
+    currentSensor->data = malloc(sizeof(dataTEMPERATURE));
+    memset(currentSensor->data, 0, sizeof(dataTEMPERATURE));
 
     currentSensor->decode = decodeTemperature;
 };
@@ -141,7 +144,8 @@ typeSensor:
 {
     currentSensor->type = CONTACT;
 
-    currentSensor->data = calloc(1, sizeof(dataCONTACT));
+    currentSensor->data = malloc(sizeof(dataCONTACT));
+    memset(currentSensor->data, 0, sizeof(dataCONTACT));
 
     currentSensor->decode = decodeContact;
 };
@@ -290,7 +294,7 @@ conditionid:
             old->nextCondition = currentCondition;
     }
     char t[9];
-    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * 9);
+    memset(t, '\0', sizeof (char) * 9);
     strcpy(t, $1);
     currentCondition->data = getSensor(t)->data;
 };

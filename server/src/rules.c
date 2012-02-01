@@ -87,27 +87,27 @@ void setConditionName(struct condition_t * c, char sensorId[9], char cndName[20]
 
     if (sensor->type == TEMPERATURE) {
         if (strcmp(cndName, "temp") == 0) {
-            c->data = &((dataTEMPERATURE*)sensor)->temp;
+            c->data = &(((dataTEMPERATURE*)sensor->data)->temp);
         } else {
             ok = 1;
         }
     } else if (sensor->type == CONTACT) {
         if (strcmp(cndName, "contact") == 0) {
-            c->data = &((dataCONTACT*)sensor)->contact;
+            c->data = &(((dataCONTACT*)sensor->data)->contact);
         } else {
             ok = 1;
         }
     } else if (sensor->type == INTERRUPTEUR) {
         if (strcmp(cndName, "switchButton") == 0) {
-            c->data = &((dataINTERRUPTEUR*)sensor)->switchButton;
+            c->data = &(((dataINTERRUPTEUR*)sensor->data)->switchButton);
         } else {
             ok = 1;
         }
     } else if (sensor->type == PRESENCE) {
         if (strcmp(cndName, "presence") == 0) {
-            c->data = &((dataPRESENCE*)sensor)->presence;
+            c->data = &(((dataPRESENCE*)sensor->data)->presence);
         } else if (strcmp(cndName, "luminosite") == 0) {
-            c->data = &((dataPRESENCE*)sensor)->luminosite;
+            c->data = &(((dataPRESENCE*)sensor->data)->luminosite);
         } else {
             ok = 1;
         }
