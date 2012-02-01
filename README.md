@@ -10,7 +10,7 @@
 - Mathieu SABOURIN
 
 ## Tunneling SSH ##
-sudo ssh -L 5000:134.214.105.28:5000 <login_insa>@iftpserv2 -N
+sudo ssh -L 5000:134.214.105.28:5000 ychevalier@iftpserv2 -N
 
 ## Etat ##
 Intégré!
