@@ -27,8 +27,6 @@ struct sensorType * sensors;
 
 struct sensorType * getSensor(char id[9]);
 
-//sensorType sensorList;
-
 
 //----- TEMPERATURE --------------------------------------------------------------------
 typedef struct dataTEMPERATURE {

@@ -8,6 +8,7 @@
     #include "../src/sensors.h"
     #include "../src/actions.h"
     #include "../src/actionneurs.h"
+    #include "../src/common.h"
     
     #include "../../kernel/memory/memory.h"
 
@@ -335,6 +336,7 @@ conditionid:
     char t[9];
     memset(t, '\0', sizeof (char) * 9);
     strcpy(t, $1);
+    
     currentCondition->data = getSensor(t)->data;
 };
         | IDENTIFIER POINT IDENTIFIER
@@ -404,8 +406,8 @@ void parseSensors() {
 	printf("%s\n", "Parsing Sensors..");
 
 	yyin = fopen( "server/config/sensors", "r" );
-
-	yyparse();
+	
+        yyparse();
 }
 
 void parseActionneurs() {
@@ -413,7 +415,7 @@ void parseActionneurs() {
 
 	yyin = fopen( "server/config/actionneurs", "r" );
 
-	yyparse();
+        yyparse();
 }
 
 void parseActions() {
@@ -421,7 +423,7 @@ void parseActions() {
 
 	yyin = fopen( "server/config/actions", "r" );
 
-	yyparse();
+        yyparse();
 }
 
 void parseRules() {
@@ -429,7 +431,11 @@ void parseRules() {
 
 	yyin = fopen( "server/config/rules", "r" );
 
-	yyparse();
+	pthread_mutex_lock(&sensorsMutex);
+
+        yyparse();
+
+        pthread_mutex_unlock(&sensorsMutex);
 }
 
 void parseAll() {

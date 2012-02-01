@@ -1,10 +1,13 @@
 #include <stdlib.h>
 
 #include "rules.h"
+#include "common.h"
 
 void applyRules() {
 
     printf("\nApplying rules..\n");
+
+    pthread_mutex_lock(&sensorsMutex);
 
     struct rule_t * currentRule = startRule;
     struct condition_t * currentCondition;
@@ -33,6 +36,8 @@ void applyRules() {
 
         currentRule = currentRule->nextRule;
     }
+
+    pthread_mutex_unlock(&sensorsMutex);
 }
 
 int testEqual(int * data, int value) {

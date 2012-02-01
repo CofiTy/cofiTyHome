@@ -112,10 +112,11 @@ void sensorsNetworkStart(){
 
 void sensorsNetworkStop(){
 
-  pthread_kill(pthreadSensorsRec, SIGTERM);
-  pthread_kill(pthreadSensorsSend, SIGTERM);
+  FAIL(pthread_cancel(pthreadSensorsRec));
+  FAIL(pthread_cancel(pthreadSensorsSend));
   FAIL(close(sock));
   FAIL(mq_close(mqSensorsSend));
+  puts("Closed");
 }
 
 int sensorsNetworkSend(const char * msg_ptr, size_t msg_len){
