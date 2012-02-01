@@ -44,11 +44,9 @@ int main(int argc, char ** argv){
     ((dataTEMPERATURE*)sensors->nextSensor->data)->temp = 5;
     strcpy(sensors->nextSensor->id, "cap2");
 */
-/*
     parseAll();
 
     applyRules();
-*/
   return 0;
 }
 
