@@ -27,6 +27,7 @@ void decodeTrame(char* trame)
     sensorType* capteur = getSensor(id);
     if(capteur!=NULL)
         capteur->decode(trame,capteur);
+    //printf("result: %d", )
 }
 void decodePresence(char* trame, struct sensorType* capteur)
 {
@@ -59,6 +60,7 @@ void decodeInterrupteur(char* trame, struct sensorType* capteur)
         case '5':
         {
            ((dataINTERRUPTEUR*)capteur->data)->switchButton  = B1;
+           printf("decode!");
             break;
         }
         case '3':

@@ -6,6 +6,7 @@
 #include "sensors.h"
 
 #include "../../kernel/memory/memory.h"
+#include "actionneurs.h"
 
 int main(int argc, char ** argv){
 	
@@ -45,6 +46,11 @@ int main(int argc, char ** argv){
     parseAll();
 
     applyRules();
+    
+    //decodeTrame("A55A0B05500000000021CBE2305E");
+    char id[9] = "FF9F1E05";
+    printf("id as declared %s \n", id);
+    closeCOURRANT(id);
 
   return 0;
 }
