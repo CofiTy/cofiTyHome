@@ -185,7 +185,7 @@ void guiNetworkStart(){
 void guiNetworkStop(){
 
   puts("closing");
-  pthread_kill(pthreadConnexion, SIGTERM);
+  pthread_kill(pthreadConnexion, SIGKILL);
 
   puts("loop");
   while(clientList.first != NULL){
