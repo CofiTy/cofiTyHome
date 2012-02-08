@@ -36,6 +36,9 @@
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
 
+    char *conIP, *lisIP;
+    int conPort, lisPort;
+
 %}
 
 %union  { char chaine[256]; int valeur; }
@@ -61,6 +64,12 @@
 %token <chaine> LESSOREQUAL
 %token <chaine> GREATER
 %token <chaine> LESS
+
+%token <chaine> CONNECT
+%token <chaine> LISTEN
+%token <chaine> IP
+%token <chaine> COLUMN
+
 %token <chaine> IDENTIFIER
 %token <valeur> NUMBER
 
@@ -70,6 +79,7 @@
 %type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
+%type <chaine> parseConfig 
  
 %%
 
@@ -78,6 +88,7 @@ root:
         | parseActionneurs
         | parseActions
         | parseRules
+        | parseConfig
 ;
 
 /*************** Capteurs ***************/
@@ -399,6 +410,27 @@ someactions:
 };
 	| IDENTIFIER someactions
 
+/************ COnfig **************************/
+
+parseConfig:
+           CONNECT IP COLUMN IDENTIFIER LISTEN IP COLUMN IDENTIFIER
+           {
+            /*
+            printf("### Original ###\n");
+            printf("\tConnect to IP: %s on Port: %s\n",$2, $4);
+            printf("\tListen on IP: %s on Port: %s\n", $6, $8);
+            */
+            conIP = gMalloc(strlen($2)*sizeof(char));
+            memcpy(conIP, $2, strlen($2));
+            lisIP = gMalloc(strlen($6)*sizeof(char));
+            memcpy(lisIP, $6, strlen($6));
+
+            conPort = atoi($4);
+            lisPort = atoi($8);
+            /*printf("### Copied ###\n");*/
+            printf("\tConnect to IP: %s on Port: %d\n",$2, conPort);
+            printf("\tListen on IP: %s on Port: %d\n", $6, lisPort);
+           };
  
 %%
 
@@ -438,6 +470,14 @@ void parseRules() {
         pthread_mutex_unlock(&sensorsMutex);
 }
 
+void parseConfig() {
+    printf("\n%s\n", "Parsing Config...");
+
+    yyin = fopen("server/config/config", "r");
+    yyparse();
+
+}
+
 void parseAll() {
 	printf("\n%s\n", "Start Parsing..");
 
@@ -445,5 +485,6 @@ void parseAll() {
         parseActionneurs();
         parseActions();
         parseRules();
+        parseConfig();
 }
 
