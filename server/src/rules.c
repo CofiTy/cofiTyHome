@@ -3,6 +3,24 @@
 #include "rules.h"
 #include "common.h"
 
+void logRule(char name[20]) {
+
+	FILE *fLogRule;
+    time_t t;
+    time(&t);
+
+	fLogRule = fopen(nameLogRules, "a+");
+    if (fLogRule != NULL)
+    {
+        fprintf(fLogRule, "%d %s\n", (int)t, name);
+		fclose(fLogRule);
+	}
+    else 
+    {
+        printf("############ No File to Log Rules...\n");
+	}
+}
+
 void applyRules() {
 
     //printf("\nApplying rules..\n");
@@ -28,6 +46,7 @@ void applyRules() {
         if (b == 1) {
 
             //printf("TOUT OK!!!\n");
+            logRule(currentRule->name);
             applyAction(currentRule->action);
         } else {
             //printf("FAIL\n");

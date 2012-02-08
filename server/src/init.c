@@ -12,15 +12,19 @@
 
 void init()
 {
+	printf("Initialisation...\n");
     initMemory();
+    printf("MemTotale: %ld\n", getGMemTotal());
+	printf("MemFree: %ld\n", getGMemFree());
+    
     pthread_mutex_init(&sensorsMutex, NULL);
 
     parseAll();
-    initRules();
-
-	printf("Initialisation...\n");
-	printf("MemTotale: %ld\n", getGMemTotal());
-	printf("MemFree: %ld\n", getGMemFree());
+	
+	nameLogRules = gMalloc(strlen("logRules.log"));
+	memcpy(nameLogRules, "logRules.log", strlen("logRules.log"));
+	
+	initRules();
 
     sensorsNetworkStart();
     guiNetworkStart();
@@ -55,6 +59,8 @@ void destroy()
     
 	stopRules();
 	pthread_mutex_destroy(&sensorsMutex);
+	
+	gFree(nameLogRules);
 	
 	destroyMemory();
 }
