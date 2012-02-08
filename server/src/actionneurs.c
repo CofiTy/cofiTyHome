@@ -15,13 +15,52 @@ struct trame{
 void itochar(int toBeTrans, char* buffer, int radix )
 {
     int i=0, n, reste,j,k=0;
-    char* reverseBuffer=(char*)gMalloc((sizeof(buffer)+1));
+    
+    char* reverseBuffer=(char*)malloc((sizeof(buffer)+1));
     n = toBeTrans;
     while(n>0)
     {
         reste = n%radix;
         n = n/radix;
-        reverseBuffer[i++]='0'+reste;
+        switch (reste)
+        {
+            case 10:
+            {
+                reverseBuffer[i++]='A';
+                break;
+            }
+            case 11:
+            {
+                reverseBuffer[i++]='B';
+                break;
+            }
+            case 12:
+            {
+                reverseBuffer[i++]='C';
+                break;
+            }    
+            case 13:
+            {
+                reverseBuffer[i++]='D';
+                break;
+            }
+            case 14:
+            {
+                reverseBuffer[i++]='E';
+                break;
+            }
+            case 15:
+            {
+                reverseBuffer[i++]='F';
+                break;
+            }
+            default:
+            {
+                reverseBuffer[i++]='0'+reste;
+                break;
+            }
+            
+        }
         
     }
     reverseBuffer[i]='\0';
@@ -33,7 +72,7 @@ void itochar(int toBeTrans, char* buffer, int radix )
     }
 
     buffer[j] = reverseBuffer[j];
-    gFree(reverseBuffer);
+    free(reverseBuffer);
 }
 int oneCharHexToInt(char hex)
 {
@@ -145,8 +184,8 @@ int hexToInt(char* hex)
 }
 void calculateCheckSum(struct trame* trameAEnv)
 {
-    char* checkSum = (char*)gMalloc(sizeof(char[2]));
-    char lSB[2];
+    char* checkSum = (char*)malloc(sizeof(char[2]));
+    char lSB[1];
     int sum =0, i;
     for(i=0;i<8;i=i+2)
     {
@@ -179,8 +218,12 @@ void calculateCheckSum(struct trame* trameAEnv)
     itochar(sum, checkSum, 16);  
     lSB[0] = checkSum[1];
     lSB[1] = checkSum[0];
-    trameAEnv->CHECKSUM = lSB;
-    gFree(checkSum);
+    //trameAEnv->CHECKSUM = lSB;
+    strcpy(trameAEnv->CHECKSUM, lSB);
+    puts(trameAEnv->CHECKSUM);
+    puts(lSB);
+    puts(checkSum);
+    free(checkSum);
 }
 
 void createMessageOpen(char id[9], char* trameToSend)
@@ -194,18 +237,19 @@ void createMessageOpen(char id[9], char* trameToSend)
 //ID= FF9F1E05
 //STATUS : 0
 //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
-    struct trame* trameAEnvoyer = (struct trame*)gMalloc(sizeof(struct trame));
+    struct trame* trameAEnvoyer = (struct trame*)malloc(sizeof(struct trame));
    // char* checkSum = (char*)malloc(sizeof(char[2]));
     //char* trameToSend;
-    trameAEnvoyer->DATA = "40000000";
-    trameAEnvoyer->HEADER = "3";
+    trameAEnvoyer->DATA = "50000000";
+    trameAEnvoyer->HEADER = "6";
     trameAEnvoyer->ID =id;
     trameAEnvoyer->LENGHT = "B";
-    trameAEnvoyer->STATUS = "00";    
+    trameAEnvoyer->STATUS = "30";    
     trameAEnvoyer->ORG = "05";
-    trameAEnvoyer->STATUS = "00";
+    //trameAEnvoyer->STATUS = "00";
     trameAEnvoyer->SYNC = "A55A";
     calculateCheckSum(trameAEnvoyer);
+    puts(trameAEnvoyer->CHECKSUM);
     //trameAEnvoyer.CHECKSUM = checkSum;
     strcpy(trameToSend, trameAEnvoyer->SYNC);
     strcat(trameToSend, trameAEnvoyer->HEADER);
@@ -215,8 +259,9 @@ void createMessageOpen(char id[9], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->ID);
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
+    puts(trameAEnvoyer->CHECKSUM);
     //strcat(trameToSend, '\0');
-    gFree(trameAEnvoyer);
+    free(trameAEnvoyer);
     //return trameToSend;
 }
 
@@ -231,16 +276,16 @@ void createMessageClose(char id[9], char* trameToSend)
 //ID= FF9F1E05
 //STATUS : 0
 //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
-    struct trame* trameAEnvoyer = (struct trame*)gMalloc(sizeof(struct trame));
+    struct trame* trameAEnvoyer = (struct trame*)malloc(sizeof(struct trame));
    // char* checkSum = (char*)malloc(sizeof(char[2]));
     //char* trameToSend;
-    trameAEnvoyer->DATA = "60000000";
-    trameAEnvoyer->HEADER = "3";
+    trameAEnvoyer->DATA = "70000000";
+    trameAEnvoyer->HEADER = "6";
     trameAEnvoyer->ID =id;
     trameAEnvoyer->LENGHT = "B";
        
     trameAEnvoyer->ORG = "05";
-    trameAEnvoyer->STATUS = "00";
+    trameAEnvoyer->STATUS = "30";
     trameAEnvoyer->SYNC = "A55A";
     calculateCheckSum(trameAEnvoyer);
     //trameAEnvoyer.CHECKSUM = checkSum;
@@ -253,7 +298,8 @@ void createMessageClose(char id[9], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
     //strcat(trameToSend, '\0');
-    gFree(trameAEnvoyer);
+    puts(trameToSend);
+    free(trameAEnvoyer);
     //return trameToSend;
 }
 
@@ -288,17 +334,19 @@ void setActionneurFct(struct actionFct_t * a, char fctName[20]){
 }
 
 void openCOURRANT(char id[9]){
-    char* trame = (char*)gMalloc(sizeof(char[28]));
+    char* trame = (char*)malloc(sizeof(char[28]));
     memset(trame, '\0', 28);
     createMessageOpen(id, trame);
-    sensorsNetworkSend(trame, 28);
-    gFree(trame);
+    puts(trame);
+    //sensorsNetworkSend(trame, 28);
+    free(trame);
 }
 
 void closeCOURRANT(char id[9]){
-    char* trame = (char*)gMalloc(sizeof(char[28]));
+    char* trame = (char*)malloc(sizeof(char[28]));
     memset(trame, '\0', 28);
     createMessageClose(id, trame);
-    sensorsNetworkSend(trame, 28);
-    gFree(trame);
+    puts(trame);
+    //sensorsNetworkSend(trame, 28);
+    free(trame);
 }
