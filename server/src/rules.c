@@ -8,7 +8,6 @@ void applyRules() {
     //printf("\nApplying rules..\n");
 
     pthread_mutex_lock(&sensorsMutex);
-
     struct rule_t * currentRule = startRule;
     struct condition_t * currentCondition;
     int b = 1;

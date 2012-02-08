@@ -7,6 +7,7 @@
 #  CAFFE
 #  VOLETS
 #  CHAUFFAGE
+#
 #  Format:
 #
 #  typeActionneur idActionneur [nomActionneur]
