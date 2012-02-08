@@ -36,8 +36,6 @@
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
 
-    char *conIP, *lisIP;
-    int conPort, lisPort;
 
 %}
 

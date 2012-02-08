@@ -18,6 +18,17 @@ pthread_mutex_t sensorsMutex;
 
 sem_t checkRules;
 
+/**
+ * Where to get data?
+ */
+char *conIP;
+int conPort;
+
+/**
+ * Where the client's gonna connect?
+ */
+char *lisIP;
+int lisPort;
 
 #endif /*COMMON*/
 
