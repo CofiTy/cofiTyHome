@@ -81,7 +81,7 @@ void decodePresence(char* trame, struct sensorType* capteur) {
 
     logValue(capteur->id, "presence", presence);
     logValue(capteur->id, "luminosite", lumin);
-
+    printf("valeur de la luminosite: %d, valeur presence %d \n",((dataPRESENCE*) capteur->data)->luminosite, ((dataPRESENCE*) capteur->data)->presence );
     printf("decode presence!\n");
 
 }
