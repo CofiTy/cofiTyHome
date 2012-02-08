@@ -51,10 +51,10 @@ void decodeTrame(char* trame) {
     if (capteur != NULL) {
         capteur->decode(trame, capteur);
         sem_post(&checkRules);
+        
     }
-
     pthread_mutex_unlock(&sensorsMutex);
-    //printf("Done searching" );
+    
 }
 
 void decodePresence(char* trame, struct sensorType* capteur) {
@@ -74,7 +74,7 @@ void decodePresence(char* trame, struct sensorType* capteur) {
 
     int valDec = strtol(data, &valHex, 16);
 
-    float lumin = ((float) (510.0 / 255.0))*(float) valDec;
+    float lumin = (116.0)*(float) valDec+300;
 
     ((dataPRESENCE*) capteur->data)->presence = presence;
     ((dataPRESENCE*) capteur->data)->luminosite = lumin;
