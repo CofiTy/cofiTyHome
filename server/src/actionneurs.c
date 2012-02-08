@@ -65,13 +65,15 @@ void itochar(int toBeTrans, char* buffer, int radix )
     }
     reverseBuffer[i]='\0';
 
-    for(j=0;j<i;j++)
+    /*for(j=0;j<i;j++)
     {
         buffer[j] = reverseBuffer[j];
         k++;
     }
 
-    buffer[j] = reverseBuffer[j];
+    buffer[j] = reverseBuffer[j];*/
+    strncpy(buffer, reverseBuffer, i);
+    puts(buffer);
     gFree(reverseBuffer);
 }
 int oneCharHexToInt(char hex)
@@ -187,6 +189,7 @@ void calculateCheckSum(struct trame* trameAEnv)
     char* checkSum = (char*)gMalloc(sizeof(char[2]));
     char lSB[1];
     int sum =0, i;
+    memset(lSB, '\0', 2);
     for(i=0;i<8;i=i+2)
     {
         checkSum[0] = trameAEnv->DATA[i];
@@ -215,11 +218,14 @@ void calculateCheckSum(struct trame* trameAEnv)
         checkSum[1] = trameAEnv->STATUS[i+1];
         sum+= hexToInt(checkSum);
     }    
-    itochar(sum, checkSum, 16);  
+    itochar(sum, checkSum, 16);
+    puts(checkSum);
     lSB[0] = checkSum[1];
     lSB[1] = checkSum[0];
+    puts(lSB);
     //trameAEnv->CHECKSUM = lSB;
     strcpy(trameAEnv->CHECKSUM, lSB);
+    puts("plop");
     puts(trameAEnv->CHECKSUM);
     puts(lSB);
     puts(checkSum);
@@ -238,6 +244,7 @@ void createMessageOpen(char id[9], char* trameToSend)
 //STATUS : 0
 //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
     struct trame* trameAEnvoyer = (struct trame*)gMalloc(sizeof(struct trame));
+    memset(trameAEnvoyer, '\0', sizeof(struct trame));
    // char* checkSum = (char*)gMalloc(sizeof(char[2]));
     //char* trameToSend;
     trameAEnvoyer->DATA = "50000000";
