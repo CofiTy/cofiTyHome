@@ -223,7 +223,7 @@ void calculateCheckSum(struct trame* trameAEnv)
     puts(trameAEnv->CHECKSUM);
     puts(lSB);
     puts(checkSum);
-    free(checkSum);
+    gFree(checkSum);
 }
 
 void createMessageOpen(char id[9], char* trameToSend)
@@ -244,13 +244,11 @@ void createMessageOpen(char id[9], char* trameToSend)
     trameAEnvoyer->HEADER = "6";
     trameAEnvoyer->ID =id;
     trameAEnvoyer->LENGHT = "B";
-    trameAEnvoyer->STATUS = "30";    
     trameAEnvoyer->ORG = "05";
-    //trameAEnvoyer->STATUS = "00";
+    trameAEnvoyer->STATUS = "10";    
     trameAEnvoyer->SYNC = "A55A";
-    calculateCheckSum(trameAEnvoyer);
-    puts(trameAEnvoyer->CHECKSUM);
-    //trameAEnvoyer.CHECKSUM = checkSum;
+    //calculateCheckSum(trameAEnvoyer);
+    trameAEnvoyer->CHECKSUM = "00";
     strcpy(trameToSend, trameAEnvoyer->SYNC);
     strcat(trameToSend, trameAEnvoyer->HEADER);
     strcat(trameToSend, trameAEnvoyer->LENGHT);
@@ -285,10 +283,10 @@ void createMessageClose(char id[9], char* trameToSend)
     trameAEnvoyer->LENGHT = "B";
        
     trameAEnvoyer->ORG = "05";
-    trameAEnvoyer->STATUS = "30";
+    trameAEnvoyer->STATUS = "10";
     trameAEnvoyer->SYNC = "A55A";
-    calculateCheckSum(trameAEnvoyer);
-    //trameAEnvoyer.CHECKSUM = checkSum;
+    //calculateCheckSum(trameAEnvoyer);
+    trameAEnvoyer->CHECKSUM = "00";
     strcpy(trameToSend, trameAEnvoyer->SYNC);
     strcat(trameToSend, trameAEnvoyer->HEADER);
     strcat(trameToSend, trameAEnvoyer->LENGHT);
