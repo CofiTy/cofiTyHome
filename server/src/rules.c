@@ -5,7 +5,7 @@
 
 void applyRules() {
 
-    printf("\nApplying rules..\n");
+    //printf("\nApplying rules..\n");
 
     pthread_mutex_lock(&sensorsMutex);
 
@@ -28,10 +28,10 @@ void applyRules() {
 
         if (b == 1) {
 
-            printf("TOUT OK!!!\n");
+            //printf("TOUT OK!!!\n");
             applyAction(currentRule->action);
         } else {
-            printf("FAIL\n");
+            //printf("FAIL\n");
         }
 
         currentRule = currentRule->nextRule;
