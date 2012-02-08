@@ -3,3 +3,4 @@ sortieTst
 src/lex.yy.c
 src/rules.tab.c
 src/rules.tab.h
+config/config

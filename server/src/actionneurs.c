@@ -73,7 +73,6 @@ void itochar(int toBeTrans, char* buffer, int radix )
 
     buffer[j] = reverseBuffer[j];*/
     strncpy(buffer, reverseBuffer, i);
-    puts(buffer);
     gFree(reverseBuffer);
 }
 int oneCharHexToInt(char hex)
@@ -187,7 +186,7 @@ int hexToInt(char* hex)
 void calculateCheckSum(struct trame* trameAEnv)
 {
     char* checkSum = (char*)gMalloc(sizeof(char[2]));
-    char lSB[1];
+    char* lSB = (char*)gMalloc(sizeof(char[2]));
     int sum =0, i;
     memset(lSB, '\0', 2);
     for(i=0;i<8;i=i+2)
@@ -219,16 +218,9 @@ void calculateCheckSum(struct trame* trameAEnv)
         sum+= hexToInt(checkSum);
     }    
     itochar(sum, checkSum, 16);
-    puts(checkSum);
     lSB[0] = checkSum[1];
     lSB[1] = checkSum[0];
-    puts(lSB);
-    //trameAEnv->CHECKSUM = lSB;
-    strcpy(trameAEnv->CHECKSUM, lSB);
-    puts("plop");
-    puts(trameAEnv->CHECKSUM);
-    puts(lSB);
-    puts(checkSum);
+    trameAEnv->CHECKSUM = lSB;
     gFree(checkSum);
 }
 
@@ -303,7 +295,6 @@ void createMessageClose(char id[9], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
     //strcat(trameToSend, '\0');
-    puts(trameToSend);
     gFree(trameAEnvoyer);
     //return trameToSend;
 }
@@ -342,8 +333,8 @@ void openCOURRANT(char id[9]){
     char* trame = (char*)gMalloc(sizeof(char[28]));
     memset(trame, '\0', 28);
     createMessageOpen(id, trame);
-    puts(trame);
-    //sensorsNetworkSend(trame, 28);
+    //puts(trame);
+    sensorsNetworkSend(trame, 28);
     gFree(trame);
 }
 
@@ -351,7 +342,7 @@ void closeCOURRANT(char id[9]){
     char* trame = (char*)gMalloc(sizeof(char[28]));
     memset(trame, '\0', 28);
     createMessageClose(id, trame);
-    puts(trame);
-    //sensorsNetworkSend(trame, 28);
+    //puts(trame);
+    sensorsNetworkSend(trame, 28);
     gFree(trame);
 }

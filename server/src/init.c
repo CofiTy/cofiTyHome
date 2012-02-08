@@ -9,7 +9,6 @@
 #include "common.h"
 
 #include "init.h"
-#include "actionneurs.h"
 
 void init()
 {
@@ -22,8 +21,6 @@ void init()
 	printf("Initialisation...\n");
 	printf("MemTotale: %ld\n", getGMemTotal());
 	printf("MemFree: %ld\n", getGMemFree());
-
-    //openCOURRANT("FF9F1E06");
 
     sensorsNetworkStart();
     guiNetworkStart();

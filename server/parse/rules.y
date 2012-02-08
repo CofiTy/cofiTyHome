@@ -36,8 +36,6 @@
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
 
-    char *conIP, *lisIP;
-    int conPort, lisPort;
 
 %}
 
@@ -424,23 +422,21 @@ someactions:
 /************ COnfig **************************/
 
 parseConfig:
-           CONNECT IP COLUMN IDENTIFIER LISTEN IP COLUMN IDENTIFIER
+           CONNECT IP COLUMN IDENTIFIER LISTEN IDENTIFIER
            {
             /*
             printf("### Original ###\n");
             printf("\tConnect to IP: %s on Port: %s\n",$2, $4);
-            printf("\tListen on IP: %s on Port: %s\n", $6, $8);
+            printf("\tListen on Port: %s\n", $6);
             */
             conIP = gMalloc(strlen($2)*sizeof(char));
             memcpy(conIP, $2, strlen($2));
-            lisIP = gMalloc(strlen($6)*sizeof(char));
-            memcpy(lisIP, $6, strlen($6));
 
             conPort = atoi($4);
-            lisPort = atoi($8);
+            lisPort = atoi($6);
             /*printf("### Copied ###\n");*/
-            printf("\tConnect to IP: %s on Port: %d\n",$2, conPort);
-            printf("\tListen on IP: %s on Port: %d\n", $6, lisPort);
+            printf("\tConnect to IP: %s on Port: %d\n", conIP, conPort);
+            printf("\tListen on Port: %d\n", lisPort);
            };
  
 %%
