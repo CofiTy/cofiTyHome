@@ -15,8 +15,13 @@
 
 // ########################### Actionneurs ###########################
 
-typedef enum typeActionneur {
-    COURRANT
+typedef enum typeActionneur 
+{
+    COURRANT,   
+    VOLETS,
+    CAFFE,
+    CHAUFFAGE
+        
 } typeActionneur;
 
 typedef struct actionneur_t {
@@ -36,6 +41,12 @@ void setActionneurFct(struct actionFct_t * a, char fctName[20]);
 //----- COURRANT --------------------------------------------------------------------
 void openCOURRANT(char id[9]);
 void closeCOURRANT(char id[9]);
+void openCAFFE(char id[9]);
+void closeCAFFE(char id[9]);
+void openVOLETS(char id[9]);
+void closeVOLETS(char id[9]);
+void openCHAUFFAGE(char id[9]);
+void closeCHAUFFAGE(char id[9]);
 
 #endif /*ACTIONNEURS_H_*/
 

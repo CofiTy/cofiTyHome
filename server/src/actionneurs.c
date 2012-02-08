@@ -314,18 +314,84 @@ struct actionneur_t * getActionneur(char id[20]) {
     return 0;
 }
 
-void setActionneurFct(struct actionFct_t * a, char fctName[20]){
-    if(a->actionneur->type == COURRANT){
-        if(strcmp(fctName, "open") == 0){
-            a->fct = openCOURRANT;
-        } else if(strcmp(fctName, "close") == 0){
-            a->fct = closeCOURRANT;
-        } else {
-            printf("Fonction not found : %s\n", fctName);
+void setActionneurFct(struct actionFct_t * a, char fctName[20])
+{
+    switch (a->actionneur->type)
+    {
+        case COURRANT:
+    //if(a->actionneur->type == COURRANT)
+        {
+
+            if(strcmp(fctName, "open") == 0)
+            {
+                a->fct = openCOURRANT;
+            } 
+            else if(strcmp(fctName, "close") == 0)
+            {
+                a->fct = closeCOURRANT;
+            } 
+            else 
+            {
+                printf("Fonction not found : %s\n", fctName);
+            }
+            break;
+        } 
+        case VOLETS:
+    //if(a->actionneur->type == COURRANT)
+        {
+
+            if(strcmp(fctName, "open") == 0)
+            {
+                a->fct = openVOLETS;
+            } 
+            else if(strcmp(fctName, "close") == 0)
+            {
+                a->fct = closeVOLETS;
+            } 
+            else 
+            {
+                printf("Fonction not found : %s\n", fctName);
+            }
+            break;
         }
-    } else {
-        printf("Actionneur type not found : %s\n", a->actionneur->id);
+        case CAFFE:
+    //if(a->actionneur->type == COURRANT)
+        {
+
+            if(strcmp(fctName, "open") == 0)
+            {
+                a->fct = openCAFFE;
+            } 
+            else if(strcmp(fctName, "close") == 0)
+            {
+                a->fct = closeCAFFE;
+            } 
+            else 
+            {
+                printf("Fonction not found : %s\n", fctName);
+            }
+            break;
+        }
+        case CHAUFFAGE:
+    //if(a->actionneur->type == COURRANT)
+        {
+
+            if(strcmp(fctName, "open") == 0)
+            {
+                a->fct = openCHAUFFAGE;
+            } 
+            else if(strcmp(fctName, "close") == 0)
+            {
+                a->fct = closeCHAUFFAGE;
+            } 
+            else 
+            {
+                printf("Fonction not found : %s\n", fctName);
+            }
+            break;
+        }
     }
+       
 
 }
 
@@ -345,4 +411,34 @@ void closeCOURRANT(char id[9]){
     //puts(trame);
     sensorsNetworkSend(trame, 28);
     gFree(trame);
+}
+
+void openCAFFE(char id[9])
+{
+    puts("Demarrer la machine a caffe!!");
+}
+
+void closeCAFFE(char id[9])
+{
+    puts("Arreter la machine a caffe!!");
+}
+
+void closeCHAUFFAGE(char id[9])
+{
+    puts("Arreter le chauffage!");
+}
+
+void openCHAUFFAGE(char id[9])
+{
+    puts("Demarrer le chauffage!");
+}
+
+void openVOLETS(char id[9])
+{
+    puts("Ouvrir les volets");
+}
+
+void closeVOLETS(char id[9])
+{
+    puts("Fermer les volets");
 }

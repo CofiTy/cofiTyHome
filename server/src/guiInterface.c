@@ -12,7 +12,9 @@ typedef enum {
   COMMAND = 3,
   UPDATE = 4,
   DATA = 5,
-  CLOSE = 6
+  CLOSE = 6,
+  HISTORY = 7,
+  HDATA = 8
 }MsgTypes;
 
 void processTypeInitialise(mqd_t mqSend){
@@ -63,7 +65,11 @@ void processTypeInitialise(mqd_t mqSend){
       default:
         puts("Sensor: Unkown type");
     }
-    name = json_object_new_string(current->id); 
+    if(name != NULL){
+      name = json_object_new_string(current->name); 
+    }else{
+      name = json_object_new_string(current->id); 
+    }
     id = json_object_new_string(current->id); 
 
     sensorObj = json_object_new_object();
@@ -200,6 +206,10 @@ void processTypeClose(){
   puts("Close detected!");
 }
 
+void processTypeHistory(char * message, mqd_t mqSend){
+  //TODO: Processing command
+}
+
 void processCommand(char * command, mqd_t mqSend){
 
   struct json_object* objCommand;
@@ -240,6 +250,15 @@ void processCommand(char * command, mqd_t mqSend){
     case CLOSE:
       puts("Close detected");
       processTypeClose();
+      break;
+
+    case HISTORY:
+      puts("History detected");
+      processTypeHistory(message, mqSend);
+      break;
+
+    case HDATA:
+      puts("type HDataerror");
       break;
 
     default:

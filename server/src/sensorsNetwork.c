@@ -96,8 +96,8 @@ void sensorsNetworkStart(){
   struct sockaddr_in saddr;
   memset(&saddr, 0, sizeof(struct sockaddr_in));
 
-
   saddr.sin_addr.s_addr = inet_addr(conIP); 
+
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(conPort);
 
