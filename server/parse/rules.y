@@ -335,6 +335,8 @@ ruleid:
     }
     memset(currentRule, 0, sizeof(struct rule_t));
 
+    strcpy(currentRule->name, $2);
+
     if(startRule == 0){
         startRule = currentRule;
     } else {
