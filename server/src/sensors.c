@@ -146,7 +146,7 @@ void decodeTemperature(char* trame, struct sensorType* capteur) {
 
     ((dataTEMPERATURE*) capteur->data)->temp = temp;
     
-    logValue(capteur->id, "contact", temp);
+    logValue(capteur->id, "Temperature", temp);
 
     printf("decode Temperature!\n");
 }
