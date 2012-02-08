@@ -41,10 +41,16 @@ void setActionneurFct(struct actionFct_t * a, char fctName[20]);
 //----- COURRANT --------------------------------------------------------------------
 void openCOURRANT(char id[9]);
 void closeCOURRANT(char id[9]);
+
+//----- CAFFE --------------------------------------------------------------------
 void openCAFFE(char id[9]);
 void closeCAFFE(char id[9]);
+
+//----- VOLETS --------------------------------------------------------------------
 void openVOLETS(char id[9]);
 void closeVOLETS(char id[9]);
+
+//----- CHAUFFAGE --------------------------------------------------------------------
 void openCHAUFFAGE(char id[9]);
 void closeCHAUFFAGE(char id[9]);
 
