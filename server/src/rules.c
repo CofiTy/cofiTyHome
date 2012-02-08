@@ -8,7 +8,7 @@ void logRule(char name[20]) {
 	FILE *fLogRule;
     time_t t;
     time(&t);
-
+    
 	fLogRule = fopen(nameLogRules, "a+");
     if (fLogRule != NULL)
     {
@@ -17,7 +17,7 @@ void logRule(char name[20]) {
 	}
     else 
     {
-        printf("############ No File to Log Rules...\n");
+        printf("No File to Log Rules...\n");
 	}
 }
 

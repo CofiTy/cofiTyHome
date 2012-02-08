@@ -26,7 +26,7 @@ typedef struct sensorType {
 
 struct sensorType * sensors;
 
-struct sensorType * getSensor(char id[20]);
+struct sensorType * getSensor(char id_or_name[20]);
 
 
 //----- TEMPERATURE --------------------------------------------------------------------

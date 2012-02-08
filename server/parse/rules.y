@@ -63,6 +63,9 @@
 %token <chaine> GREATER
 %token <chaine> LESS
 
+%token <chaine> NAMELOGRULES
+%token <chaine> NAMELOGSENSORS
+
 %token <chaine> CONNECT
 %token <chaine> LISTEN
 %token <chaine> IP
@@ -435,10 +438,10 @@ someactions:
 };
 	| IDENTIFIER someactions
 
-/************ COnfig **************************/
+/********************** Config **************************/
 
 parseConfig:
-           CONNECT IP COLUMN IDENTIFIER LISTEN IDENTIFIER
+           CONNECT IP COLUMN IDENTIFIER LISTEN IDENTIFIER NAMELOGRULES IDENTIFIER NAMELOGSENSORS IDENTIFIER
            {
             /*
             printf("### Original ###\n");
@@ -450,9 +453,20 @@ parseConfig:
 
             conPort = atoi($4);
             lisPort = atoi($6);
+            
+            nameLogSensors = gMalloc((strlen($10)+strlen(LOG_EXT))*sizeof(char));
+            memcpy(nameLogSensors, $10, strlen($10));
+            strcat(nameLogSensors, LOG_EXT);
+            
+            nameLogRules = gMalloc((strlen($8)+strlen(LOG_EXT))*sizeof(char));
+            memcpy(nameLogRules, $8, strlen($8));
+            strcat(nameLogRules, LOG_EXT);
+            
             /*printf("### Copied ###\n");*/
             printf("\tConnect to IP: %s on Port: %d\n", conIP, conPort);
             printf("\tListen on Port: %d\n", lisPort);
+            
+            printf("\tLog Rules: %s\n\tLog Sensors: %s\n", nameLogRules, nameLogSensors);
            };
  
 %%

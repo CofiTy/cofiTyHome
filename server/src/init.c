@@ -21,9 +21,6 @@ void init()
 
     parseAll();
 	
-	nameLogRules = gMalloc(strlen("logRules.log"));
-	memcpy(nameLogRules, "logRules.log", strlen("logRules.log"));
-	
 	initRules();
 
     sensorsNetworkStart();

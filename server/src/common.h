@@ -13,6 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define LOG_EXT ".log"
+
 #define FAIL(x) if(x == -1) {\
 	perror(#x);exit(-1);}
 	
@@ -46,7 +48,7 @@ char *nameLogRules;
 /**
  * Where to log the sensors data?
  */
-char *nameLogSen;
+char *nameLogSensors;
 
 
 #endif /*COMMON*/

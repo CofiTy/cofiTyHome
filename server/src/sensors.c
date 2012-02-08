@@ -3,30 +3,33 @@
 
 void logValue(char idSensor[9], char nameValue[20], int value) {
     FILE * pFile;
-    pFile = fopen("GHome.log", "a+");
+    puts("try Open");
+    pFile = fopen(nameLogSensors, "a+");
+    puts("Open");
     time_t t;
     time(&t);
 
     if (pFile != NULL) {
         fprintf(pFile, "%d %s %s %d\n", (int)t, idSensor, nameValue, value);
+        puts("Write");
         fclose(pFile);
     } else {
-        printf("Le fichier GHome.log n'a pas pu être ouvert !!!\n");
+        printf("Le fichier %s n'a pas pu être ouvert !!!\n", nameLogSensors);
     }
 }
 
-struct sensorType * getSensor(char id[20]) {
+struct sensorType * getSensor(char id_or_name[20]) {
     struct sensorType * current = sensors;
 
     while (current != NULL) {
-        if (strcmp(current->id, id) == 0 || (current->name != NULL && strcmp(current->name, id) == 0)) {
+        if (strcmp(current->id, id_or_name) == 0 || (current->name != NULL && strcmp(current->name, id_or_name) == 0)) {
             return current;
         }
 
         current = current->nextSensor;
     }
 
-    printf("Sensor not recognized : %s !!!\n", id);
+    printf("Sensor not recognized : %s !!!\n", id_or_name);
     return 0;
 }
 
@@ -146,7 +149,7 @@ void decodeTemperature(char* trame, struct sensorType* capteur) {
 
     ((dataTEMPERATURE*) capteur->data)->temp = temp;
     
-    logValue(capteur->id, "Temperature", temp);
+    logValue(capteur->id, "contact", temp);
 
     printf("decode Temperature!\n");
 }
