@@ -132,7 +132,7 @@ void * guiNetworkConnexion(){
   socklen_t size_addr = sizeof(struct sockaddr_in);
   memset(&saddr_client, 0, sizeof(struct sockaddr_in));
 
-  saddr.sin_addr.s_addr = inet_addr(lisIP);
+  saddr.sin_addr.s_addr = htonl(INADDR_ANY);
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(lisPort);
 

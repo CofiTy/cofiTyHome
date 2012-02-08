@@ -27,7 +27,6 @@ int conPort;
 /**
  * Where the client's gonna connect?
  */
-char *lisIP;
 int lisPort;
 
 #endif /*COMMON*/
