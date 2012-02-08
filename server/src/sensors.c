@@ -3,13 +3,15 @@
 
 void logValue(char idSensor[9], char nameValue[20], int value) {
     FILE * pFile;
+    puts("try Open");
     pFile = fopen("GHome.log", "a+");
-
+    puts("Open");
     time_t t;
     time(&t);
 
     if (pFile != NULL) {
         fprintf(pFile, "%d %s %s %d\n", (int)t, idSensor, nameValue, value);
+        puts("Write");
         fclose(pFile);
     } else {
         printf("Le fichier GHome.log n'a pas pu être ouvert !!!\n");
@@ -118,11 +120,9 @@ void decodeInterrupteur(char* trame, struct sensorType* capteur) {
             break;
 
         }
-
-            logValue(capteur->id, "switchButton", ((dataINTERRUPTEUR*) capteur->data)->switchButton);
-
-            printf("decode interrupteur!\n");
     }
+            logValue(capteur->id, "switchButton", ((dataINTERRUPTEUR*) capteur->data)->switchButton);
+            printf("decode interrupteur!\n");
 }
 
 void decodeContact(char* trame, struct sensorType* capteur) {
