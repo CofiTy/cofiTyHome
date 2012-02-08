@@ -295,7 +295,6 @@ void createMessageClose(char id[9], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
     //strcat(trameToSend, '\0');
-    puts(trameToSend);
     gFree(trameAEnvoyer);
     //return trameToSend;
 }

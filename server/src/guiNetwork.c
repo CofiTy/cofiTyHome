@@ -12,6 +12,7 @@
 
 #include "guiNetwork.h"
 #include "guiInterface.h"
+#include "common.h"
 
 #include "../../kernel/memory/memory.h"
 
@@ -133,7 +134,7 @@ void * guiNetworkConnexion(){
 
   saddr.sin_addr.s_addr = htonl(INADDR_ANY);
   saddr.sin_family = AF_INET;
-  saddr.sin_port = htons(5003);
+  saddr.sin_port = htons(lisPort);
 
   acceptSock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(acceptSock);

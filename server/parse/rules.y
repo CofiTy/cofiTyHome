@@ -36,8 +36,6 @@
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
 
-    char *conIP, *lisIP;
-    int conPort, lisPort;
 
 %}
 
@@ -75,7 +73,7 @@
 
  
 %type <chaine> root 
-%type <chaine> parseSensors oneSensor initSensor typeSensor
+%type <chaine> parseSensors oneSensor initSensor typeSensor idSensor
 %type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
@@ -99,19 +97,30 @@ parseSensors:
 ;
 
 oneSensor:
-        initSensor typeSensor IDENTIFIER
+        initSensor typeSensor idSensor nameSensor
+
+idSensor:
+        IDENTIFIER
 {
-    printf("Sensor %s\n", $3);
-    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    strcpy(currentSensor->id, $3);
+    printf("Sensor %s\n", $1);
+    memset(currentSensor->id, '\0', sizeof(char) * 9);
+    strcpy(currentSensor->id, $1);
 };
-        | initSensor typeSensor NUMBER
+        | NUMBER
 {
-    printf("Sensor %d\n", $3);
-    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    sprintf(currentSensor->id, "%d", $3);
+    printf("Sensor %d\n", $1);
+    memset(currentSensor->id, '\0', sizeof(char) * 9);
+    sprintf(currentSensor->id, "%d", $1);
 
 };
+
+nameSensor:
+        | IDENTIFIER
+{
+    memset(currentSensor->name, '\0', sizeof(char) * 20);
+    strcpy(currentSensor->name, $1);
+};
+
 
 initSensor:
 {
@@ -413,23 +422,21 @@ someactions:
 /************ COnfig **************************/
 
 parseConfig:
-           CONNECT IP COLUMN IDENTIFIER LISTEN IP COLUMN IDENTIFIER
+           CONNECT IP COLUMN IDENTIFIER LISTEN IDENTIFIER
            {
             /*
             printf("### Original ###\n");
             printf("\tConnect to IP: %s on Port: %s\n",$2, $4);
-            printf("\tListen on IP: %s on Port: %s\n", $6, $8);
+            printf("\tListen on Port: %s\n", $6);
             */
             conIP = gMalloc(strlen($2)*sizeof(char));
             memcpy(conIP, $2, strlen($2));
-            lisIP = gMalloc(strlen($6)*sizeof(char));
-            memcpy(lisIP, $6, strlen($6));
 
             conPort = atoi($4);
-            lisPort = atoi($8);
+            lisPort = atoi($6);
             /*printf("### Copied ###\n");*/
-            printf("\tConnect to IP: %s on Port: %d\n",$2, conPort);
-            printf("\tListen on IP: %s on Port: %d\n", $6, lisPort);
+            printf("\tConnect to IP: %s on Port: %d\n", conIP, conPort);
+            printf("\tListen on Port: %d\n", lisPort);
            };
  
 %%

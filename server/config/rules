@@ -19,7 +19,7 @@
 rule:	
 	temperature
 conditions:	
-	0021CBE2.switchButton<30
+	pipicaca.switchButton<30
 	00053F44.presence<=20
 	00053F44.luminosite<=20
 actions:

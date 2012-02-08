@@ -18,6 +18,7 @@ typedef enum typeCapteur {
 typedef struct sensorType {
  typeCapteur type;
  char id[9];
+ char name[20];
  void *data;
  struct sensorType* nextSensor;
  void (*decode)(char* trame, struct sensorType*);
@@ -25,7 +26,7 @@ typedef struct sensorType {
 
 struct sensorType * sensors;
 
-struct sensorType * getSensor(char id[9]);
+struct sensorType * getSensor(char id[20]);
 
 
 //----- TEMPERATURE --------------------------------------------------------------------
