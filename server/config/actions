@@ -18,9 +18,11 @@
 nomAction:
 	ToutFermer
 actionneurs:
-	FF9F1E05.close
+#	FF9F1E05.close
+	FF9F1E06.close
 	
 nomAction:
 	ToutOuvrir
 actionneurs:
-	FF9F1E05.open
+#	FF9F1E05.open
+	FF9F1E06.open

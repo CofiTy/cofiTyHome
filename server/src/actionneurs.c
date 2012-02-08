@@ -197,11 +197,11 @@ void createMessageOpen(char id[9], char* trameToSend)
     struct trame* trameAEnvoyer = (struct trame*)gMalloc(sizeof(struct trame));
    // char* checkSum = (char*)malloc(sizeof(char[2]));
     //char* trameToSend;
-    trameAEnvoyer->DATA = "40000000";
-    trameAEnvoyer->HEADER = "3";
+    trameAEnvoyer->DATA = "50000000";
+    trameAEnvoyer->HEADER = "6";
     trameAEnvoyer->ID =id;
     trameAEnvoyer->LENGHT = "B";
-    trameAEnvoyer->STATUS = "00";    
+    trameAEnvoyer->STATUS = "30";    
     trameAEnvoyer->ORG = "05";
     trameAEnvoyer->STATUS = "00";
     trameAEnvoyer->SYNC = "A55A";
@@ -234,13 +234,13 @@ void createMessageClose(char id[9], char* trameToSend)
     struct trame* trameAEnvoyer = (struct trame*)gMalloc(sizeof(struct trame));
    // char* checkSum = (char*)malloc(sizeof(char[2]));
     //char* trameToSend;
-    trameAEnvoyer->DATA = "60000000";
-    trameAEnvoyer->HEADER = "3";
+    trameAEnvoyer->DATA = "70000000";
+    trameAEnvoyer->HEADER = "6";
     trameAEnvoyer->ID =id;
     trameAEnvoyer->LENGHT = "B";
        
     trameAEnvoyer->ORG = "05";
-    trameAEnvoyer->STATUS = "00";
+    trameAEnvoyer->STATUS = "30";
     trameAEnvoyer->SYNC = "A55A";
     calculateCheckSum(trameAEnvoyer);
     //trameAEnvoyer.CHECKSUM = checkSum;
