@@ -201,9 +201,8 @@ void createMessageOpen(char id[9], char* trameToSend)
     trameAEnvoyer->HEADER = "6";
     trameAEnvoyer->ID =id;
     trameAEnvoyer->LENGHT = "B";
-    trameAEnvoyer->STATUS = "30";    
     trameAEnvoyer->ORG = "05";
-    trameAEnvoyer->STATUS = "00";
+    trameAEnvoyer->STATUS = "30";    
     trameAEnvoyer->SYNC = "A55A";
     calculateCheckSum(trameAEnvoyer);
     //trameAEnvoyer.CHECKSUM = checkSum;
