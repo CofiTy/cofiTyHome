@@ -249,7 +249,6 @@ void createMessageOpen(char id[9], char* trameToSend)
     strcat(trameToSend, trameAEnvoyer->ID);
     strcat(trameToSend, trameAEnvoyer->STATUS);
     strcat(trameToSend, trameAEnvoyer->CHECKSUM);
-    puts(trameAEnvoyer->CHECKSUM);
     //strcat(trameToSend, '\0');
     gFree(trameAEnvoyer);
     //return trameToSend;
