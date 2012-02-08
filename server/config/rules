@@ -33,7 +33,7 @@ actions:
 rule:	
 	temperature
 conditions:	
-	salon<15
+	salon>5
 	intrusion.presence<=20
 	intrusion.luminosite<=20
 actions:
