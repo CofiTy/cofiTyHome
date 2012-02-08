@@ -12,7 +12,7 @@ struct trame{
         char* CHECKSUM;//CHECKSUM:least significant byte from addition of all bytes except for sync and checksum
 };
 
-void itochar(int toBeTrans, char* buffer, int radix )
+void itochar(int toBeTrans, char* buffer, int radix ) //max base to transform: 16
 {
     int i=0, n, reste,j,k=0;
     
@@ -65,13 +65,6 @@ void itochar(int toBeTrans, char* buffer, int radix )
     }
     reverseBuffer[i]='\0';
 
-    /*for(j=0;j<i;j++)
-    {
-        buffer[j] = reverseBuffer[j];
-        k++;
-    }
-
-    buffer[j] = reverseBuffer[j];*/
     strncpy(buffer, reverseBuffer, i);
     gFree(reverseBuffer);
 }

@@ -4,7 +4,9 @@
 #
 #  Types d'actionneurs disponibles actuellement :
 #  COURRANT
-#  
+#  CAFFE
+#  VOLETS
+#  CHAUFFAGE
 #  Format:
 #
 #  typeActionneur idActionneur [nomActionneur]
