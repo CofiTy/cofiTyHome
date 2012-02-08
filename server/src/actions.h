@@ -4,26 +4,28 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "common.h"
+
 // ########################### Actions ###########################
 
 struct actionFct_t{
-    void (*fct)(char[9]);
+    void (*fct)(char[SIZE_ID]);
     struct actionneur_t * actionneur;
     struct actionFct_t * nextActionFct;
 };
 
 struct action_t{
-    char nom[20];
+    char nom[SIZE_NAME];
     struct actionFct_t * actionFcts;
     struct action_t * nextAction;
 };
 
 struct action_t * actions;
 
-struct action_t * getAction(const char nom[20]);
+struct action_t * getAction(const char nom[SIZE_NAME]);
 
 void applyAction(struct action_t * action);
 
-void applyActionByName(const char nom[20]);
+void applyActionByName(const char nom[SIZE_NAME]);
 
 #endif /*ACTIONS_H_*/

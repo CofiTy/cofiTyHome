@@ -13,11 +13,33 @@
 #include <string.h>
 #include <stdlib.h>
 
+/**
+ * Extension that we use for logs.
+ */
 #define LOG_EXT ".log"
 
+/**
+ * Size of name parameter.
+ */
+#define SIZE_NAME 20
+
+/**
+ * Size of ID parameters.
+ */
+#define SIZE_ID 9
+
+/**
+ * USEFUL
+ */ 
+#define MAX(x,y) ((x>y)?x:y)
+
+/**
+ * IDEM
+ */
 #define FAIL(x) if(x == -1) {\
 	perror(#x);exit(-1);}
 	
+#define ERROR -1
 
 /**
  * Get the semaphore when checking sensors.

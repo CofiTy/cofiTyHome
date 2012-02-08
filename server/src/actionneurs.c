@@ -217,7 +217,7 @@ void calculateCheckSum(struct trame* trameAEnv)
     gFree(checkSum);
 }
 
-void createMessageOpen(char id[9], char* trameToSend)
+void createMessageOpen(char id[SIZE_ID], char* trameToSend)
 {
     /*
 //SYNC: A55A
@@ -254,7 +254,7 @@ void createMessageOpen(char id[9], char* trameToSend)
     //return trameToSend;
 }
 
-void createMessageClose(char id[9], char* trameToSend)
+void createMessageClose(char id[SIZE_ID], char* trameToSend)
 {
     /*
 //SYNC: A55A
@@ -291,22 +291,22 @@ void createMessageClose(char id[9], char* trameToSend)
     //return trameToSend;
 }
 
-struct actionneur_t * getActionneur(char id[20]) {
+struct actionneur_t * getActionneur(char id_or_name[MAX(SIZE_NAME, SIZE_ID)]) {
     struct actionneur_t * current = actionneurs;
 
     while (current != 0) {
-        if (strcmp(current->id, id) == 0 || (current->name != NULL && strcmp(current->name, id) == 0)) {
+        if (strcmp(current->id, id_or_name) == 0 || (current->name != NULL && strcmp(current->name, id_or_name) == 0)) {
             return current;
         }
 
         current = current->nextActionneur;
     }
 
-    printf("Actionneur not recognized : %s !!!\n", id);
+    printf("Actionneur not recognized : %s !!!\n", id_or_name);
     return 0;
 }
 
-void setActionneurFct(struct actionFct_t * a, char fctName[20])
+void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME])
 {
     switch (a->actionneur->type)
     {
@@ -387,7 +387,7 @@ void setActionneurFct(struct actionFct_t * a, char fctName[20])
 
 }
 
-void openCOURRANT(char id[9]){
+void openCOURRANT(char id[SIZE_ID]){
     char* trame = (char*)gMalloc(sizeof(char[28]));
     memset(trame, '\0', 28);
     createMessageOpen(id, trame);
@@ -396,7 +396,7 @@ void openCOURRANT(char id[9]){
     gFree(trame);
 }
 
-void closeCOURRANT(char id[9]){
+void closeCOURRANT(char id[SIZE_ID]){
     char* trame = (char*)gMalloc(sizeof(char[28]));
     memset(trame, '\0', 28);
     createMessageClose(id, trame);
@@ -405,32 +405,32 @@ void closeCOURRANT(char id[9]){
     gFree(trame);
 }
 
-void openCAFFE(char id[9])
+void openCAFFE(char id[SIZE_ID])
 {
     puts("Demarrer la machine a caffe!!");
 }
 
-void closeCAFFE(char id[9])
+void closeCAFFE(char id[SIZE_ID])
 {
     puts("Arreter la machine a caffe!!");
 }
 
-void closeCHAUFFAGE(char id[9])
+void closeCHAUFFAGE(char id[SIZE_ID])
 {
     puts("Arreter le chauffage!");
 }
 
-void openCHAUFFAGE(char id[9])
+void openCHAUFFAGE(char id[SIZE_ID])
 {
     puts("Demarrer le chauffage!");
 }
 
-void openVOLETS(char id[9])
+void openVOLETS(char id[SIZE_ID])
 {
     puts("Ouvrir les volets");
 }
 
-void closeVOLETS(char id[9])
+void closeVOLETS(char id[SIZE_ID])
 {
     puts("Fermer les volets");
 }

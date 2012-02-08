@@ -1,7 +1,7 @@
 #include "sensors.h"
 #include "common.h"
 
-void logValue(char idSensor[9], char nameValue[20], int value) {
+void logValue(char idSensor[SIZE_ID], char nameValue[SIZE_NAME], int value) {
     FILE * pFile;
     puts("try Open");
     pFile = fopen(nameLogSensors, "a+");
@@ -18,7 +18,7 @@ void logValue(char idSensor[9], char nameValue[20], int value) {
     }
 }
 
-struct sensorType * getSensor(char id_or_name[20]) {
+struct sensorType * getSensor(char id_or_name[MAX(SIZE_NAME,SIZE_ID)]) {
     struct sensorType * current = sensors;
 
     while (current != NULL) {
@@ -38,7 +38,7 @@ void decodeTrame(char* trame) {
     pthread_mutex_lock(&sensorsMutex);
 
     int i;
-    char id[9];
+    char id[SIZE_ID];
 
     for (i = 0; i < 8; i++) {
         id[i] = trame[i + 16];

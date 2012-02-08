@@ -20,7 +20,7 @@ typedef struct condition_t {
 
 //Une règle
 typedef struct rule_t {
-    char name[20];
+    char name[SIZE_NAME];
     struct condition_t * conditions;
     struct action_t * action;
     struct rule_t * nextRule;
@@ -35,7 +35,7 @@ int testLessOrEqual(int * data, int value);
 int testGreater(int * data, int value);
 int testLess(int * data, int value);
 
-void setConditionName(struct condition_t * c, char sensorId[9], char cndName[20]);
+void setConditionName(struct condition_t * c, char sensorId[SIZE_ID], char cndName[SIZE_NAME]);
 
 
 #endif /*RULES_H_*/
