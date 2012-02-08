@@ -73,8 +73,8 @@
 
  
 %type <chaine> root 
-%type <chaine> parseSensors oneSensor initSensor typeSensor idSensor
-%type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur
+%type <chaine> parseSensors oneSensor initSensor typeSensor idSensor nameSensor
+%type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur idActionneur nameActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
 %type <chaine> parseConfig 
@@ -98,6 +98,7 @@ parseSensors:
 
 oneSensor:
         initSensor typeSensor idSensor nameSensor
+;
 
 idSensor:
         IDENTIFIER
@@ -115,6 +116,7 @@ idSensor:
 };
 
 nameSensor:
+{};
         | IDENTIFIER
 {
     memset(currentSensor->name, '\0', sizeof(char) * 20);
@@ -198,18 +200,8 @@ parseActionneurs:
 ;
 
 oneActionneur:
-        initActionneur typeActionneur IDENTIFIER
-{
-    printf("Actionneur %s\n", $3);
-    memcpy(currentActionneur->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    strcpy(currentActionneur->id, $3);
-};
-        | initActionneur typeActionneur NUMBER
-{
-    printf("Actionneur %d\n", $3);
-    memcpy(currentActionneur->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    sprintf(currentActionneur->id, "%d", $3);
-};
+        initActionneur typeActionneur idActionneur nameActionneur
+;
 
 initActionneur:
 {
@@ -233,6 +225,28 @@ typeActionneur:
         CCOURRANT
 {
     currentSensor->type = COURRANT;
+};
+
+idActionneur:
+        IDENTIFIER
+{
+    printf("Actionneur %s\n", $1);
+    memset(currentActionneur->id, '\0', sizeof(char) * 9);
+    strcpy(currentActionneur->id, $1);
+};
+        | NUMBER
+{
+    printf("Actionneur %d\n", $1);
+    memset(currentActionneur->id, '\0', sizeof(char) * 9);
+    sprintf(currentActionneur->id, "%d", $1);
+};
+
+nameActionneur:
+{};
+        | IDENTIFIER
+{
+    memset(currentActionneur->name, '\0', sizeof(char) * 20);
+    strcpy(currentActionneur->name, $1);
 };
 
 /*************** Actions ***************/

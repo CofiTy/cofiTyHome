@@ -299,11 +299,11 @@ void createMessageClose(char id[9], char* trameToSend)
     //return trameToSend;
 }
 
-struct actionneur_t * getActionneur(char id[9]) {
+struct actionneur_t * getActionneur(char id[20]) {
     struct actionneur_t * current = actionneurs;
 
     while (current != 0) {
-        if (strcmp(current->id, id) == 0) {
+        if (strcmp(current->id, id) == 0 || (current->name != NULL && strcmp(current->name, id) == 0)) {
             return current;
         }
 
