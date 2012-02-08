@@ -16,11 +16,11 @@ void logValue(char idSensor[9], char nameValue[20], int value) {
     }
 }
 
-struct sensorType * getSensor(char id[9]) {
+struct sensorType * getSensor(char id[20]) {
     struct sensorType * current = sensors;
 
     while (current != NULL) {
-        if (strcmp(current->id, id) == 0) {
+        if (strcmp(current->id, id) == 0 || (current->name != NULL && strcmp(current->name, id) == 0)) {
             return current;
         }
 

@@ -75,7 +75,7 @@
 
  
 %type <chaine> root 
-%type <chaine> parseSensors oneSensor initSensor typeSensor
+%type <chaine> parseSensors oneSensor initSensor typeSensor idSensor
 %type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
@@ -99,19 +99,30 @@ parseSensors:
 ;
 
 oneSensor:
-        initSensor typeSensor IDENTIFIER
+        initSensor typeSensor idSensor nameSensor
+
+idSensor:
+        IDENTIFIER
 {
-    printf("Sensor %s\n", $3);
-    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    strcpy(currentSensor->id, $3);
+    printf("Sensor %s\n", $1);
+    memset(currentSensor->id, '\0', sizeof(char) * 9);
+    strcpy(currentSensor->id, $1);
 };
-        | initSensor typeSensor NUMBER
+        | NUMBER
 {
-    printf("Sensor %d\n", $3);
-    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    sprintf(currentSensor->id, "%d", $3);
+    printf("Sensor %d\n", $1);
+    memset(currentSensor->id, '\0', sizeof(char) * 9);
+    sprintf(currentSensor->id, "%d", $1);
 
 };
+
+nameSensor:
+        | IDENTIFIER
+{
+    memset(currentSensor->name, '\0', sizeof(char) * 20);
+    strcpy(currentSensor->name, $1);
+};
+
 
 initSensor:
 {
