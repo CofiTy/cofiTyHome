@@ -65,7 +65,7 @@ void processTypeInitialise(mqd_t mqSend){
       default:
         puts("Sensor: Unkown type");
     }
-    if(name != NULL){
+    if(current->name != NULL){
       name = json_object_new_string(current->name); 
     }else{
       name = json_object_new_string(current->id); 
