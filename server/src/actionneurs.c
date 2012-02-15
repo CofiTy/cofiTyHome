@@ -485,26 +485,22 @@ void pressKEYbackwards(char id[SIZE_ID])
 }
 
 //---- MYSTERE ----------------------------------------------------------------------
-pthread_t pthreadMplayer;
+FILE *pp; 
 
 void * mplayer(){
-  FILE *pp; 
+  return NULL;
+}
+
+void actionMYSTERE(char id[SIZE_ID]){
   if((pp = popen("mplayer weAre.mp3", "w")) == NULL){ 
       perror("popen"); 
       exit(1);
   }
   pclose(pp);
-  //system("mplayer weAre.mp3");
-  return NULL;
-}
-
-void actionMYSTERE(char id[SIZE_ID]){
-  pthread_create(&pthreadMplayer, NULL, mplayer, NULL);
-  pthread_detach(pthreadMplayer);
 }
 
 void finMYSTERE(char id[SIZE_ID]){
-  system("killall mplayer");
-  FAIL(pthread_cancel(pthreadMplayer));
+  fputs("q", pp);
+  pclose(pp);
 }
 
