@@ -372,8 +372,9 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
       {
         if (strcmp(fctName, "action") == 0) {
           a->fct = actionMYSTERE;
-        }
-        else {
+        }else if (strcmp(fctName, "fin") == 0) {
+          a->fct = finMYSTERE;
+        }else {
           printf("Fonction not found : %s\n", fctName);
         }
         break;
@@ -486,4 +487,8 @@ void pressKEYbackwards(char id[SIZE_ID])
 //---- MYSTERE ----------------------------------------------------------------------
 void actionMYSTERE(char id[SIZE_ID]){
   system("mplayer weAre.mp3");
+}
+
+void finMYSTERE(char id[SIZE_ID]){
+  system("killall mplayer");
 }

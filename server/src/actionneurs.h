@@ -66,8 +66,9 @@ void pressKEYbackwards(char id[SIZE_ID]);
 
 //---- MYSTERE ----------------------------------------------------------------------
 void actionMYSTERE(char id[SIZE_ID]);
+void finMYSTERE(char id[SIZE_ID]);
 
-void cleanActionneurs();
+  void cleanActionneurs();
 
 #endif /*ACTIONNEURS_H_*/
 
