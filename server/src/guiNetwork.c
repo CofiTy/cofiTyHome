@@ -115,7 +115,7 @@ void * guiMsgSend(void* data){
       nbSent += nb;
       sending += nb;
     }
-    puts("sent");
+    //puts("sent");
     sending = (char *) buff;
   }
 

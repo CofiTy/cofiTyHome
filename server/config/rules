@@ -19,7 +19,7 @@
 rule:	
 	allumeLampe
 conditions:	
-	bascule.switchButton==0
+	bascule.switchButton==4
 actions:
 	ToutOuvrir
 	
@@ -46,3 +46,17 @@ conditions:
 	aileOuest==35
 actions:
 	ToutOuvrir
+	
+rule:
+	testImg1
+conditions:
+	nico.switchButton==4
+actions:
+	testOuvertureImg
+
+rule:
+	testImg2
+conditions:
+	nico.switchButton==3
+actions:
+	testOuvertureImg2

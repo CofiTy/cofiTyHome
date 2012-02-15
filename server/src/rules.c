@@ -5,20 +5,17 @@
 
 void logRule(char name[SIZE_NAME]) {
 
-	FILE *fLogRule;
+    FILE *fLogRule;
     time_t t;
     time(&t);
-    
-	fLogRule = fopen(nameLogRules, "a+");
-    if (fLogRule != NULL)
-    {
-        fprintf(fLogRule, "%d %s\n", (int)t, name);
-		fclose(fLogRule);
-	}
-    else 
-    {
+
+    fLogRule = fopen(nameLogRules, "a+");
+    if (fLogRule != NULL) {
+        fprintf(fLogRule, "%d %s\n", (int) t, name);
+        fclose(fLogRule);
+    } else {
         printf("No File to Log Rules...\n");
-	}
+    }
 }
 
 void applyRules() {
@@ -110,33 +107,33 @@ void setConditionName(struct condition_t * c, char sensorId[SIZE_ID], char cndNa
 
     if (sensor->type == TEMPERATURE) {
         if (strcmp(cndName, "temp") == 0) {
-            c->data = &(((dataTEMPERATURE*)sensor->data)->temp);
+            c->data = &(((dataTEMPERATURE*) sensor->data)->temp);
         } else {
             ok = 1;
         }
     } else if (sensor->type == CONTACT) {
         if (strcmp(cndName, "contact") == 0) {
-            c->data = &(((dataCONTACT*)sensor->data)->contact);
+            c->data = &(((dataCONTACT*) sensor->data)->contact);
         } else {
             ok = 1;
         }
     } else if (sensor->type == INTERRUPTEUR) {
         if (strcmp(cndName, "switchButton") == 0) {
-            c->data = ((int*)&(((dataINTERRUPTEUR*)sensor->data)->switchButton));
+            c->data = ((int*) &(((dataINTERRUPTEUR*) sensor->data)->switchButton));
         } else {
             ok = 1;
         }
     } else if (sensor->type == PRESENCE) {
         if (strcmp(cndName, "presence") == 0) {
-            c->data = &(((dataPRESENCE*)sensor->data)->presence);
+            c->data = &(((dataPRESENCE*) sensor->data)->presence);
         } else if (strcmp(cndName, "luminosite") == 0) {
-            c->data = &(((dataPRESENCE*)sensor->data)->luminosite);
+            c->data = &(((dataPRESENCE*) sensor->data)->luminosite);
         } else {
             ok = 1;
         }
     }
 
-    if(ok == 1){
+    if (ok == 1) {
         printf("La propriété %s du capteur %s n'existe pas !\n", cndName, sensorId);
         exit(EXIT_FAILURE);
     }

@@ -49,6 +49,9 @@
 %token <valeur> CCONTACT
 
 %token <valeur> CCOURRANT
+%token <valeur> CCHAUFFAGE
+%token <valeur> CCAFFE
+%token <valeur> CVOLETS
 
 %token <valeur> NOMACTION
 %token <valeur> ACTIONNEURS
@@ -107,13 +110,13 @@ idSensor:
         IDENTIFIER
 {
     printf("Sensor %s\n", $1);
-    memset(currentSensor->id, '\0', sizeof(char) * 9);
+    memset(currentSensor->id, '\0', sizeof(char) * SIZE_ID);
     strcpy(currentSensor->id, $1);
 };
         | NUMBER
 {
     printf("Sensor %d\n", $1);
-    memset(currentSensor->id, '\0', sizeof(char) * 9);
+    memset(currentSensor->id, '\0', sizeof(char) * SIZE_ID);
     sprintf(currentSensor->id, "%d", $1);
 
 };
@@ -122,7 +125,7 @@ nameSensor:
 {};
         | IDENTIFIER
 {
-    memset(currentSensor->name, '\0', sizeof(char) * 20);
+    memset(currentSensor->name, '\0', sizeof(char) * SIZE_NAME);
     strcpy(currentSensor->name, $1);
 };
 
@@ -227,20 +230,32 @@ initActionneur:
 typeActionneur:
         CCOURRANT
 {
-    currentSensor->type = COURRANT;
+    currentActionneur->type = COURRANT;
+};
+        |CCAFFE
+{
+    currentActionneur->type = CAFFE;
+};
+        |CVOLETS
+{
+    currentActionneur->type = VOLETS;
+};
+        |CCHAUFFAGE
+{
+    currentActionneur->type = CHAUFFAGE;
 };
 
 idActionneur:
         IDENTIFIER
 {
     printf("Actionneur %s\n", $1);
-    memset(currentActionneur->id, '\0', sizeof(char) * 9);
+    memset(currentActionneur->id, '\0', sizeof(char) * SIZE_ID);
     strcpy(currentActionneur->id, $1);
 };
         | NUMBER
 {
     printf("Actionneur %d\n", $1);
-    memset(currentActionneur->id, '\0', sizeof(char) * 9);
+    memset(currentActionneur->id, '\0', sizeof(char) * SIZE_ID);
     sprintf(currentActionneur->id, "%d", $1);
 };
 
@@ -248,7 +263,7 @@ nameActionneur:
 {};
         | IDENTIFIER
 {
-    memset(currentActionneur->name, '\0', sizeof(char) * 20);
+    memset(currentActionneur->name, '\0', sizeof(char) * SIZE_NAME);
     strcpy(currentActionneur->name, $1);
 };
 
@@ -372,8 +387,8 @@ conditionid:
     } else {
             old->nextCondition = currentCondition;
     }
-    char t[9];
-    memset(t, '\0', sizeof (char) * 9);
+    char t[SIZE_NAME];
+    memset(t, '\0', sizeof (char) * SIZE_NAME);
     strcpy(t, $1);
     
     currentCondition->data = getSensor(t)->data;
@@ -391,8 +406,8 @@ conditionid:
     } else {
             old->nextCondition = currentCondition;
     }
-    /*char t[9];
-    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * 9);
+    /*char t[SIZE_NAME];
+    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * SIZE_NAME);
     strcpy(t, $1);
     currentCondition->data = getSensor(t)->data;*/
 

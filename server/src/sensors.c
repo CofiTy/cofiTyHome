@@ -3,15 +3,15 @@
 
 void logValue(char idSensor[SIZE_ID], char nameValue[SIZE_NAME], int value) {
     FILE * pFile;
-    puts("try Open");
+    //puts("try Open");
     pFile = fopen(nameLogSensors, "a+");
-    puts("Open");
+    //puts("Open");
     time_t t;
     time(&t);
 
     if (pFile != NULL) {
         fprintf(pFile, "%d %s %s %d\n", (int)t, idSensor, nameValue, value);
-        puts("Write");
+        //puts("Write");
         fclose(pFile);
     } else {
         printf("Le fichier %s n'a pas pu être ouvert !!!\n", nameLogSensors);
