@@ -4,13 +4,11 @@
 #
 #  Format:
 #
-#  rule:
-#  	nomRegle
-#  conditions:
-#  	idCapteur operateur valeur
-#  	nomCapteur operateur valeur
-#  actions:
+#  nomAction:
 #  	nomAction
+#  actionneurs:
+#  	idActionneur.fonction
+#  	nomActionneur.fonction
 #  ...
 #  
 #####################################################
@@ -18,11 +16,21 @@
 nomAction:
 	ToutFermer
 actionneurs:
-	12345678.close
-	87654321.close
+#	FF9F1E05.close
+	courrantSalle.close
 	
 nomAction:
 	ToutOuvrir
 actionneurs:
-	12345678.open
-	87654321.open
+#	FF9F1E05.open
+	FF9F1E06.open
+	
+nomAction:
+	testOuvertureImg
+actionneurs:
+	cafeeee.open
+	
+nomAction:
+	testOuvertureImg2
+actionneurs:
+	cafeeee.close

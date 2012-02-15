@@ -1,44 +1,63 @@
 #include <unistd.h>
+#include <sys/epoll.h>
+#include <unistd.h> //Pour STDIN_FILENO
+#include <stdio.h>
+#include <string.h>
 
-#include "guiNetwork.h"
-#include "sensorsNetwork.h"
-#include "../parse/rules.tab.h"
-#include "sensors.h"
+#include "common.h"
 
-int main(int argc, char ** argv){
-/*
-    sensorsNetworkStart();
-    sleep(120);
-    sensorsNetworkStop();
-*/
+#include "init.h"
 
-/*
-    guiNetworkStart();
-    sleep(120);
-    guiNetworkStop();
-*/
+#define MAX_EVENTS 10
 
-    
-/*
-    sensors = calloc(1, sizeof(struct sensorType));
-
-    sensors->data = calloc(1, sizeof(dataTEMPERATURE));
-
-    ((dataTEMPERATURE*)sensors->data)->temp = 35;
-    strcpy(sensors->id, "cap1");
+int main(int argc, char ** argv) {
 
 
-    sensors->nextSensor = calloc(1, sizeof(struct sensorType));
+    init();
 
-    sensors->nextSensor->data = calloc(1, sizeof(dataTEMPERATURE));
+    struct epoll_event ev;
+    memset(&ev, 0, sizeof (struct epoll_event));
+    int epollfd;
 
-    ((dataTEMPERATURE*)sensors->nextSensor->data)->temp = 5;
-    strcpy(sensors->nextSensor->id, "cap2");
-*/
+    epollfd = epoll_create(10);
+    FAIL(epollfd);
 
-    parseAll();
+    //Ajout à epoll de l'entrée standard
+    ev.events = EPOLLIN;
+    ev.data.fd = STDIN_FILENO;
+    FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, STDIN_FILENO, &ev));
 
-    applyRules();
-  return 0;
+    struct epoll_event events[MAX_EVENTS];
+
+    int nfds;
+    int done = 0;
+
+
+    while (done == 0) //Boucle principale
+    {
+
+        nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+        FAIL(nfds);
+
+        int n;
+
+        for (n = 0; n < nfds; ++n) {
+            if (events[n].data.fd == STDIN_FILENO) {
+                char chaine[16];
+                fgets(chaine, 15, stdin); //récupère l'entrée standard
+
+                //Traite la commande
+                if (strcmp(chaine, "exit\n") == 0 || strcmp(chaine, "quit\n") == 0 || strcmp(chaine, "q\n") == 0) {
+                    done = 1;
+                    puts("Quiting server!");
+                } else {
+                    puts("Commande invalide\nUsage: exit, quit, q");
+                }
+            }
+        }
+    }
+    destroy();
+
+    return 0;
 }
 

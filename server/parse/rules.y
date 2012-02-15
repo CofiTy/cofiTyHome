@@ -8,6 +8,9 @@
     #include "../src/sensors.h"
     #include "../src/actions.h"
     #include "../src/actionneurs.h"
+    #include "../src/common.h"
+    
+    #include "../../kernel/memory/memory.h"
 
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
@@ -33,6 +36,7 @@
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
 
+
 %}
 
 %union  { char chaine[256]; int valeur; }
@@ -45,6 +49,9 @@
 %token <valeur> CCONTACT
 
 %token <valeur> CCOURRANT
+%token <valeur> CCHAUFFAGE
+%token <valeur> CCAFFE
+%token <valeur> CVOLETS
 
 %token <valeur> NOMACTION
 %token <valeur> ACTIONNEURS
@@ -58,15 +65,25 @@
 %token <chaine> LESSOREQUAL
 %token <chaine> GREATER
 %token <chaine> LESS
+
+%token <chaine> NAMELOGRULES
+%token <chaine> NAMELOGSENSORS
+
+%token <chaine> CONNECT
+%token <chaine> LISTEN
+%token <chaine> IP
+%token <chaine> COLUMN
+
 %token <chaine> IDENTIFIER
 %token <valeur> NUMBER
 
  
 %type <chaine> root 
-%type <chaine> parseSensors oneSensor initSensor typeSensor
-%type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur
+%type <chaine> parseSensors oneSensor initSensor typeSensor idSensor nameSensor
+%type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur idActionneur nameActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
+%type <chaine> parseConfig 
  
 %%
 
@@ -75,6 +92,7 @@ root:
         | parseActionneurs
         | parseActions
         | parseRules
+        | parseConfig
 ;
 
 /*************** Capteurs ***************/
@@ -85,25 +103,42 @@ parseSensors:
 ;
 
 oneSensor:
-        initSensor typeSensor IDENTIFIER
+        initSensor typeSensor idSensor nameSensor
+;
+
+idSensor:
+        IDENTIFIER
 {
-    printf("Sensor %s\n", $3);
-    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    strcpy(currentSensor->id, $3);
+    printf("Sensor %s\n", $1);
+    memset(currentSensor->id, '\0', sizeof(char) * SIZE_ID);
+    strcpy(currentSensor->id, $1);
 };
-        | initSensor typeSensor NUMBER
+        | NUMBER
 {
-    printf("Sensor %d\n", $3);
-    memcpy(currentSensor->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    sprintf(currentSensor->id, "%d", $3);
+    printf("Sensor %d\n", $1);
+    memset(currentSensor->id, '\0', sizeof(char) * SIZE_ID);
+    sprintf(currentSensor->id, "%d", $1);
 
 };
+
+nameSensor:
+{};
+        | IDENTIFIER
+{
+    memset(currentSensor->name, '\0', sizeof(char) * SIZE_NAME);
+    strcpy(currentSensor->name, $1);
+};
+
 
 initSensor:
 {
     struct sensorType * old = currentSensor;
 
-    currentSensor = calloc(1, sizeof(struct sensorType));
+    if((currentSensor = gMalloc(sizeof(struct sensorType))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor, 0, sizeof(struct sensorType));
 
     if(sensors == 0){
         sensors = currentSensor;
@@ -117,7 +152,11 @@ typeSensor:
 {
     currentSensor->type = INTERRUPTEUR;
 
-    currentSensor->data = calloc(1, sizeof(dataINTERRUPTEUR));
+    if((currentSensor->data = gMalloc(sizeof(dataINTERRUPTEUR))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataINTERRUPTEUR));
 
     currentSensor->decode = decodeInterrupteur;
 };
@@ -125,7 +164,12 @@ typeSensor:
 {
     currentSensor->type = PRESENCE;
 
-    currentSensor->data = calloc(1, sizeof(dataPRESENCE));
+
+    if((currentSensor->data = gMalloc(sizeof(dataPRESENCE))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataPRESENCE));
 
     currentSensor->decode = decodePresence;
 };
@@ -133,7 +177,11 @@ typeSensor:
 {
     currentSensor->type = TEMPERATURE;
 
-    currentSensor->data = calloc(1, sizeof(dataTEMPERATURE));
+    if((currentSensor->data = gMalloc(sizeof(dataTEMPERATURE))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataTEMPERATURE));
 
     currentSensor->decode = decodeTemperature;
 };
@@ -141,7 +189,11 @@ typeSensor:
 {
     currentSensor->type = CONTACT;
 
-    currentSensor->data = calloc(1, sizeof(dataCONTACT));
+    if((currentSensor->data = gMalloc(sizeof(dataCONTACT))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataCONTACT));
 
     currentSensor->decode = decodeContact;
 };
@@ -154,24 +206,18 @@ parseActionneurs:
 ;
 
 oneActionneur:
-        initActionneur typeActionneur IDENTIFIER
-{
-    printf("Actionneur %s\n", $3);
-    memcpy(currentActionneur->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    strcpy(currentActionneur->id, $3);
-};
-        | initActionneur typeActionneur NUMBER
-{
-    printf("Actionneur %d\n", $3);
-    memcpy(currentActionneur->id, "\0\0\0\0\0\0\0\0\0", sizeof(char) * 9);
-    sprintf(currentActionneur->id, "%d", $3);
-};
+        initActionneur typeActionneur idActionneur nameActionneur
+;
 
 initActionneur:
 {
     struct actionneur_t * old = currentActionneur;
 
-    currentActionneur = calloc(1, sizeof(struct actionneur_t));
+    if((currentActionneur = gMalloc(sizeof(struct actionneur_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentActionneur, 0, sizeof(struct actionneur_t));
 
     if(actionneurs == 0){
         actionneurs = currentActionneur;
@@ -184,7 +230,41 @@ initActionneur:
 typeActionneur:
         CCOURRANT
 {
-    currentSensor->type = COURRANT;
+    currentActionneur->type = COURRANT;
+};
+        |CCAFFE
+{
+    currentActionneur->type = CAFFE;
+};
+        |CVOLETS
+{
+    currentActionneur->type = VOLETS;
+};
+        |CCHAUFFAGE
+{
+    currentActionneur->type = CHAUFFAGE;
+};
+
+idActionneur:
+        IDENTIFIER
+{
+    printf("Actionneur %s\n", $1);
+    memset(currentActionneur->id, '\0', sizeof(char) * SIZE_ID);
+    strcpy(currentActionneur->id, $1);
+};
+        | NUMBER
+{
+    printf("Actionneur %d\n", $1);
+    memset(currentActionneur->id, '\0', sizeof(char) * SIZE_ID);
+    sprintf(currentActionneur->id, "%d", $1);
+};
+
+nameActionneur:
+{};
+        | IDENTIFIER
+{
+    memset(currentActionneur->name, '\0', sizeof(char) * SIZE_NAME);
+    strcpy(currentActionneur->name, $1);
 };
 
 /*************** Actions ***************/
@@ -205,7 +285,11 @@ actionId:
 {
     struct action_t * old = currentAction;
 
-    currentAction = calloc(1, sizeof(struct action_t));
+    if((currentAction = gMalloc(sizeof(struct action_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentAction, 0, sizeof(struct action_t));
 
     if(actions == 0){
         actions = currentAction;
@@ -226,7 +310,11 @@ oneActionneurFct:
 {
     struct actionFct_t * old = currentActionFct;
 
-    currentActionFct = calloc(1, sizeof(struct actionFct_t));
+    if((currentActionFct = gMalloc(sizeof(struct actionFct_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentActionFct, 0, sizeof(struct actionFct_t));
 
     if(currentAction->actionFcts == 0){
         currentAction->actionFcts = currentActionFct;
@@ -259,7 +347,13 @@ ruleid:
 
     struct rule_t * old = currentRule;
 
-    currentRule = calloc(1, sizeof(struct rule_t));
+    if((currentRule = gMalloc(sizeof(struct rule_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentRule, 0, sizeof(struct rule_t));
+
+    strcpy(currentRule->name, $2);
 
     if(startRule == 0){
         startRule = currentRule;
@@ -282,6 +376,29 @@ conditionid:
 
     struct condition_t * old = currentCondition;
 
+    if((currentCondition = gMalloc(sizeof(struct condition_t))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentCondition, 0, sizeof(struct condition_t));
+
+    if(currentRule->conditions == 0){
+            currentRule->conditions = currentCondition;
+    } else {
+            old->nextCondition = currentCondition;
+    }
+    char t[SIZE_NAME];
+    memset(t, '\0', sizeof (char) * SIZE_NAME);
+    strcpy(t, $1);
+    
+    currentCondition->data = getSensor(t)->data;
+};
+        | IDENTIFIER POINT IDENTIFIER
+{
+    printf("\tcond  %s\n", $1);
+
+    struct condition_t * old = currentCondition;
+
     currentCondition = calloc(1, sizeof(struct condition_t));
 
     if(currentRule->conditions == 0){
@@ -289,10 +406,12 @@ conditionid:
     } else {
             old->nextCondition = currentCondition;
     }
-    char t[9];
-    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * 9);
+    /*char t[SIZE_NAME];
+    memcpy(t, "\0\0\0\0\0\0\0\0", sizeof(char) * SIZE_NAME);
     strcpy(t, $1);
-    currentCondition->data = getSensor(t)->data;
+    currentCondition->data = getSensor(t)->data;*/
+
+    setConditionName(currentCondition, $1, $3);
 };
 
 numberid:
@@ -334,39 +453,102 @@ someactions:
 };
 	| IDENTIFIER someactions
 
+/********************** Config **************************/
+
+parseConfig:
+           CONNECT IP COLUMN IDENTIFIER LISTEN IDENTIFIER NAMELOGRULES IDENTIFIER NAMELOGSENSORS IDENTIFIER
+           {
+            /*
+            printf("### Original ###\n");
+            printf("\tConnect to IP: %s on Port: %s\n",$2, $4);
+            printf("\tListen on Port: %s\n", $6);
+            */
+            conIP = gMalloc(strlen($2)*sizeof(char));
+            memcpy(conIP, $2, strlen($2));
+
+            conPort = atoi($4);
+            lisPort = atoi($6);
+            
+            nameLogSensors = gMalloc((strlen($10)+strlen(LOG_EXT))*sizeof(char));
+            memcpy(nameLogSensors, $10, strlen($10));
+            strcat(nameLogSensors, LOG_EXT);
+            
+            nameLogRules = gMalloc((strlen($8)+strlen(LOG_EXT))*sizeof(char));
+            memcpy(nameLogRules, $8, strlen($8));
+            strcat(nameLogRules, LOG_EXT);
+            
+            /*printf("### Copied ###\n");*/
+            printf("\tConnect to IP: %s on Port: %d\n", conIP, conPort);
+            printf("\tListen on Port: %d\n", lisPort);
+            
+            printf("\tLog Rules: %s\n\tLog Sensors: %s\n", nameLogRules, nameLogSensors);
+           };
  
 %%
 
 void parseSensors() {
 	printf("%s\n", "Parsing Sensors..");
 
-	yyin = fopen( "config/sensors", "r" );
-
-	yyparse();
+	if((yyin = fopen( "server/config/sensors", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/sensors...");
+		exit(ERROR);
+	}
+	
+    yyparse();
 }
 
 void parseActionneurs() {
 	printf("\n%s\n", "Parsing Actionneurs..");
 
-	yyin = fopen( "config/actionneurs", "r" );
+	if((yyin = fopen( "server/config/actionneurs", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/actionneurs...");
+		exit(ERROR);
+	}
 
-	yyparse();
+    yyparse();
 }
 
 void parseActions() {
 	printf("\n%s\n", "Parsing Actions..");
 
-	yyin = fopen( "config/actions", "r" );
+	if((yyin = fopen( "server/config/actions", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/actions...");
+		exit(ERROR);
+	}
 
-	yyparse();
+    yyparse();
 }
 
 void parseRules() {
 	printf("\n%s\n", "Parsing Rules..");
 
-	yyin = fopen( "config/rules", "r" );
+	if((yyin = fopen( "server/config/rules", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/rules...\n");
+		exit(ERROR);
+	}
 
-	yyparse();
+	pthread_mutex_lock(&sensorsMutex);
+
+    yyparse();
+
+    pthread_mutex_unlock(&sensorsMutex);
+}
+
+void parseConfig() {
+    printf("\n%s\n", "Parsing Config...");
+
+    if((yyin = fopen("server/config/config", "r")) == NULL)
+    {
+		printf("ERROR: No File server/config/config...\n");
+		exit(ERROR);
+	}
+		
+    yyparse();
+
 }
 
 void parseAll() {
@@ -376,5 +558,6 @@ void parseAll() {
         parseActionneurs();
         parseActions();
         parseRules();
+        parseConfig();
 }
 

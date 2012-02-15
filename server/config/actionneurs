@@ -2,9 +2,12 @@
 #
 #  Fichier des actionneurs.
 #
-#  Types d'actionneurs disponibles actuellement :
-#  COURRANT
-#  
+#  Types d'actionneurs disponibles actuellement, suivi de leurs fonctions :
+#  COURRANT open close
+#  CAFFE open close
+#  VOLETS open close
+#  CHAUFFAGE open close
+#
 #  Format:
 #
 #  typeActionneur idActionneur [nomActionneur]
@@ -14,5 +17,6 @@
 #####################################################
 
 #TODO: Changer valeur id
-COURRANT 12345678
-COURRANT 87654321
+#COURRANT FF9F1E05
+COURRANT FF9F1E06 courrantSalle
+CAFFE F99F1E03 cafeeee

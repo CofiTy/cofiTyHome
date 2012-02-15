@@ -5,12 +5,15 @@
 
 #include "memory.h"
 
+#define SECRET_CODE 42
+
 typedef long Align;    /* for alignment to long boundary */
 
 union header {         /* block header */
   struct {
     union header *ptr; /* next block if on free list */
     unsigned long size;     /* size of this block */
+    unsigned char sCode;
   } s;
   Align x;             /* force alignment of blocks */
 };
@@ -36,8 +39,10 @@ void initMemory()
         up = (Header *) heap; 
         /*up->s.size = (SIZE_ALLOC+sizeof(Header)-1)/sizeof(Header) + 1;*/
         up->s.size = SIZE_ALLOC/sizeof(Header);
+        up->s.sCode = SECRET_CODE;
         /*up->s.size = SIZE_ALLOC - sizeof(Header);*/
-        gFree((void *)(up+1));    
+        gFree((void *)(up+1));   
+        /*printf("Début : %p, Fin: %p\n", (void *)heap, (void *)(heap+SIZE_ALLOC));*/
     }
 }
 
@@ -46,19 +51,42 @@ void gFree(void *ap)
 {
     Header *bp, *p;
 
+    /* Test if memory is initialised */
     if(freep == NULL)
         return;
 
     pthread_mutex_lock(&myLock);
+ 
+    /* Test if pointer is within our memory */
+    if(ap == NULL
+            || (void *)ap < (void *)heap
+            || (void *)ap >= (void *)(heap + SIZE_ALLOC))
+    {
+        pthread_mutex_unlock(&myLock);
+        return;
+    }
     bp = (Header *)ap - 1;
-    /* point to block header */
+
+    /* Test if it's a valid Header */
+    if(bp->s.sCode != SECRET_CODE)
+    {
+        pthread_mutex_unlock(&myLock);
+        return;
+    }
+
+    /* We search the preceding free block in memory */
     for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
     {
+		/* Freelist is circular, we break if were at the 
+		 * beginning or end of freelist.
+		 */
         if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
         {
-             break; /* freed block at start or end of arena */
+             break;
         }
     }
+    
+    /* Try to merge with next block. */
     if (bp + bp->s.size == p->s.ptr) 
     {
         /* join to upper nbr */
@@ -69,9 +97,10 @@ void gFree(void *ap)
     {
         bp->s.ptr = p->s.ptr;
     }
+    
+    /* Try to merge with previous block */
     if (p + p->s.size == bp) 
     {
-        /* join to lower nbr */
         p->s.size += bp->s.size;
         p->s.ptr = bp->s.ptr;
     } 
@@ -120,8 +149,10 @@ void *gMalloc(unsigned long nbytes)
                 /*printf("New Taille: %d\n", p->s.size);*/
             	p += p->s.size;
             	p->s.size = nunits;
+                p->s.sCode = SECRET_CODE;
             }
             freep = prevp;
+            pthread_mutex_unlock(&myLock);
             return (void *)(p+1);
         }
         if (p == freep) /* wrapped around free list */
@@ -135,6 +166,12 @@ void *gMalloc(unsigned long nbytes)
             }
         }
     }
+}
+
+void destroyMemory()
+{
+	freep = NULL;
+	pthread_mutex_destroy(&myLock);
 }
 
 unsigned long getGMemTotal()

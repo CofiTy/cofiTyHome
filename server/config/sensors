@@ -2,11 +2,11 @@
 #
 #  Fichier de capteurs.
 #
-#  Types de capteurs disponibles actuellement :
-#  INTERRUPTEUR
-#  PRESENCE
-#  TEMPERATURE
-#  CONTACT
+#  Types de capteurs disponibles actuellement, avec leurs attributs :
+#  INTERRUPTEUR : switchButton
+#  PRESENCE : presence luminosite
+#  TEMPERATURE : temp
+#  CONTACT : contact
 #  
 #  Format:
 #
@@ -16,8 +16,9 @@
 #
 #####################################################
 
-INTERRUPTEUR 0021CBE2
-PRESENCE 00053F44
-TEMPERATURE 10020024
-CONTACT 0001B291
-CONTACT 0001B292
+INTERRUPTEUR 0021CBE2 bascule 
+INTERRUPTEUR 0021CBE5 nico
+PRESENCE 00053F44 intrusion
+TEMPERATURE 00893382 salon
+CONTACT 0001B291 aileEst
+CONTACT 0001B292 aileOuest

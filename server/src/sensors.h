@@ -2,8 +2,11 @@
 #define SENSORS_H_
 
 
-#include "stdio.h"
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "common.h"
 
 // ########################### Capteurs ##############################
 
@@ -16,7 +19,8 @@ typedef enum typeCapteur {
 
 typedef struct sensorType {
  typeCapteur type;
- char id[9];
+ char id[SIZE_ID];
+ char name[SIZE_NAME];
  void *data;
  struct sensorType* nextSensor;
  void (*decode)(char* trame, struct sensorType*);
@@ -24,9 +28,7 @@ typedef struct sensorType {
 
 struct sensorType * sensors;
 
-struct sensorType * getSensor(char id[9]);
-
-//sensorType sensorList;
+struct sensorType * getSensor(char id_or_name[MAX(SIZE_ID,SIZE_NAME)]);
 
 
 //----- TEMPERATURE --------------------------------------------------------------------
@@ -38,15 +40,15 @@ void decodeTemperature(char* trame, struct sensorType* capteur);
 
 //----- CONTACT ------------------------------------------------------------------------
 typedef struct dataCONTACT {
-    char contact;
+    int contact;
 } dataCONTACT;
 
 void decodeContact(char* trame, struct sensorType* capteur);
 
 //----- PRESENCE ------------------------------------------------------------------------
 typedef struct dataPRESENCE {
-    char presence;
-    char luminosite;
+    int presence;
+    int luminosite;
 } dataPRESENCE;
 
 
@@ -69,5 +71,7 @@ typedef struct dataINTERRUPTEUR {
 
 
 void decodeInterrupteur(char* trame, struct sensorType* capteur);
+
+void decodeTrame(char* trame);
 
 #endif /*SENSORS_H_*/

@@ -12,6 +12,13 @@
 
 #include "guiNetwork.h"
 #include "guiInterface.h"
+#include "common.h"
+
+#include "../../kernel/memory/memory.h"
+
+/**
+ * TODO: guiNetworkStop: On rentre dans kill thread et on sort pas: Pas de close
+ */
 
 typedef struct Client *PClient;
 
@@ -67,7 +74,7 @@ void * guiMsgRec(void* data){
       if(blocs == 0){ /* If enough data we can process */
         puts("recv");
         /*Traiter traite*/
-        processCommand(traite);
+        processCommand(traite, client->mqSend);
         j = 0;
         memset(traite, '\0', 128);
       }
@@ -95,6 +102,8 @@ void * guiMsgSend(void* data){
     nb = mq_receive(client->mqSend, buff, 8192, NULL);
     puts("mq rec");
     FAIL(nb);
+    
+    printf("Sending toward GUI: %s\n", buff);
 
     total = nb;
     nbSent = 0;
@@ -106,7 +115,7 @@ void * guiMsgSend(void* data){
       nbSent += nb;
       sending += nb;
     }
-    puts("sent");
+    //puts("sent");
     sending = (char *) buff;
   }
 
@@ -125,7 +134,7 @@ void * guiNetworkConnexion(){
 
   saddr.sin_addr.s_addr = htonl(INADDR_ANY);
   saddr.sin_family = AF_INET;
-  saddr.sin_port = htons(5003);
+  saddr.sin_port = htons(lisPort);
 
   acceptSock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(acceptSock);
@@ -144,12 +153,12 @@ void * guiNetworkConnexion(){
     puts("gotConnexion");
 
     if(clientList.first == NULL){
-      clientList.first = malloc(sizeof(Client));
+      clientList.first = gMalloc(sizeof(Client));
       clientList.first->next = NULL;
       clientList.current = clientList.first;
     } 
     else{
-      clientList.current = malloc(sizeof(Client));
+      clientList.current = gMalloc(sizeof(Client));
       clientList.current->next = clientList.first;
       clientList.first = clientList.current;
     }
@@ -176,17 +185,19 @@ void guiNetworkStart(){
 
 void guiNetworkStop(){
 
-  pthread_kill(pthreadConnexion, SIGTERM);
+  FAIL(pthread_cancel(pthreadConnexion));
+
   while(clientList.first != NULL){
-    pthread_kill(clientList.first->pthreadSend, SIGTERM);
-    pthread_kill(clientList.first->pthreadRec, SIGTERM);
+    FAIL(pthread_cancel(clientList.first->pthreadSend));
+    FAIL(pthread_cancel(clientList.first->pthreadRec));
     close(clientList.first->sock);
     FAIL(mq_close(clientList.first->mqSend));
 
     clientList.current = clientList.first;
     clientList.first = clientList.first->next;
-    free(clientList.current);
+    gFree(clientList.current);
   }
+  puts("Closed");
 }
 
 int guiNetworkSend(const char * msg_ptr, size_t msg_len, mqd_t mqId){

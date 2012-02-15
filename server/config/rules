@@ -1,6 +1,6 @@
 ######################################################
 #
-#  Fichier de règles.
+#  Fichier de règles. Si vous ne specifiez pas d'attribut pour un capteur, prend le 1er.
 #
 #  Format:
 #
@@ -8,7 +8,7 @@
 #  	nomRegle
 #  conditions:
 #  	idCapteur operateur valeur
-#  	nomCapteur operateur valeur
+#  	nomCapteur.attributCapteur operateur valeur
 #  actions:
 #  	nomAction
 #  ...
@@ -17,25 +17,46 @@
 
 
 rule:	
-	temperature
+	allumeLampe
 conditions:	
-	0021CBE2<30
-	00053F44<=20
+	bascule.switchButton==4
 actions:
-	ToutFermer
+	ToutOuvrir
 	
 rule:	
-	pipi
+	allumeLampe
 conditions:	
-	10020024>5
-	0021CBE2<=20
+	bascule.switchButton==1
+actions:
+	ToutFermer
+
+rule:	
+	temperature
+conditions:	
+	salon>5
+	intrusion.presence<=20
+	intrusion.luminosite<=20
 actions:
 	ToutOuvrir
 	
 rule:
 	cafe
 conditions:
-	0001B292<=5	
-	0001B291==35
+	aileEst<=5	
+	aileOuest==35
 actions:
 	ToutOuvrir
+	
+rule:
+	testImg1
+conditions:
+	nico.switchButton==4
+actions:
+	testOuvertureImg
+
+rule:
+	testImg2
+conditions:
+	nico.switchButton==3
+actions:
+	testOuvertureImg2
