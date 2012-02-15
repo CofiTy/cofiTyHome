@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define CONF_PATH "/server/config/"
+#define CONF_PATH "server/config/"
 
 #define ACTIONNEURS_FILE "actionneurs"
 

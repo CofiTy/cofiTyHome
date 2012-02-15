@@ -9,13 +9,17 @@
     #include "../src/actions.h"
     #include "../src/actionneurs.h"
     #include "../src/common.h"
+    #include "../src/init.h"
     
     #include "../../kernel/memory/memory.h"
 
+    int parsedFlag;
+    void clean();
+
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
-
-        //TODO:appeler clean
+      parsedFlag = FALSE;
+      clean();
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -44,6 +48,7 @@
     INIT = 0,
     RELOADING = 1
     } state;
+    
 
     state progState = INIT;
 
@@ -687,22 +692,12 @@ void parseConfig() {
 
 }
 
-void parseAll() {
-	printf("\n%s\n", "Start Parsing..");
-
-//TODO:Changer en parseFile.
-	parseSensors();
-        parseActionneurs();
-        parseActions();
-        parseRules();
-        parseConfig();
-}
 
 void parseFile(const char* file){
     printf("Trying to Parse %s\n", file);
     if((yyin = fopen(file, "r")) == NULL)
     {
-        fprintf("ERROR: No file named %s\n", file);
+        fprintf(stderr, "ERROR: No file named %s\n", file);
     }
     pthread_mutex_lock(&sensorsMutex);
     yyparse();
@@ -710,8 +705,24 @@ void parseFile(const char* file){
     printf("Parsing of %s finished\n", file);
 }
 
-//bool reparseFiles(enumBenJ p, const char * file){
+void parseAll() {
+  printf("\n%s\n", "Start Parsing..");
+  
+  progState = INIT;
+  parsedFlag = TRUE;
+  
+  parseFile(CONF_PATH SENSORS_FILE);
+  parseFile(CONF_PATH ACTIONNEURS_FILE);
+  parseFile(CONF_PATH ACTIONS_FILE);
+  parseFile(CONF_PATH RULES_FILE);
+  parseFile(CONF_PATH CONFIG_FILE);
+}
+
 int reparseFiles(int p, const char * file) {
+
+    cleanMemory();
+    progState = RELOADING;
+    parsedFlag = TRUE;
 
     if(p != F_SENSORS)
         parseFile(CONF_PATH SENSORS_FILE);
@@ -732,19 +743,19 @@ int reparseFiles(int p, const char * file) {
         parseFile(CONF_PATH RULES_FILE);
     else
         parseFile(file);
-    
+
     return 1;
 
 }
 
-void clean(state progState){
+void clean(){
 
-    //TODO:on clean la memoire
+    cleanMemory();
 
     if(progState == INIT){
         exit(-1);
     } else if(progState == RELOADING){
-        //parseAll
+        parseAll();
     }
 }
 /*
