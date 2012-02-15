@@ -488,7 +488,13 @@ void pressKEYbackwards(char id[SIZE_ID])
 pthread_t pthreadMplayer;
 
 void * mplayer(){
-  system("mplayer weAre.mp3");
+  FILE *pp; 
+  if((pp = popen("mplayer weAre.mp3", "w")) == NULL){ 
+      perror("popen"); 
+      exit(1);
+  }
+  pclose(pp);
+  //system("mplayer weAre.mp3");
   return NULL;
 }
 
