@@ -157,6 +157,8 @@ void decodeTemperature(char* trame, struct sensorType* capteur) {
     printf("decode Temperature!, %d\n", temp);
 }
 
+void decodeHorloge(char* trame, struct sensorType* capteur) {}
+
 void cleanSensors(){
   struct sensorType * cSensor;
   

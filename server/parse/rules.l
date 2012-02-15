@@ -44,7 +44,6 @@
 
 "-gt"	{ strcpy(yylval.chaine, yytext); return TIMEGREATERTHAN; }
 "-lt"	{ strcpy(yylval.chaine, yytext); return TIMELOWERTHAN; }
-"-eq"	{ strcpy(yylval.chaine, yytext); return TIMEEQUAL; }
 
 [Cc]"onnect"[Ss]"erver:"    {strcpy(yylval.chaine, yytext); return CONNECT; }
 [Ll]"isten"[Cc]"lient:"     {strcpy(yylval.chaine, yytext); return LISTEN; }

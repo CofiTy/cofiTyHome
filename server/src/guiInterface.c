@@ -72,6 +72,10 @@ void processTypeInitialise(mqd_t mqSend){
       case PRESENCE:
         type = json_object_new_string("Presence");
         break;
+        
+      case HORLOGE:
+        type = json_object_new_string("Horloge");
+        break;
 
       default:
         puts("Sensor: Unkown type");
@@ -168,6 +172,10 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
 
       case INTERRUPTEUR:
         type = json_object_new_string("Interupteur");
+        break;
+        
+      case HORLOGE:
+        type = json_object_new_string("Horloge");
         break;
 
       case PRESENCE:

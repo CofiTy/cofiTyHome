@@ -97,6 +97,24 @@ int testLess(int * data, int value) {
         return 0;
 }
 
+int testTimeLess(int * data, int value)
+{
+    if(time(NULL) < value)
+        return 1;
+    else
+        return 0;
+}
+
+int testTimeMore(int * data, int value)
+{
+    if(time(NULL) > value)
+    {
+        return 1;
+    }
+    else
+        return 0;
+}
+
 void setConditionName(struct condition_t * c, char sensorId[SIZE_ID], char cndName[SIZE_NAME]) {
     char t[SIZE_ID];
     memset(t, '\0', sizeof (char) * SIZE_ID);

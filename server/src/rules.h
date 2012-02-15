@@ -35,6 +35,9 @@ int testLessOrEqual(int * data, int value);
 int testGreater(int * data, int value);
 int testLess(int * data, int value);
 
+int testTimeLess(int * data, int value);
+int testTimeMore(int * data, int value);
+
 void setConditionName(struct condition_t * c, char sensorId[SIZE_ID], char cndName[SIZE_NAME]);
 
 void cleanRules();

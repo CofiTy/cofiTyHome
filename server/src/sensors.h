@@ -59,6 +59,8 @@ typedef struct dataHORLOGE {
     int currentTime;
 } dataHORLOGE;
 
+void decodeHorloge(char* trame, struct sensorType* capteur);
+
 //----- INTERRUPTEUR --------------------------------------------------------------------
 
 typedef enum buttonPressed {

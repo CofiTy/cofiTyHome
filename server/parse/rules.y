@@ -82,7 +82,6 @@
 
 %token <chaine> TIMEGREATERTHAN
 %token <chaine> TIMELOWERTHAN
-%token <chaine> TIMEEQUAL
  
 %type <chaine> root 
 %type <chaine> parseSensors oneSensor initSensor typeSensor idSensor nameSensor
@@ -142,7 +141,8 @@ initSensor:
 
     if((currentSensor = gMalloc(sizeof(struct sensorType))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor, 0, sizeof(struct sensorType));
 
@@ -160,7 +160,8 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataINTERRUPTEUR))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataINTERRUPTEUR));
 
@@ -173,7 +174,8 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataPRESENCE))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataPRESENCE));
 
@@ -185,7 +187,8 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataTEMPERATURE))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataTEMPERATURE));
 
@@ -197,7 +200,8 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataCONTACT))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataCONTACT));
 
@@ -209,11 +213,12 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataHORLOGE))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataHORLOGE));
 
-    currentSensor->decode = NULL;
+    currentSensor->decode = decodeHorloge;
 };
 
 
@@ -236,7 +241,8 @@ initActionneur:
 
     if((currentActionneur = gMalloc(sizeof(struct actionneur_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentActionneur, 0, sizeof(struct actionneur_t));
 
@@ -308,7 +314,8 @@ actionId:
 
     if((currentAction = gMalloc(sizeof(struct action_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentAction, 0, sizeof(struct action_t));
 
@@ -333,7 +340,8 @@ oneActionneurFct:
 
     if((currentActionFct = gMalloc(sizeof(struct actionFct_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentActionFct, 0, sizeof(struct actionFct_t));
 
@@ -370,7 +378,8 @@ ruleid:
 
     if((currentRule = gMalloc(sizeof(struct rule_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentRule, 0, sizeof(struct rule_t));
 
@@ -399,7 +408,8 @@ conditionid:
 
     if((currentCondition = gMalloc(sizeof(struct condition_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentCondition, 0, sizeof(struct condition_t));
 
@@ -420,7 +430,11 @@ conditionid:
 
     struct condition_t * old = currentCondition;
 
-    currentCondition = gMalloc(sizeof(struct condition_t));
+    if((currentCondition = gMalloc(sizeof(struct condition_t))) == NULL)
+    {
+        fprintf(stderr, "No Memory\n");
+        exit(ERROR);
+    }
     memset(currentCondition, 0, sizeof(struct condition_t));
 
     if(currentRule->conditions == 0){
@@ -485,14 +499,13 @@ numberid:
         }
 
         currentTime = time (NULL);
-        currentCondition->value = currentTime;
         memcpy(&str_time, localtime(&currentTime), sizeof(struct tm));
 
         str_time.tm_hour = hi;
         str_time.tm_min = mi;
         str_time.tm_sec = 0;
 
-        currentCondition->data = mktime(&str_time);
+        currentCondition->value = mktime(&str_time);
 	}
 	else
 	{
@@ -528,19 +541,14 @@ operator:
 {
     currentCondition->conditionOK = testLess;
 };
-	| TIMEEQUAL
-{
-    currentCondition->conditionOK = testEqual;
-    flagTime = TRUE;
-};
 	| TIMEGREATERTHAN
 {
-    currentCondition->conditionOK = testGreater;
+    currentCondition->conditionOK = testTimeMore;
     flagTime = TRUE;
 };
 	| TIMELOWERTHAN
 {
-    currentCondition->conditionOK = testLess;
+    currentCondition->conditionOK = testTimeLess;
     flagTime = TRUE;
 };
 
@@ -561,17 +569,31 @@ parseConfig:
             printf("\tConnect to IP: %s on Port: %s\n",$2, $4);
             printf("\tListen on Port: %s\n", $6);
             */
-            conIP = gMalloc(strlen($2)*sizeof(char));
+            if((conIP = gMalloc(strlen($2)*sizeof(char))) == NULL)
+            {
+                fprintf(stderr, "No Memory!\n");
+                exit(ERROR);
+            }
             memcpy(conIP, $2, strlen($2));
 
             conPort = atoi($4);
             lisPort = atoi($6);
             
-            nameLogSensors = gMalloc((strlen($10)+strlen(LOG_EXT))*sizeof(char));
+            if((nameLogSensors =
+            gMalloc((strlen($10)+strlen(LOG_EXT))*sizeof(char))) == NULL)
+            {
+                fprintf(stderr, "No Memory!\n");
+                exit(ERROR);
+            }
             memcpy(nameLogSensors, $10, strlen($10));
             strcat(nameLogSensors, LOG_EXT);
             
-            nameLogRules = gMalloc((strlen($8)+strlen(LOG_EXT))*sizeof(char));
+            if((nameLogRules =
+            gMalloc((strlen($8)+strlen(LOG_EXT))*sizeof(char))) == NULL)
+            {
+                fprintf(stderr, "No Memory!\n");
+                exit(ERROR);
+            }
             memcpy(nameLogRules, $8, strlen($8));
             strcat(nameLogRules, LOG_EXT);
             
