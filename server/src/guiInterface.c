@@ -65,7 +65,7 @@ void processTypeInitialise(mqd_t mqSend){
       case PRESENCE:
         type = json_object_new_string("Presence");
         break;
-        
+
       case HORLOGE:
         type = json_object_new_string("Horloge");
         break;
@@ -166,7 +166,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
       case INTERRUPTEUR:
         type = json_object_new_string("Interupteur");
         break;
-        
+
       case HORLOGE:
         type = json_object_new_string("Horloge");
         break;
@@ -221,7 +221,7 @@ void processTypeClose(){
 void processTypeHistory(struct json_object* history, mqd_t mqSend){
   struct json_object* objId;
   struct json_object* objRollback;
-  
+
   struct json_object* response;
   struct json_object* messType;
   struct json_object* message;
@@ -295,7 +295,7 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   fileObj = json_object_new_object();
   type = json_object_new_int(EDATA);
   json_object_object_add(response, "type", type);
-  
+
   switch(fileType){
     case F_RULES:
       name = json_object_new_int(F_RULES);
