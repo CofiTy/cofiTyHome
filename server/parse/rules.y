@@ -9,15 +9,19 @@
     #include "../src/actions.h"
     #include "../src/actionneurs.h"
     #include "../src/common.h"
+    #include "../src/init.h"
 
     #include "../libHeaders/json.h"
     
     #include "../../kernel/memory/memory.h"
 
+    int parsedFlag;
+    void clean();
+
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
-
-        //TODO:appeler clean
+      parsedFlag = FALSE;
+      clean();
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -46,6 +50,7 @@
     INIT = 0,
     RELOADING = 1
     } state;
+    
 
     state progState = INIT;
 
@@ -715,38 +720,73 @@ void parseConfig() {
 
 }
 
-void parseAll() {
-	printf("\n%s\n", "Start Parsing..");
-
-//TODO:Changer en parseFile.
-	parseSensors();
-        parseActionneurs();
-        parseActions();
-        parseRules();
-        parseConfig();
-}
 
 void parseFile(const char* file){
-    
+    printf("Trying to Parse %s\n", file);
+    if((yyin = fopen(file, "r")) == NULL)
+    {
+        fprintf(stderr, "ERROR: No file named %s\n", file);
+    }
+    pthread_mutex_lock(&sensorsMutex);
+    yyparse();
+    pthread_mutex_unlock(&sensorsMutex);
+    printf("Parsing of %s finished\n", file);
 }
 
-//bool reparseFiles(enumBenJ p, const char * file){
+void parseAll() {
+  printf("\n%s\n", "Start Parsing..");
+  
+  progState = INIT;
+  parsedFlag = TRUE;
+  
+  parseFile(CONF_PATH SENSORS_FILE);
+  parseFile(CONF_PATH ACTIONNEURS_FILE);
+  parseFile(CONF_PATH ACTIONS_FILE);
+  parseFile(CONF_PATH RULES_FILE);
+  parseFile(CONF_PATH CONFIG_FILE);
+}
+
 int reparseFiles(int p, const char * file) {
-//TODO:on clean la memoire
-//TODO:faire les parse qu'il faut.
+
+    cleanMemory();
+    progState = RELOADING;
+    parsedFlag = TRUE;
+
+    if(p != F_SENSORS)
+        parseFile(CONF_PATH SENSORS_FILE);
+    else
+        parseFile(file);
+
+    if(p != F_ACTIONNEURS)
+        parseFile(CONF_PATH ACTIONNEURS_FILE);
+    else
+        parseFile(file);
+
+    if(p != F_ACTIONS)
+        parseFile(CONF_PATH ACTIONS_FILE);
+    else
+        parseFile(file);
+
+    if(p != F_RULES)
+        parseFile(CONF_PATH RULES_FILE);
+    else
+        parseFile(file);
+
+    return 1;
+
 }
 
-void clean(state progState){
+void clean(){
 
-    //TODO:on clean la memoire
+    cleanMemory();
 
     if(progState == INIT){
         exit(-1);
     } else if(progState == RELOADING){
-        //parseAll
+        parseAll();
     }
 }
-
+/*
 void getHistory(int id, int nbValues, struct json_object* message){
     idSensorToSearch = id;
     remainingSensorsToSearch = nbValues;
@@ -756,4 +796,4 @@ void getHistory(int id, int nbValues, struct json_object* message){
 
     
 }
-
+*/

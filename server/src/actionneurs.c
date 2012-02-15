@@ -394,32 +394,10 @@ void closeCOURRANT(char id[SIZE_ID]) {
 }
 
 void openCAFFE(char id[SIZE_ID]) {
-  if (fork() == 0) {
-    execl("/usr/bin/eog", "eog", "background.jpg", NULL);
-  }
-
-  //On peut ouvrir un seul eog en mm temps
-  /*
-     if (fork() == 0) { 
-     execl("/usr/bin/eog", "eog", "background2.png", NULL);
-     }
-     */
-
-  /*
-     if (fork() == 0) {
-     execl("/bin/ls", "ls", "-la", NULL);
-     }
-     */
-
   puts("Demarrer la machine a caffe!!");
 }
 
 void closeCAFFE(char id[SIZE_ID]) {
-
-  if (fork() == 0) {
-    execl("/usr/bin/eog", "eog", "background2.png", NULL);
-  }
-
   puts("Arreter la machine a caffe!!");
 }
 

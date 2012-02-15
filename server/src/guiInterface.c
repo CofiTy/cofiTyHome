@@ -21,13 +21,6 @@ typedef enum {
   EDATA = 12 
 }MsgTypes;
 
-typedef enum {
-  RULES = 1,
-  ACTIONS= 2,
-  ACTIONNEURS = 3,
-  SENSORS = 4
-}FileTypes;
-
 void processTypeInitialise(mqd_t mqSend){
 
   struct json_object* configuration;
@@ -304,23 +297,23 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   json_object_object_add(response, "type", type);
 
   switch(fileType){
-    case RULES:
-      name = json_object_new_int(RULES);
+    case F_RULES:
+      name = json_object_new_int(F_RULES);
       readWholeFile("server/config/rules", buffer);
       break;
 
-    case ACTIONS:
-      name = json_object_new_int(ACTIONS);
+    case F_ACTIONS:
+      name = json_object_new_int(F_ACTIONS);
       readWholeFile("server/config/actions", buffer);
       break;
 
-    case ACTIONNEURS:
-      name = json_object_new_int(ACTIONNEURS);
+    case F_ACTIONNEURS:
+      name = json_object_new_int(F_ACTIONNEURS);
       readWholeFile("server/config/actionneurs", buffer);
       break;
 
-    case SENSORS:
-      name = json_object_new_int(SENSORS);
+    case F_SENSORS:
+      name = json_object_new_int(F_SENSORS);
       readWholeFile("server/config/sensors", buffer);
       break;
 
