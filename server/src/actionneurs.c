@@ -367,7 +367,7 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
         }
         break;
       }
-    
+
     case MYSTERE:
       {
         if (strcmp(fctName, "action") == 0) {
@@ -497,14 +497,16 @@ void actionMYSTERE(char id[SIZE_ID]){
   }
   onGoing = TRUE;
   if((pp = popen("mplayer weAre.mp3", "w")) == NULL){ 
-      perror("popen"); 
-      exit(1);
+    perror("popen"); 
+    exit(1);
   }
 }
 
 void finMYSTERE(char id[SIZE_ID]){
-  fputs("q\n", pp);
-  pclose(pp);
-  onGoing = FALSE;
+  if(onGoing == TRUE){
+    fputs("q\n", pp);
+    pclose(pp);
+    onGoing = FALSE;
+  }
 }
 
