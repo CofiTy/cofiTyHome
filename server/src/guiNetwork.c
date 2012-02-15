@@ -103,7 +103,7 @@ void * guiMsgSend(void* data){
     puts("mq rec");
     FAIL(nb);
     
-    //printf("Sending toward GUI: %s\n", buff);
+    printf("Sending toward GUI: %s\n", buff);
 
     total = nb;
     nbSent = 0;

@@ -252,7 +252,7 @@ void processTypeHistory(struct json_object* history, mqd_t mqSend){
 
 }
 
-void readWholeFile(const char * fileName, char * buffer){
+void readWholeFile(const char * fileName, char ** buffer){
   FILE *file;
   unsigned long fileLen;
   if((file = fopen(fileName, "r")) == NULL)
@@ -267,8 +267,8 @@ void readWholeFile(const char * fileName, char * buffer){
   fseek(file, 0, SEEK_SET);
 
   //Allocate memory
-  buffer=(char *)malloc(fileLen+1);
-  if (!buffer)
+  *buffer=(char *)gMalloc(fileLen+1);
+  if (!(*buffer))
   {
     fprintf(stderr, "Memory error!");
     fclose(file);
@@ -276,7 +276,7 @@ void readWholeFile(const char * fileName, char * buffer){
   }
 
   //Read file contents into buffer
-  fread(buffer, fileLen, 1, file);
+  fread(*buffer, fileLen, 1, file);
   fclose(file);
 }
 
@@ -295,26 +295,26 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   fileObj = json_object_new_object();
   type = json_object_new_int(EDATA);
   json_object_object_add(response, "type", type);
-
+  
   switch(fileType){
     case F_RULES:
       name = json_object_new_int(F_RULES);
-      readWholeFile("server/config/rules", buffer);
+      readWholeFile("server/config/rules", &buffer);
       break;
 
     case F_ACTIONS:
       name = json_object_new_int(F_ACTIONS);
-      readWholeFile("server/config/actions", buffer);
+      readWholeFile("server/config/actions", &buffer);
       break;
 
     case F_ACTIONNEURS:
       name = json_object_new_int(F_ACTIONNEURS);
-      readWholeFile("server/config/actionneurs", buffer);
+      readWholeFile("server/config/actionneurs", &buffer);
       break;
 
     case F_SENSORS:
       name = json_object_new_int(F_SENSORS);
-      readWholeFile("server/config/sensors", buffer);
+      readWholeFile("server/config/sensors", &buffer);
       break;
 
     default:
@@ -328,7 +328,7 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
 
   sending = json_object_to_json_string(response);
   guiNetworkSend(sending, strlen(sending), mqSend);
-  free(buffer);
+  gFree(buffer);
 }
 
 void processCommand(char * command, mqd_t mqSend){

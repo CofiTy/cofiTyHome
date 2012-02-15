@@ -71,7 +71,7 @@ void * sensorsMsgSend(){
     nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
     
-    //printf("Sending toward Gateway: %s\n", buff);
+    printf("Sending toward Gateway: %s\n", buff);
 
     total = nb;
     nbSent = 0;
