@@ -397,7 +397,7 @@ void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
     }
     message = json_object_new_string("Configuration updated");
   } else{
-    system("rm "CONF_PATH TMP_FILE");
+    system("rm "CONF_PATH TMP_FILE);
     message = json_object_new_string("Invalid File!");
   }
 
