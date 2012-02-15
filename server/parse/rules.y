@@ -453,7 +453,7 @@ numberid:
 
         if(strlen($1) > 5)
         {
-            printf("Temps Invalide!\n");
+            yyerror("Temps Invalide!\n");
         }
 
         for(i = 0;i < strlen($1); i++)
@@ -481,7 +481,7 @@ numberid:
         if(hi < 0  || hi > 23
             || mi < 0 || mi > 59)
         {
-            printf("Temps Invalide!\n");
+            yyerror("Temps Invalide!\n");
         }
 
         currentTime = time (NULL);
