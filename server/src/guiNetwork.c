@@ -48,13 +48,12 @@ void * guiMsgRec(void* data){
   char* receiving = (char *) buff;
   Client* client = (Client*)data;
 
-  memset(buff, 0, 9182);
+  memset(buff, '\0', 8192);
   total = 0;
   blocs = 0;
 
   for(;;)
   {
-    printf("Sock: %d\n", client->sock);
     /* reception form sensors */
     nb = recv(client->sock, receiving, 8192, 0);
     puts("recv");
@@ -100,7 +99,6 @@ void * guiMsgSend(void* data){
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
     nb = mq_receive(client->mqSend, buff, 8192, NULL);
-    puts("mq rec");
     FAIL(nb);
     
     //printf("Sending toward GUI: %s\n", buff);
@@ -168,7 +166,6 @@ void * guiNetworkConnexion(){
     clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT, S_IRWXU, NULL);
     FAIL(clientList.current->mqSend);
 
-    printf("Sock: %d\n", clientList.current->sock);
     pthread_create(&clientList.current->pthreadRec, NULL, guiMsgRec, (void*)clientList.current);
     pthread_detach(clientList.current->pthreadRec);
 

@@ -21,7 +21,6 @@
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
       parsedFlag = FALSE;
-      clean();
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -660,72 +659,6 @@ onelog:
 
 %%
 
-void parseSensors() {
-	printf("%s\n", "Parsing Sensors..");
-
-	if((yyin = fopen( "server/config/sensors", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/sensors...");
-		exit(ERROR);
-	}
-	
-    yyparse();
-}
-
-void parseActionneurs() {
-	printf("\n%s\n", "Parsing Actionneurs..");
-
-	if((yyin = fopen( "server/config/actionneurs", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/actionneurs...");
-		exit(ERROR);
-	}
-
-    yyparse();
-}
-
-void parseActions() {
-	printf("\n%s\n", "Parsing Actions..");
-
-	if((yyin = fopen( "server/config/actions", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/actions...");
-		exit(ERROR);
-	}
-
-    yyparse();
-}
-
-void parseRules() {
-	printf("\n%s\n", "Parsing Rules..");
-
-	if((yyin = fopen( "server/config/rules", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/rules...\n");
-		exit(ERROR);
-	}
-
-	pthread_mutex_lock(&sensorsMutex);
-
-    yyparse();
-
-    pthread_mutex_unlock(&sensorsMutex);
-}
-
-void parseConfig() {
-    printf("\n%s\n", "Parsing Config...");
-
-    if((yyin = fopen("server/config/config", "r")) == NULL)
-    {
-        printf("ERROR: No File server/config/config...\n");
-        exit(ERROR);
-    }
-		
-    yyparse();
-
-}
-
-
 void parseFile(const char* file){
     printf("Trying to Parse %s\n", file);
     if((yyin = fopen(file, "r")) == NULL)
@@ -761,21 +694,31 @@ int reparseFiles(int p, const char * file) {
         parseFile(CONF_PATH SENSORS_FILE);
     else
         parseFile(file);
-
+    
+    if(parsedFlag == TRUE){
     if(p != F_ACTIONNEURS)
         parseFile(CONF_PATH ACTIONNEURS_FILE);
     else
         parseFile(file);
+    }
 
+    if(parsedFlag == TRUE){
     if(p != F_ACTIONS)
         parseFile(CONF_PATH ACTIONS_FILE);
     else
         parseFile(file);
+    }
 
+    if(parsedFlag == TRUE){
     if(p != F_RULES)
         parseFile(CONF_PATH RULES_FILE);
     else
         parseFile(file);
+    }
+    
+    if(parsedFlag == FALSE){
+      clean();
+    }
 
     return parsedFlag;
 }
