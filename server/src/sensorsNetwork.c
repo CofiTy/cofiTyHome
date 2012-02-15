@@ -45,7 +45,7 @@ void * sensorsMsgRec(){
       data[j++] = buff[i++];
       if(j == 28){
         /*Traiter data*/
-        printf("Trame : %s\n", data);
+        //printf("Trame : %s\n", data);
         decodeTrame(data);
         //puts("finished decoding");
         j = 0;
@@ -71,7 +71,7 @@ void * sensorsMsgSend(){
     nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
     
-    printf("Sending toward Gateway: %s\n", buff);
+    //printf("Sending toward Gateway: %s\n", buff);
 
     total = nb;
     nbSent = 0;

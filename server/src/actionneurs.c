@@ -461,13 +461,13 @@ static void SendKey (Display * disp, KeySym keysym, KeySym modsym)
 void pressKEYforward(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  sleep (5);  
+  //sleep (5);  
   SendKey (disp, XK_Right , 0);  
 }
 
 void pressKEYbackwards(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  sleep (5);  
+  //sleep (5);  
   SendKey (disp, XK_Left , 0);  
 }
