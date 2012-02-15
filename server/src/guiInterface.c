@@ -331,6 +331,10 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   gFree(buffer);
 }
 
+void processTypeEdits(struct json_object * fileObj, mqd_t mqSend){
+
+}
+
 void processCommand(char * command, mqd_t mqSend){
 
   struct json_object* objCommand;
@@ -396,7 +400,8 @@ void processCommand(char * command, mqd_t mqSend){
       break;
 
     case EDATA:
-      puts("type EData Error");
+      puts("type EData detected");
+      processTypeEData(message, mqSend);
       break;
 
     default:
