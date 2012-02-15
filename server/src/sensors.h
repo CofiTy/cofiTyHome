@@ -15,7 +15,9 @@ typedef enum typeCapteur {
     CONTACT,
     INTERRUPTEUR,
     PRESENCE,
+
     HORLOGE
+
 } typeCapteur;
 
 typedef struct sensorType {
