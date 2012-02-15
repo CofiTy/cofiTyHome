@@ -14,7 +14,8 @@ typedef enum typeCapteur {
     TEMPERATURE,
     CONTACT,
     INTERRUPTEUR,
-    PRESENCE
+    PRESENCE,
+    HORLOGE
 } typeCapteur;
 
 typedef struct sensorType {
@@ -51,9 +52,12 @@ typedef struct dataPRESENCE {
     int luminosite;
 } dataPRESENCE;
 
-
 void decodePresence(char* trame, struct sensorType* capteur);
 
+//----- HORLOGE ------------------------------------------------------------------------
+typedef struct dataHORLOGE {
+    int currentTime;
+} dataHORLOGE;
 
 //----- INTERRUPTEUR --------------------------------------------------------------------
 

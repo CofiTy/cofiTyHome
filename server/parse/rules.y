@@ -35,6 +35,8 @@
 
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
+    
+    int flagTime = FALSE;
 
 
 %}
@@ -47,6 +49,7 @@
 %token <valeur> CPRESENCE
 %token <valeur> CTEMPERATURE
 %token <valeur> CCONTACT
+%token <valeur> CHORLOGE
 
 %token <valeur> CCOURRANT
 
@@ -74,6 +77,9 @@
 %token <chaine> IDENTIFIER
 %token <valeur> NUMBER
 
+%token <chaine> TIMEGREATERTHAN
+%token <chaine> TIMELOWERTHAN
+%token <chaine> TIMEEQUAL
  
 %type <chaine> root 
 %type <chaine> parseSensors oneSensor initSensor typeSensor idSensor nameSensor
@@ -194,6 +200,21 @@ typeSensor:
 
     currentSensor->decode = decodeContact;
 };
+       | CHORLOGE
+{
+    currentSensor->type = HORLOGE;
+
+    if((currentSensor->data = gMalloc(sizeof(dataHORLOGE))) == NULL)
+    {
+		printf("No Memory\n");
+    }
+    memset(currentSensor->data, 0, sizeof(dataHORLOGE));
+
+    currentSensor->decode = NULL;
+};
+
+
+
 
 /*************** Actionneurs ***************/
 
@@ -384,7 +405,8 @@ conditionid:
 
     struct condition_t * old = currentCondition;
 
-    currentCondition = calloc(1, sizeof(struct condition_t));
+    currentCondition = gMalloc(sizeof(struct condition_t));
+    memset(currentCondition, 0, sizeof(struct condition_t));
 
     if(currentRule->conditions == 0){
             currentRule->conditions = currentCondition;
@@ -402,11 +424,72 @@ conditionid:
 numberid:
     IDENTIFIER
 {
-    currentCondition->value = atoi($1);
+	if(flagTime)
+	{
+        int i;
+
+        int hi = 0;
+        char h[3] = {'\0'};
+        int mi = 0;
+        char m[3] = {'\0'};
+
+        struct tm str_time;
+        time_t currentTime;
+
+        if(strlen($1) > 5)
+        {
+            printf("Temps Invalide!\n");
+        }
+
+        for(i = 0;i < strlen($1); i++)
+        {
+            if($1[i] == 'h' || $1[i] == 'H'){
+                hi = 42;
+                continue;
+            }
+            if(hi < 2)
+            {
+                h[hi++] = $1[i];
+            }
+            else
+            {
+                if(mi < 2)
+                {
+                    m[mi++] = $1[i];
+                }
+            }
+        }
+
+        hi = atoi(h);
+        mi = atoi(m);
+
+        if(hi < 0  || hi > 23
+            || mi < 0 || mi > 59)
+        {
+            printf("Temps Invalide!\n");
+        }
+
+        currentTime = time (NULL);
+        currentCondition->value = currentTime;
+        memcpy(&str_time, localtime(&currentTime), sizeof(struct tm));
+
+        str_time.tm_hour = hi;
+        str_time.tm_min = mi;
+        str_time.tm_sec = 0;
+
+        currentCondition->data = mktime(&str_time);
+	}
+	else
+	{
+		currentCondition->value = atoi($1);
+	}
+	flagTime = FALSE;
+    
 };
     | NUMBER
 {
-    currentCondition->value = $1;
+	
+	currentCondition->value = $1;
 };
 
 operator:
@@ -429,6 +512,21 @@ operator:
 	| LESS
 {
     currentCondition->conditionOK = testLess;
+};
+	| TIMEEQUAL
+{
+    currentCondition->conditionOK = testEqual;
+    flagTime = TRUE;
+};
+	| TIMEGREATERTHAN
+{
+    currentCondition->conditionOK = testGreater;
+    flagTime = TRUE;
+};
+	| TIMELOWERTHAN
+{
+    currentCondition->conditionOK = testLess;
+    flagTime = TRUE;
 };
 
 someactions:

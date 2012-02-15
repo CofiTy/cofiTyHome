@@ -12,7 +12,12 @@
 #  actions:
 #  	nomAction
 #  ...
-#  
+# 
+#   operateur de temps:
+#       -gt Greater than
+#       -lt Lower than
+#       -eq Equal
+#
 #####################################################
 
 
@@ -44,5 +49,12 @@ rule:
 conditions:
 	aileEst<=5	
 	aileOuest==35
+actions:
+	ToutOuvrir
+	
+rule:
+	heure
+conditions:
+	now -gt 11h30
 actions:
 	ToutOuvrir
