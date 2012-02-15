@@ -21,6 +21,13 @@
 
 
 rule:	
+	byebye
+conditions:	
+	bascule.switchButton==4
+actions:
+	startFun
+
+rule:	
 	allumeLampe
 conditions:	
 	bascule.switchButton==4
