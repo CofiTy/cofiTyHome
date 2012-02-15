@@ -21,6 +21,8 @@
 "CAFFE"                 { strcpy(yylval.chaine, yytext); return CCAFFE; }
 "VOLETS"		{ strcpy(yylval.chaine, yytext); return CVOLETS; }
 "CHAUFFAGE"		{ strcpy(yylval.chaine, yytext); return CCHAUFFAGE; }
+"VIRTUALKEYBOARD" 	{ strcpy(yylval.chaine, yytext); return CVKB; }
+
 
 [Rr]"ule:"		{ strcpy(yylval.chaine, yytext); return RULE; }
 [Cc]"onditions:"	{ strcpy(yylval.chaine, yytext); return CONDITIONS; }
