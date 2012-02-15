@@ -54,7 +54,7 @@
 
     state progState = INIT;
 
-    int idSensorToSearch;
+    char* idSensorToSearch;
     int remainingSensorsToSearch;
     struct json_object* messageJSON;
 
@@ -787,7 +787,7 @@ void clean(){
     }
 }
 /*
-void getHistory(int id, int nbValues, struct json_object* message){
+void getHistory(char * id, int nbValues, struct json_object* message){
     idSensorToSearch = id;
     remainingSensorsToSearch = nbValues;
     messageJSON = message;
