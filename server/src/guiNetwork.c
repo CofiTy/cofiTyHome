@@ -48,7 +48,7 @@ void * guiMsgRec(void* data){
   char* receiving = (char *) buff;
   Client* client = (Client*)data;
 
-  memset(buff, 0, 9182);
+  memset(buff, '\0', 8192);
   total = 0;
   blocs = 0;
 
@@ -166,7 +166,6 @@ void * guiNetworkConnexion(){
     clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT, S_IRWXU, NULL);
     FAIL(clientList.current->mqSend);
 
-    printf("Sock: %d\n", clientList.current->sock);
     pthread_create(&clientList.current->pthreadRec, NULL, guiMsgRec, (void*)clientList.current);
     pthread_detach(clientList.current->pthreadRec);
 
