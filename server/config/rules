@@ -28,11 +28,25 @@ actions:
 	ToutOuvrir
 	
 rule:	
-	allumeLampe
+	fermeLampe
 conditions:	
 	bascule.switchButton==1
 actions:
 	ToutFermer
+
+rule:	
+	slideSuivante
+conditions:	
+	bascule.switchButton==3
+actions:
+	nextSlide
+
+rule:	
+	slidePrecedente
+conditions:	
+	bascule.switchButton==2
+actions:
+	previousSlide
 
 rule:	
 	temperature
@@ -50,24 +64,3 @@ conditions:
 	aileOuest==35
 actions:
 	ToutOuvrir
-	
-rule:
-	heure
-conditions:
-	now -gt 11h30
-actions:
-	ToutOuvrir
-
-rule:
-    testImg1
-conditions:
-	nico.switchButton==4
-actions:
-	testOuvertureImg
-
-rule:
-	testImg2
-conditions:
-	nico.switchButton==3
-actions:
-	testOuvertureImg2

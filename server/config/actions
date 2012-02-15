@@ -26,11 +26,11 @@ actionneurs:
 	FF9F1E06.open
 	
 nomAction:
-	testOuvertureImg
+  nextSlide
 actionneurs:
-	cafeeee.open
-	
+  clavier.next
+
 nomAction:
-	testOuvertureImg2
+  previousSlide
 actionneurs:
-	cafeeee.close
+  clavier.previous
