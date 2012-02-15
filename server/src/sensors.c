@@ -30,7 +30,7 @@ struct sensorType * getSensor(char id_or_name[MAX(SIZE_NAME,SIZE_ID)]) {
         current = current->nextSensor;
     }
 
-    printf("Sensor not recognized : %s !!!\n", id_or_name);
+    //printf("Sensor not recognized : %s !!!\n", id_or_name);
     return 0;
 }
 

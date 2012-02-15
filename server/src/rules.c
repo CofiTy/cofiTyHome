@@ -43,7 +43,7 @@ void applyRules() {
 
         if (b == 1) {
 
-            //printf("TOUT OK!!!\n");
+            printf("Regle ! : %s\n", currentRule->name);
             logRule(currentRule->name);
             applyAction(currentRule->action);
         } else {

@@ -14,6 +14,8 @@
 
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
+
+        //TODO:appeler clean
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -38,6 +40,15 @@
     
     int flagTime = FALSE;
 
+    typedef enum state {
+    INIT = 0,
+    RELOADING = 1
+    } state;
+
+    state progState = INIT;
+
+    int idSensorToSearch;
+    int remainingSensorsToSearch;
 
 %}
 
@@ -679,10 +690,41 @@ void parseConfig() {
 void parseAll() {
 	printf("\n%s\n", "Start Parsing..");
 
+//TODO:Changer en parseFile.
 	parseSensors();
         parseActionneurs();
         parseActions();
         parseRules();
         parseConfig();
+}
+
+void parseFile(const char* file){
+    
+}
+
+//bool reparseFiles(enumBenJ p, const char * file){
+int reparseFiles(int p, const char * file) {
+//TODO:on clean la memoire
+//TODO:faire les parse qu'il faut.
+}
+
+void clean(state progState){
+
+    //TODO:on clean la memoire
+
+    if(progState == INIT){
+        exit(-1);
+    } else if(progState == RELOADING){
+        //parseAll
+    }
+}
+
+void getHistory(int id, int nbValues, struct json_object* message){
+    idSensorToSearch = id;
+    remainingSensorsToSearch = nbValues;
+
+    parseFile(nameLogRules);
+
+    
 }
 
