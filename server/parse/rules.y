@@ -9,6 +9,8 @@
     #include "../src/actions.h"
     #include "../src/actionneurs.h"
     #include "../src/common.h"
+
+    #include "../libHeaders/json.h"
     
     #include "../../kernel/memory/memory.h"
 
@@ -49,6 +51,7 @@
 
     int idSensorToSearch;
     int remainingSensorsToSearch;
+    struct json_object* messageJSON;
 
 %}
 
@@ -100,7 +103,8 @@
 %type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur idActionneur nameActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
-%type <chaine> parseConfig 
+%type <chaine> parseConfig
+%type <chaine> parseLog onelog
  
 %%
 
@@ -110,6 +114,7 @@ root:
         | parseActions
         | parseRules
         | parseConfig
+        | parseLog
 ;
 
 /*************** Capteurs ***************/
@@ -619,7 +624,30 @@ parseConfig:
             
             printf("\tLog Rules: %s\n\tLog Sensors: %s\n", nameLogRules, nameLogSensors);
            };
- 
+
+/********************** Log **************************/
+
+parseLog:
+    onelog
+    | parseLog onelog
+;
+
+onelog:
+    IDENTIFIER IDENTIFIER IDENTIFIER IDENTIFIER
+{
+    if(strcmp($2, idSensorToSearch) == 0){
+        if(remainingSensorsToSearch > 0){
+            struct json_object* log;
+            log = json_object_new_object();
+
+            json_object_object_add(log, "value", json_object_new_string($4));
+            json_object_object_add(log, "timestamp", json_object_new_string($1));
+
+            json_object_array_add(messageJSON, log);
+        }
+    }
+};
+
 %%
 
 void parseSensors() {
@@ -679,9 +707,9 @@ void parseConfig() {
 
     if((yyin = fopen("server/config/config", "r")) == NULL)
     {
-		printf("ERROR: No File server/config/config...\n");
-		exit(ERROR);
-	}
+        printf("ERROR: No File server/config/config...\n");
+        exit(ERROR);
+    }
 		
     yyparse();
 
@@ -722,6 +750,7 @@ void clean(state progState){
 void getHistory(int id, int nbValues, struct json_object* message){
     idSensorToSearch = id;
     remainingSensorsToSearch = nbValues;
+    messageJSON = message;
 
     parseFile(nameLogRules);
 
