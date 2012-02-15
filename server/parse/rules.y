@@ -47,6 +47,9 @@
 
     state progState = INIT;
 
+    int idSensorToSearch;
+    int remainingSensorsToSearch;
+
 %}
 
 %union  { char chaine[256]; int valeur; }
@@ -695,7 +698,7 @@ void parseAll() {
         parseConfig();
 }
 
-void parseFile(const char* file, state progState){
+void parseFile(const char* file){
     
 }
 
@@ -717,6 +720,11 @@ void clean(state progState){
 }
 
 void getHistory(int id, int nbValues, struct json_object* message){
-    parseFile(nameLogRules, RELOADING);
+    idSensorToSearch = id;
+    remainingSensorsToSearch = nbValues;
+
+    parseFile(nameLogRules);
+
+    
 }
 
