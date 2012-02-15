@@ -26,10 +26,10 @@
 #define SENSORS_FILE "sensors"
 
 typedef enum {
-    RULES = 1,
-    ACTIONS = 2,
-    ACTIONNEURS = 3,
-    SENSORS = 4
+    F_RULES = 1,
+    F_ACTIONS = 2,
+    F_ACTIONNEURS = 3,
+    F_SENSORS = 4
 }FileTypes;
 
 /**

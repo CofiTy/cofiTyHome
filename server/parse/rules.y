@@ -707,34 +707,36 @@ void parseFile(const char* file){
     pthread_mutex_lock(&sensorsMutex);
     yyparse();
     pthread_mutex_unlock(&sensorsMutex);
-    printf("Parsing of %s finished\n");
+    printf("Parsing of %s finished\n", file);
 }
-
+/*
 //bool reparseFiles(enumBenJ p, const char * file){
 int reparseFiles(int p, const char * file) {
 
-    if(p != SENSORS)
+    if(p != F_SENSORS)
         parseFile(CONF_PATH SENSORS_FILE);
     else
         parseFile(file);
 
-    if(p != ACTIONNEURS)
+    if(p != F_ACTIONNEURS)
         parseFile(CONF_PATH ACTIONNEURS_FILE);
     else
         parseFile(file);
 
-    if(p != ACTIONS)
+    if(p != F_ACTIONS)
         parseFile(CONF_PATH ACTIONS_FILES);
     else
         parseFile(file);
 
-    if(p != RULES)
+    if(p != F_RULES)
         parseFile(CONF_PATH RULESFILE);
     else
         parseFile(file);
+    
+    return 1;
 
 }
-
+*/
 void clean(state progState){
 
     //TODO:on clean la memoire
@@ -745,7 +747,7 @@ void clean(state progState){
         //parseAll
     }
 }
-
+/*
 void getHistory(int id, int nbValues, struct json_object* message){
     idSensorToSearch = id;
     remainingSensorsToSearch = nbValues;
@@ -754,4 +756,4 @@ void getHistory(int id, int nbValues, struct json_object* message){
 
     
 }
-
+*/

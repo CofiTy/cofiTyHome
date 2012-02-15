@@ -30,14 +30,14 @@ actions:
 rule:	
 	fermeLampe
 conditions:	
-	bascule.switchButton==1
+	bascule.switchButton==3
 actions:
 	ToutFermer
 
 rule:	
 	slideSuivante
 conditions:	
-	bascule.switchButton==3
+	bascule.switchButton==1
 actions:
 	nextSlide
 
