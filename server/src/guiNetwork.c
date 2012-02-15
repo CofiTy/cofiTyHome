@@ -41,14 +41,14 @@ List clientList;
 
 void * guiMsgRec(void* data){
 
-  char buff[128];
-  char traite[128];
+  char buff[8192];
+  char traite[8192];
   int i, j, nb, total, blocs;
   int over = 0;
   char* receiving = (char *) buff;
   Client* client = (Client*)data;
 
-  memset(buff, 0, 128);
+  memset(buff, 0, 9182);
   total = 0;
   blocs = 0;
 
@@ -56,7 +56,7 @@ void * guiMsgRec(void* data){
   {
     printf("Sock: %d\n", client->sock);
     /* reception form sensors */
-    nb = recv(client->sock, receiving, 128, 0);
+    nb = recv(client->sock, receiving, 8192, 0);
     puts("recv");
     FAIL(nb);
     total += nb;
@@ -76,7 +76,7 @@ void * guiMsgRec(void* data){
         /*Traiter traite*/
         processCommand(traite, client->mqSend);
         j = 0;
-        memset(traite, '\0', 128);
+        memset(traite, '\0', 8192);
       }
       ++i;
     }
@@ -85,7 +85,7 @@ void * guiMsgRec(void* data){
     blocs = 0;
     over = 0;
     receiving = (char *) buff;
-    memset(buff, '\0', 128);
+    memset(buff, '\0', 8192);
   }
 }
 
