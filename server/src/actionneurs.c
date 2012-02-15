@@ -367,6 +367,17 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
         }
         break;
       }
+    
+    case MYSTERE:
+      {
+        if (strcmp(fctName, "action") == 0) {
+          a->fct = actionMYSTERE;
+        }
+        else {
+          printf("Fonction not found : %s\n", fctName);
+        }
+        break;
+      }
 
     default:
       puts("Actionneur: Type not found");
@@ -470,4 +481,9 @@ void pressKEYbackwards(char id[SIZE_ID])
   Display *disp = XOpenDisplay (NULL);  
   //sleep (5);  
   SendKey (disp, XK_Left , 0);  
+}
+
+//---- MYSTERE ----------------------------------------------------------------------
+void actionMYSTERE(char id[SIZE_ID]){
+  system("mplayer weAre.mp3");
 }
