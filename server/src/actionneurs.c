@@ -486,12 +486,16 @@ void pressKEYbackwards(char id[SIZE_ID])
 
 //---- MYSTERE ----------------------------------------------------------------------
 FILE *pp; 
-
+int onGoing = FALSE;
 void * mplayer(){
   return NULL;
 }
 
 void actionMYSTERE(char id[SIZE_ID]){
+  if(onGoing == TRUE){
+    finMYSTERE(NULL);
+  }
+  onGoing = TRUE;
   if((pp = popen("mplayer weAre.mp3", "w")) == NULL){ 
       perror("popen"); 
       exit(1);
@@ -501,5 +505,6 @@ void actionMYSTERE(char id[SIZE_ID]){
 void finMYSTERE(char id[SIZE_ID]){
   fputs("q\n", pp);
   pclose(pp);
+  onGoing = FALSE;
 }
 
