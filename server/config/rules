@@ -12,7 +12,11 @@
 #  actions:
 #  	nomAction
 #  ...
-#  
+# 
+#   operateur de temps:
+#       -gt Greater than
+#       -lt Lower than
+#
 #####################################################
 
 
@@ -48,7 +52,14 @@ actions:
 	ToutOuvrir
 	
 rule:
-	testImg1
+	heure
+conditions:
+	now -gt 11h30
+actions:
+	ToutOuvrir
+
+rule:
+    testImg1
 conditions:
 	bascule.switchButton==2
 actions:

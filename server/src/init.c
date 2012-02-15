@@ -5,60 +5,49 @@
 #include "sensorsNetwork.h"
 #include "../parse/rules.tab.h"
 #include "sensors.h"
+#include "actions.h"
+#include "actionneurs.h"
 #include "initCheckRules.h"
 #include "common.h"
 
 #include "init.h"
 #include "rules.h"
 
-void init() {
-    printf("Initialisation...\n");
-    initMemory();
-    printf("MemTotale: %ld\n", getGMemTotal());
-    printf("MemFree: %ld\n", getGMemFree());
+void init()
+{
+  printf("Initialisation...\n");
+  initMemory();
+  printf("MemTotale: %ld\n", getGMemTotal());
+  printf("MemFree: %ld\n", getGMemFree());
 
-    pthread_mutex_init(&sensorsMutex, NULL);
+  pthread_mutex_init(&sensorsMutex, NULL);
 
-    parseAll();
+  parseAll();
 
-    initRules();
+  initRules();
 
-    //applyRules();
-
-    sensorsNetworkStart();
-    guiNetworkStart();
-
-    /*
-        sensors = gMalloc(sizeof(struct sensorType));
-        memset(sensors, 0, sizeof(struct sensorType));
-
-        sensors->data = gMalloc(sizeof(dataTEMPERATURE));
-        memset(sensors->data, 0, sizeof(dataTEMPERATURE));
-
-        ((dataTEMPERATURE*)sensors->data)->temp = 35;
-        strcpy(sensors->id, "cap1");
-
-
-        sensors->nextSensor = gMalloc(sizeof(struct sensorType));
-        memset(sensors->nextSensor, 0, sizeof(struct sensorType));
-
-        sensors->nextSensor->data = gMalloc(sizeof(dataTEMPERATURE));
-        memset(sensors->nextSensor->data, 0, sizeof(dataTEMPERATURE));
-
-        ((dataTEMPERATURE*)sensors->nextSensor->data)->temp = 5;
-        strcpy(sensors->nextSensor->id, "cap2");
-     */
+  sensorsNetworkStart();
+  guiNetworkStart();
 
 }
 
-void destroy() {
-    guiNetworkStop();
-    sensorsNetworkStop();
+void destroy()
+{
+  guiNetworkStop();
+  sensorsNetworkStop();
 
-    stopRules();
-    pthread_mutex_destroy(&sensorsMutex);
+  stopRules();
+  pthread_mutex_destroy(&sensorsMutex);
 
-    gFree(nameLogRules);
+  cleanMemory();
+  gFree(nameLogRules);
 
-    destroyMemory();
+  destroyMemory();
+}
+
+void cleanMemory(){
+  cleanActions();
+  cleanRules();
+  cleanActionneurs();
+  cleanSensors();
 }
