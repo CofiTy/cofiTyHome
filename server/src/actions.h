@@ -28,4 +28,6 @@ void applyAction(struct action_t * action);
 
 void applyActionByName(const char nom[SIZE_NAME]);
 
+void cleanActions();
+
 #endif /*ACTIONS_H_*/

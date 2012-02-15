@@ -2,6 +2,7 @@
 
 #include "rules.h"
 #include "common.h"
+#include "../../kernel/memory/memory.h"
 
 void logRule(char name[SIZE_NAME]) {
 
@@ -140,4 +141,21 @@ void setConditionName(struct condition_t * c, char sensorId[SIZE_ID], char cndNa
         printf("La propriété %s du capteur %s n'existe pas !\n", cndName, sensorId);
         exit(EXIT_FAILURE);
     }
+}
+
+void cleanRules(){
+  struct rule_t * cRule;
+  struct condition_t * cCondition;
+  
+  while(startRule != NULL){
+    while(startRule->conditions != NULL){
+      cCondition = startRule->conditions;
+      startRule->conditions = startRule->conditions->nextCondition;
+      gFree(cCondition);
+    }
+    cRule = startRule;
+    startRule = startRule->nextRule;
+    gFree(cRule);
+  }
+
 }

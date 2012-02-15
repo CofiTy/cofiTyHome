@@ -434,3 +434,14 @@ void closeVOLETS(char id[SIZE_ID])
 {
     puts("Fermer les volets");
 }
+
+void cleanActionneurs(){
+  struct actionneur_t * cActionneur;
+  
+  while(actionneurs != NULL){
+    cActionneur = actionneurs;
+    actionneurs = actionneurs->nextActionneur;
+    gFree(cActionneur);
+  }
+
+}

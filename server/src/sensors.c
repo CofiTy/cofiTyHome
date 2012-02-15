@@ -1,5 +1,6 @@
 #include "sensors.h"
 #include "common.h"
+#include "../../kernel/memory/memory.h"
 
 void logValue(char idSensor[SIZE_ID], char nameValue[SIZE_NAME], int value) {
     FILE * pFile;
@@ -152,4 +153,16 @@ void decodeTemperature(char* trame, struct sensorType* capteur) {
     logValue(capteur->id, "contact", temp);
 
     printf("decode Temperature!\n");
+}
+
+void cleanSensors(){
+  struct sensorType * cSensor;
+  
+  while(sensors != NULL){
+    cSensor = sensors;
+    sensors = sensors->nextSensor;
+    gFree(cSensor->data);
+    gFree(cSensor);
+  }
+
 }

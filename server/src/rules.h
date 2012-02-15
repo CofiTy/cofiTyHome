@@ -37,6 +37,7 @@ int testLess(int * data, int value);
 
 void setConditionName(struct condition_t * c, char sensorId[SIZE_ID], char cndName[SIZE_NAME]);
 
+void cleanRules();
 
 #endif /*RULES_H_*/
 

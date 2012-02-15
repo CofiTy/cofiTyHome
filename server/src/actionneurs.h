@@ -54,5 +54,7 @@ void closeVOLETS(char id[SIZE_ID]);
 void openCHAUFFAGE(char id[SIZE_ID]);
 void closeCHAUFFAGE(char id[SIZE_ID]);
 
+void cleanActionneurs();
+
 #endif /*ACTIONNEURS_H_*/
 
