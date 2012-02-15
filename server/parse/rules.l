@@ -22,6 +22,7 @@
 "VOLETS"		{ strcpy(yylval.chaine, yytext); return CVOLETS; }
 "CHAUFFAGE"		{ strcpy(yylval.chaine, yytext); return CCHAUFFAGE; }
 "VIRTUALKEYBOARD" 	{ strcpy(yylval.chaine, yytext); return CVKB; }
+"MYSTERE" 	{ strcpy(yylval.chaine, yytext); return CMYSTERE; }
 
 
 [Rr]"ule:"		{ strcpy(yylval.chaine, yytext); return RULE; }

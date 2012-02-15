@@ -75,6 +75,7 @@
 %token <valeur> CCAFFE
 %token <valeur> CVOLETS
 %token <valeur> CVKB
+%token <valeur> CMYSTERE
 
 %token <valeur> NOMACTION
 %token <valeur> ACTIONNEURS
@@ -296,6 +297,10 @@ typeActionneur:
         |CVKB
 {
     currentActionneur->type = VIRTUALKEYBOARD;
+};
+        |CMYSTERE
+{
+    currentActionneur->type = MYSTERE;
 };
 
 idActionneur:
@@ -772,8 +777,7 @@ int reparseFiles(int p, const char * file) {
     else
         parseFile(file);
 
-    return 1;
-
+    return parsedFlag;
 }
 
 void clean(){

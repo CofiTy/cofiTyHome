@@ -21,6 +21,8 @@
 
 #define CONFIG_FILE "config"
 
+#define TMP_FILE "temporary"
+
 #define RULES_FILE "rules"
 
 #define SENSORS_FILE "sensors"
