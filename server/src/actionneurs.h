@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "actions.h"
 #include "sensorsNetwork.h"
@@ -53,6 +54,8 @@ void closeVOLETS(char id[SIZE_ID]);
 //----- CHAUFFAGE --------------------------------------------------------------------
 void openCHAUFFAGE(char id[SIZE_ID]);
 void closeCHAUFFAGE(char id[SIZE_ID]);
+
+void cleanActionneurs();
 
 #endif /*ACTIONNEURS_H_*/
 

@@ -7,16 +7,17 @@
 #include "common.h"
 
 #include "init.h"
+#include "../parse/rules.tab.h"
 
 #define MAX_EVENTS 10
 
-int main(int argc, char ** argv){
+int main(int argc, char ** argv) {
 
 
-	init();
-	
+  init();
+
   struct epoll_event ev;
-  memset(&ev, 0, sizeof(struct epoll_event));
+  memset(&ev, 0, sizeof (struct epoll_event));
   int epollfd;
 
   epollfd = epoll_create(10);
@@ -32,8 +33,8 @@ int main(int argc, char ** argv){
   int nfds;
   int done = 0;
 
-  
-  while(done == 0) //Boucle principale
+
+  while (done == 0) //Boucle principale
   {
 
     nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
@@ -41,21 +42,20 @@ int main(int argc, char ** argv){
 
     int n;
 
-    for (n = 0; n < nfds; ++n)
-    {
-      if(events[n].data.fd == STDIN_FILENO)
-      {
+    for (n = 0; n < nfds; ++n) {
+      if (events[n].data.fd == STDIN_FILENO) {
         char chaine[16];
         fgets(chaine, 15, stdin); //récupère l'entrée standard
 
         //Traite la commande
-        if(strcmp(chaine, "exit\n") == 0 || strcmp(chaine, "quit\n") == 0 || strcmp(chaine, "q\n") == 0)
-        {
+        if (strcmp(chaine, "exit\n") == 0 || strcmp(chaine, "quit\n") == 0 || strcmp(chaine, "q\n") == 0) {
           done = 1;
           puts("Quiting server!");
+        } else if (strcmp(chaine, "reload\n") == 0 ||  strcmp(chaine, "update\n") == 0 || strcmp(chaine, "u\n") == 0){
+          cleanMemory();
+          parseAll();
         }
-        else
-        {
+        else {
           puts("Commande invalide\nUsage: exit, quit, q");
         }
       }

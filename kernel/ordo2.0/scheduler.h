@@ -18,7 +18,7 @@
  * sec in int and milli in int 
  */
 #define SWITCH_LAPSE_SEC 0
-#define SWITCH_LAPSE_MILLI 10
+#define SWITCH_LAPSE_MILLI 80
 
 /**
  * Function returns, convenient.
@@ -32,6 +32,7 @@ typedef struct gThread
 	mctx_t context;       /* Context (see gThread.h) */
 	THREAD_ID id;         /* Thread Id */
 	time_t timeToWait;    /* Timestamp when wake up if sleeping */
+	char name[20];
 	int toDelete;
 	char *stack;          /* Stack */
 } gThread;
@@ -42,10 +43,31 @@ typedef struct semaphore
 	gThread* inWait;
 }semaphore;
 
+typedef struct message
+{
+	char *data;
+	int size;
+	struct message *next;
+}message;
+
+typedef struct messageQueue
+{
+	message *inBox;
+	gThread* inWait;
+}messageQueue;
+
+messageQueue *newMessageQueue();
+void sendMessage(messageQueue *mQ, char* myMessage, int messageSize);
+int receiveMessage(messageQueue *mQ, char* buffer);
+
+
 
 void semTake(semaphore *sem);
 void semGive(semaphore *sem);
 semaphore* newSemaphore(int init);
+
+
+
 
 
 /**
@@ -59,7 +81,7 @@ semaphore* newSemaphore(int init);
  * Return:
  *   Id of the launched thread.
  */
-THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize);
+THREAD_ID createGThread(void (*sf_addr)(void*),void *sf_arg, int stackSize, char* name);
 
 /**
  * Kill a thread (Sleeping or Activable).

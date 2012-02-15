@@ -1,17 +1,18 @@
 #include "sensors.h"
 #include "common.h"
+#include "../../kernel/memory/memory.h"
 
 void logValue(char idSensor[SIZE_ID], char nameValue[SIZE_NAME], int value) {
     FILE * pFile;
-    puts("try Open");
+    //puts("try Open");
     pFile = fopen(nameLogSensors, "a+");
-    puts("Open");
+    //puts("Open");
     time_t t;
     time(&t);
 
     if (pFile != NULL) {
         fprintf(pFile, "%d %s %s %d\n", (int)t, idSensor, nameValue, value);
-        puts("Write");
+        //puts("Write");
         fclose(pFile);
     } else {
         printf("Le fichier %s n'a pas pu être ouvert !!!\n", nameLogSensors);
@@ -58,13 +59,15 @@ void decodeTrame(char* trame) {
 }
 
 void decodePresence(char* trame, struct sensorType* capteur) {
+    //TYPE: 06
+    //FUNC: 01
     int presence;
     char and = '1';
 
-    if (((trame[15])&(and)) == and)
-        presence = 1;
-    else
+    if (((trame[15]>>1)&(and)) == and) //le bit 1 du octet 0 
         presence = 0;
+    else
+        presence = 1;
 
     char data[2];
     data[0] = trame[10];
@@ -74,7 +77,7 @@ void decodePresence(char* trame, struct sensorType* capteur) {
 
     int valDec = strtol(data, &valHex, 16);
 
-    float lumin = (116.0)*(float) valDec+300;
+    float lumin = 2*(float) valDec; // 2= ~510/256
 
     ((dataPRESENCE*) capteur->data)->presence = presence;
     ((dataPRESENCE*) capteur->data)->luminosite = lumin;
@@ -145,11 +148,23 @@ void decodeTemperature(char* trame, struct sensorType* capteur) {
 
     char* valHex;
     int valDec = strtol(data, &valHex, 16);
-    int temp = ((float) (40.0 / 255.0)) * valDec;
+    int temp = 40 - ((float) (40.0 / 255.0)) * valDec; //la formule de conversion lineaire: tempMax-multiplicateur*data
 
     ((dataTEMPERATURE*) capteur->data)->temp = temp;
     
     logValue(capteur->id, "contact", temp);
 
-    printf("decode Temperature!\n");
+    printf("decode Temperature!, %d\n", temp);
+}
+
+void cleanSensors(){
+  struct sensorType * cSensor;
+  
+  while(sensors != NULL){
+    cSensor = sensors;
+    sensors = sensors->nextSensor;
+    gFree(cSensor->data);
+    gFree(cSensor);
+  }
+
 }
