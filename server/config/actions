@@ -39,3 +39,8 @@ nomAction:
   startFun
 actionneurs:
   surprise.action
+
+nomAction:
+  endFun
+actionneurs:
+  surprise.fin
