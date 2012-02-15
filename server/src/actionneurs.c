@@ -485,10 +485,19 @@ void pressKEYbackwards(char id[SIZE_ID])
 }
 
 //---- MYSTERE ----------------------------------------------------------------------
-void actionMYSTERE(char id[SIZE_ID]){
+pthread_t pthreadMplayer;
+
+void * mplayer(){
   system("mplayer weAre.mp3");
+  return NULL;
+}
+
+void actionMYSTERE(char id[SIZE_ID]){
+  pthread_create(&pthreadMplayer, NULL, mplayer, NULL);
+  pthread_detach(pthreadMplayer);
 }
 
 void finMYSTERE(char id[SIZE_ID]){
-  system("killall mplayer");
+  FAIL(pthread_cancel(pthreadMplayer));
 }
+
