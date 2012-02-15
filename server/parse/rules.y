@@ -744,8 +744,7 @@ int reparseFiles(int p, const char * file) {
     else
         parseFile(file);
 
-    return 1;
-
+    return parsedFlag;
 }
 
 void clean(){
