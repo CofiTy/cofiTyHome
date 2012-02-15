@@ -254,29 +254,35 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   const char * sending;
   struct json_object * response;
   struct json_object* type;
-  struct json_object* message;
+  struct json_object* fileObj;
+  struct json_object* name;
+  struct json_object* file;
   char *buffer;
 
   fileType = json_object_get_int(typeId);
   response = json_object_new_object();
+  fileObj = json_object_new_object();
   type = json_object_new_int(EDATA);
   json_object_object_add(response, "type", type);
 
   switch(fileType){
     case RULES:
+      name = json_object_new_int(RULES);
       readWholeFile("server/config/rules", buffer);
       break;
 
     case ACTIONS:
+      name = json_object_new_int(ACTIONS);
       readWholeFile("server/config/actions", buffer);
-      break;
       break;
 
     case ACTIONNEURS:
+      name = json_object_new_int(ACTIONNEURS);
       readWholeFile("server/config/actionneurs", buffer);
       break;
 
     case SENSORS:
+      name = json_object_new_int(SENSORS);
       readWholeFile("server/config/sensors", buffer);
       break;
 
@@ -284,8 +290,10 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
       puts("File: Unkown type");
   }
 
-  message = json_object_new_string(buffer);
-  json_object_object_add(response, "message", message);
+  json_object_object_add(fileObj, "name", name);
+  file = json_object_new_string(buffer);
+  json_object_object_add(fileObj, "file", file);
+  json_object_object_add(response, "message", fileObj);
 
   sending = json_object_to_json_string(response);
   guiNetworkSend(sending, strlen(sending), mqSend);
