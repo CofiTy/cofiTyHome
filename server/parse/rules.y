@@ -19,7 +19,6 @@
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
       parsedFlag = FALSE;
-      clean();
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -668,21 +667,31 @@ int reparseFiles(int p, const char * file) {
         parseFile(CONF_PATH SENSORS_FILE);
     else
         parseFile(file);
-
+    
+    if(parsedFlag == TRUE){
     if(p != F_ACTIONNEURS)
         parseFile(CONF_PATH ACTIONNEURS_FILE);
     else
         parseFile(file);
+    }
 
+    if(parsedFlag == TRUE){
     if(p != F_ACTIONS)
         parseFile(CONF_PATH ACTIONS_FILE);
     else
         parseFile(file);
+    }
 
+    if(parsedFlag == TRUE){
     if(p != F_RULES)
         parseFile(CONF_PATH RULES_FILE);
     else
         parseFile(file);
+    }
+    
+    if(parsedFlag == FALSE){
+      clean();
+    }
 
     return parsedFlag;
 }
