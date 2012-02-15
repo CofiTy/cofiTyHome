@@ -13,6 +13,25 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define CONF_PATH "/server/config/"
+
+#define ACTIONNEURS_FILE "actionneurs"
+
+#define ACTIONS_FILE "actions"
+
+#define CONFIG_FILE "config"
+
+#define RULES_FILE "rules"
+
+#define SENSORS_FILE "sensors"
+
+typedef enum {
+    RULES = 1,
+    ACTIONS = 2,
+    ACTIONNEURS = 3,
+    SENSORS = 4
+}FileTypes;
+
 /**
  * Extension that we use for logs.
  */

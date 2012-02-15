@@ -21,13 +21,6 @@ typedef enum {
   EDATA = 12 
 }MsgTypes;
 
-typedef enum {
-  RULES = 1,
-  ACTIONS= 2,
-  ACTIONNEURS = 3,
-  SENSORS = 4
-}FileTypes;
-
 void processTypeInitialise(mqd_t mqSend){
 
   struct json_object* configuration;

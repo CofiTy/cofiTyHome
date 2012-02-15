@@ -699,13 +699,40 @@ void parseAll() {
 }
 
 void parseFile(const char* file){
-    
+    printf("Trying to Parse %s\n", file);
+    if((yyin = fopen(file, "r")) == NULL)
+    {
+        fprintf("ERROR: No file named %s\n", file);
+    }
+    pthread_mutex_lock(&sensorsMutex);
+    yyparse();
+    pthread_mutex_unlock(&sensorsMutex);
+    printf("Parsing of %s finished\n");
 }
 
 //bool reparseFiles(enumBenJ p, const char * file){
 int reparseFiles(int p, const char * file) {
-//TODO:on clean la memoire
-//TODO:faire les parse qu'il faut.
+
+    if(p != SENSORS)
+        parseFile(CONF_PATH SENSORS_FILE);
+    else
+        parseFile(file);
+
+    if(p != ACTIONNEURS)
+        parseFile(CONF_PATH ACTIONNEURS_FILE);
+    else
+        parseFile(file);
+
+    if(p != ACTIONS)
+        parseFile(CONF_PATH ACTIONS_FILES);
+    else
+        parseFile(file);
+
+    if(p != RULES)
+        parseFile(CONF_PATH RULESFILE);
+    else
+        parseFile(file);
+
 }
 
 void clean(state progState){
