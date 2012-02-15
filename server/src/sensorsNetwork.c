@@ -45,7 +45,7 @@ void * sensorsMsgRec(){
       data[j++] = buff[i++];
       if(j == 28){
         /*Traiter data*/
-        printf("Trame : %s\n", data);
+        //printf("Trame : %s\n", data);
         decodeTrame(data);
         //puts("finished decoding");
         j = 0;

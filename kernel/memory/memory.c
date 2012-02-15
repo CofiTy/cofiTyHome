@@ -5,48 +5,82 @@
 
 #include "memory.h"
 
+/**
+ * Secret Cookie to verify Chunks.
+ */
 #define SECRET_CODE 42
 
-typedef long Align;    /* for alignment to long boundary */
+/**
+ * Chunks are aligned on long.
+ */
+typedef long Align;
 
-union header {         /* block header */
-  struct {
-    union header *ptr; /* next block if on free list */
-    unsigned long size;     /* size of this block */
-    unsigned char sCode;
-  } s;
-  Align x;             /* force alignment of blocks */
+/**
+ * Header for chunks.
+ */
+union header 
+{
+	struct 
+	{
+		/* Next Chunk if FreeList. */
+		union header *ptr;
+		/* Chunk Size (Data, without Header). */
+		unsigned long size;
+		/* Cookie to verify alignment. */
+		unsigned char sCode;
+	} s;
+	/* Force Alignement... */
+	Align x;
 };
 
+/**
+ * Type definition for convenience.
+ */
 typedef union header Header;
 
+/**
+ * Base of all memory.
+ */
 static Header base;
+
+/**
+ * Free Chunk List.
+ */
 static Header *freep = NULL;
 
+/**
+ * All Memory!
+ */
 static char heap[SIZE_ALLOC];
 
+/**
+ * Mutex for concurrent Access.
+ */
 static pthread_mutex_t myLock;
 
+/**
+ * Initialise memory if first call.
+ */
 void initMemory()
 {
+	/* If First Call. */
     if(freep == NULL)
     { 
+		/* Create a big fatty fat chunk with all memory. */
         Header *up;
         base.s.ptr = freep = &base;
         base.s.size = 0;
         pthread_mutex_init (&myLock, NULL);
-
-        up = (Header *) heap; 
-        /*up->s.size = (SIZE_ALLOC+sizeof(Header)-1)/sizeof(Header) + 1;*/
+        up = (Header *) heap;
         up->s.size = SIZE_ALLOC/sizeof(Header);
         up->s.sCode = SECRET_CODE;
-        /*up->s.size = SIZE_ALLOC - sizeof(Header);*/
-        gFree((void *)(up+1));   
-        /*printf("Début : %p, Fin: %p\n", (void *)heap, (void *)(heap+SIZE_ALLOC));*/
+        gFree((void *)(up+1));
     }
 }
 
-/* free: put block ap in free list */
+/**
+ * Put a block in the free list (if valid).
+ */
 void gFree(void *ap)
 {
     Header *bp, *p;
@@ -55,6 +89,7 @@ void gFree(void *ap)
     if(freep == NULL)
         return;
 
+	/* Protect the free list. */
     pthread_mutex_lock(&myLock);
  
     /* Test if pointer is within our memory */
@@ -65,9 +100,11 @@ void gFree(void *ap)
         pthread_mutex_unlock(&myLock);
         return;
     }
+    
+    /* Get the header for this chunk. */
     bp = (Header *)ap - 1;
 
-    /* Test if it's a valid Header */
+    /* Test if it's a valid Header (Cookie Test Miam) */
     if(bp->s.sCode != SECRET_CODE)
     {
         pthread_mutex_unlock(&myLock);
@@ -89,7 +126,6 @@ void gFree(void *ap)
     /* Try to merge with next block. */
     if (bp + bp->s.size == p->s.ptr) 
     {
-        /* join to upper nbr */
         bp->s.size += p->s.ptr->s.size;
         bp->s.ptr = p->s.ptr->s.ptr;
     } 
@@ -112,7 +148,9 @@ void gFree(void *ap)
     pthread_mutex_unlock(&myLock);
 }
 
-/* malloc: general-purpose storage allocator */
+/**
+ * Marvellous Memory allocator. 
+ */
 void *gMalloc(unsigned long nbytes)
 {
     Header *p, *prevp;
@@ -124,30 +162,32 @@ void *gMalloc(unsigned long nbytes)
         return NULL;
     }
 
+	/* Protect free list. */
     pthread_mutex_lock(&myLock);
 
     /*printf("nBytes: %d\n", nbytes);*/
 
+	/* Compute the real needed size (Aligment + header) */
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
-    /*nunits = nbytes+sizeof(Header);*/
+    
+    /* Iterate the free list (First Fit). */
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) 
     {
-        /* Chunk is big enough */
+        /* Big enough chunk. */
         if (p->s.size >= nunits) 
         { 
-            /* Chunk fits exactly */
+            /* Perfect Chunk. */
             if (p->s.size == nunits)
             {
 	            prevp->s.ptr = p->s.ptr;
             }
-            /* Chunk is too big, Cut it */
+            /* Too Big Chunk, Cut it! */
             else 
             {
-                /*printf("Taille: %d et Retire: %d\n", p->s.size, nunits);*/
-	            /* allocate tail end */
+	            /* Diminuce remaining chunk. */
             	p->s.size -= nunits;
-                /*printf("New Taille: %d\n", p->s.size);*/
             	p += p->s.size;
+            	/* Initialise our chunk. */
             	p->s.size = nunits;
                 p->s.sCode = SECRET_CODE;
             }
@@ -155,47 +195,57 @@ void *gMalloc(unsigned long nbytes)
             pthread_mutex_unlock(&myLock);
             return (void *)(p+1);
         }
-        if (p == freep) /* wrapped around free list */
+        /* We iterate the whole list... */
+        if (p == freep)
         {
-
-            /* System is not dynamic... */
-            /*if ((p = morecore(nunits)) == NULL)*/
-            {
-                pthread_mutex_unlock(&myLock);
-                return NULL;
-            }
+			/* No memory big enough, Bye Bye! */
+			pthread_mutex_unlock(&myLock);
+            return NULL;
         }
     }
 }
 
+/**
+ * Quite simple, just say "no free list -> No initialisation...".
+ */
 void destroyMemory()
 {
 	freep = NULL;
 	pthread_mutex_destroy(&myLock);
 }
 
+/**
+ * Simple. 
+ */
 unsigned long getGMemTotal()
 {
     return SIZE_ALLOC;
 }
 
+/**
+ * Iterate the free list and sum the free memory.
+ */
 unsigned long getGMemFree()
 {
     Header *p, *prevp;
     unsigned long sum;
+    
+    /* Memory Not Initialised... */
     if(freep == NULL)
         return 0;
 
+	/* Protect Free List. */
     pthread_mutex_lock(&myLock);
     prevp = freep;
     sum = 0;
+    /* Iterate. */
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) 
     {
         sum += p->s.size*sizeof(Header);
-        if (p == freep) /* wrapped around free list */
-        {
+        
+        /* No More Chunk. */
+        if (p == freep)
             break;
-        }
     }
     pthread_mutex_unlock(&myLock);
     return sum;
