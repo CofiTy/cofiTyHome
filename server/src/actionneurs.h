@@ -8,6 +8,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <X11/Xlib.h>  
+#include <X11/Intrinsic.h>  
+#include <X11/extensions/XTest.h>  
 
 #include "actions.h"
 #include "sensorsNetwork.h"
@@ -21,7 +24,8 @@ typedef enum typeActionneur
     COURRANT,   
     VOLETS,
     CAFFE,
-    CHAUFFAGE
+    CHAUFFAGE,
+    VIRTUALKEYBOARD,
         
 } typeActionneur;
 
@@ -54,6 +58,10 @@ void closeVOLETS(char id[SIZE_ID]);
 //----- CHAUFFAGE --------------------------------------------------------------------
 void openCHAUFFAGE(char id[SIZE_ID]);
 void closeCHAUFFAGE(char id[SIZE_ID]);
+
+//----- VIRTUALKEYBOARD -------------------------------------------------------------
+void pressKEYforward(char id[SIZE_ID]);
+void pressKEYbackwards(char id[SIZE_ID]);
 
 void cleanActionneurs();
 
