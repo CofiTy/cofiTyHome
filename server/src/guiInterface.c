@@ -331,7 +331,7 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   gFree(buffer);
 }
 
-void processTypeEdits(struct json_object * fileObj, mqd_t mqSend){
+void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
 
 }
 
