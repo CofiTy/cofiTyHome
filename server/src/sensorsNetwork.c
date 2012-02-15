@@ -47,7 +47,7 @@ void * sensorsMsgRec(){
         /*Traiter data*/
         printf("Trame : %s\n", data);
         decodeTrame(data);
-        puts("finished decoding");
+        //puts("finished decoding");
         j = 0;
         memset(data, '\0', 32);
       }

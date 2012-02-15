@@ -16,6 +16,9 @@
 "CONTACT"		{ strcpy(yylval.chaine, yytext); return CCONTACT; }
 
 "COURRANT"		{ strcpy(yylval.chaine, yytext); return CCOURRANT; }
+"CAFFE"                 { strcpy(yylval.chaine, yytext); return CCAFFE; }
+"VOLETS"		{ strcpy(yylval.chaine, yytext); return CVOLETS; }
+"CHAUFFAGE"		{ strcpy(yylval.chaine, yytext); return CCHAUFFAGE; }
 
 [Rr]"ule:"		{ strcpy(yylval.chaine, yytext); return RULE; }
 [Cc]"onditions:"	{ strcpy(yylval.chaine, yytext); return CONDITIONS; }
