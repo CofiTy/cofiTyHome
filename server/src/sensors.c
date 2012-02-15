@@ -58,6 +58,8 @@ void decodeTrame(char* trame) {
 }
 
 void decodePresence(char* trame, struct sensorType* capteur) {
+    //TYPE: 06
+    //FUNC: 01
     int presence;
     char and = '1';
 
