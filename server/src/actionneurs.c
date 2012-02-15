@@ -504,6 +504,7 @@ void actionMYSTERE(char id[SIZE_ID]){
 }
 
 void finMYSTERE(char id[SIZE_ID]){
+  system("killall mplayer");
   FAIL(pthread_cancel(pthreadMplayer));
 }
 
