@@ -5,4 +5,6 @@ void init();
 
 void destroy();
 
+void cleanMemory();
+
 #endif

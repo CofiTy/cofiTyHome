@@ -5,6 +5,8 @@
 #include "sensorsNetwork.h"
 #include "../parse/rules.tab.h"
 #include "sensors.h"
+#include "actions.h"
+#include "actionneurs.h"
 #include "initCheckRules.h"
 #include "common.h"
 
@@ -37,7 +39,15 @@ void destroy()
   stopRules();
   pthread_mutex_destroy(&sensorsMutex);
 
+  cleanMemory();
   gFree(nameLogRules);
 
   destroyMemory();
+}
+
+void cleanMemory(){
+  cleanActions();
+  cleanRules();
+  cleanActionneurs();
+  cleanSensors();
 }

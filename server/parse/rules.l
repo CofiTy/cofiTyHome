@@ -14,6 +14,8 @@
 "PRESENCE"		{ strcpy(yylval.chaine, yytext); return CPRESENCE; }
 "TEMPERATURE"		{ strcpy(yylval.chaine, yytext); return CTEMPERATURE; }
 "CONTACT"		{ strcpy(yylval.chaine, yytext); return CCONTACT; }
+"HORLOGE"      { strcpy(yylval.chaine, yytext); return CHORLOGE; }
+
 
 "COURRANT"		{ strcpy(yylval.chaine, yytext); return CCOURRANT; }
 "CAFFE"                 { strcpy(yylval.chaine, yytext); return CCAFFE; }
@@ -39,6 +41,10 @@
 "<="			{ strcpy(yylval.chaine, yytext); return LESSOREQUAL; }
 ">"			{ strcpy(yylval.chaine, yytext); return GREATER; }
 "<"			{strcpy(yylval.chaine, yytext); return LESS; }
+
+"-gt"	{ strcpy(yylval.chaine, yytext); return TIMEGREATERTHAN; }
+"-lt"	{ strcpy(yylval.chaine, yytext); return TIMELOWERTHAN; }
+"-eq"	{ strcpy(yylval.chaine, yytext); return TIMEEQUAL; }
 
 [Cc]"onnect"[Ss]"erver:"    {strcpy(yylval.chaine, yytext); return CONNECT; }
 [Ll]"isten"[Cc]"lient:"     {strcpy(yylval.chaine, yytext); return LISTEN; }
