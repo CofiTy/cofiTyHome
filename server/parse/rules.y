@@ -63,6 +63,7 @@
 %token <valeur> CCHAUFFAGE
 %token <valeur> CCAFFE
 %token <valeur> CVOLETS
+%token <valeur> CVKB
 
 %token <valeur> NOMACTION
 %token <valeur> ACTIONNEURS
@@ -278,6 +279,10 @@ typeActionneur:
         |CCHAUFFAGE
 {
     currentActionneur->type = CHAUFFAGE;
+};
+        |CVKB
+{
+    currentActionneur->type = VIRTUALKEYBOARD;
 };
 
 idActionneur:
