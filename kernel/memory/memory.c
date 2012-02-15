@@ -72,6 +72,8 @@ void initMemory()
         base.s.size = 0;
         pthread_mutex_init (&myLock, NULL);
         up = (Header *) heap;
+        up->s.size = SIZE_ALLOC/sizeof(Header);
+        up->s.sCode = SECRET_CODE;
         gFree((void *)(up+1));
     }
 }
