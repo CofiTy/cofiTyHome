@@ -401,7 +401,7 @@ void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
   }
 
   json_object_object_add(respObj, "info", message);
-  json_object_object_add(response, "message", fileObj);
+  json_object_object_add(response, "message", respObj);
 
   sending = json_object_to_json_string(response);
   guiNetworkSend(sending, strlen(sending), mqSend);
