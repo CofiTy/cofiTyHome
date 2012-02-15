@@ -17,26 +17,32 @@
 
 
 rule:	
-	temperature
+	allumeLampe
 conditions:	
-	pipicaca.switchButton<30
-	00053F44.presence<=20
-	00053F44.luminosite<=20
+	bascule.switchButton==0
 actions:
-	ToutFermer
+	ToutOuvrir
 	
 rule:	
-	pipi
+	allumeLampe
 conditions:	
-	10020024>5
-	0021CBE2<=20
+	bascule.switchButton==1
+actions:
+	ToutFermer
+
+rule:	
+	temperature
+conditions:	
+	salon>5
+	intrusion.presence<=20
+	intrusion.luminosite<=20
 actions:
 	ToutOuvrir
 	
 rule:
 	cafe
 conditions:
-	0001B292<=5	
-	0001B291==35
+	aileEst<=5	
+	aileOuest==35
 actions:
 	ToutOuvrir

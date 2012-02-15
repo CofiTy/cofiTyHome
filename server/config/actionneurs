@@ -2,11 +2,11 @@
 #
 #  Fichier des actionneurs.
 #
-#  Types d'actionneurs disponibles actuellement :
-#  COURRANT
-#  CAFFE
-#  VOLETS
-#  CHAUFFAGE
+#  Types d'actionneurs disponibles actuellement, suivi de leurs fonctions :
+#  COURRANT open close
+#  CAFFE open close
+#  VOLETS open close
+#  CHAUFFAGE open close
 #
 #  Format:
 #

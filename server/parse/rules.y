@@ -63,6 +63,9 @@
 %token <chaine> GREATER
 %token <chaine> LESS
 
+%token <chaine> NAMELOGRULES
+%token <chaine> NAMELOGSENSORS
+
 %token <chaine> CONNECT
 %token <chaine> LISTEN
 %token <chaine> IP
@@ -335,6 +338,8 @@ ruleid:
     }
     memset(currentRule, 0, sizeof(struct rule_t));
 
+    strcpy(currentRule->name, $2);
+
     if(startRule == 0){
         startRule = currentRule;
     } else {
@@ -433,10 +438,10 @@ someactions:
 };
 	| IDENTIFIER someactions
 
-/************ COnfig **************************/
+/********************** Config **************************/
 
 parseConfig:
-           CONNECT IP COLUMN IDENTIFIER LISTEN IDENTIFIER
+           CONNECT IP COLUMN IDENTIFIER LISTEN IDENTIFIER NAMELOGRULES IDENTIFIER NAMELOGSENSORS IDENTIFIER
            {
             /*
             printf("### Original ###\n");
@@ -448,9 +453,20 @@ parseConfig:
 
             conPort = atoi($4);
             lisPort = atoi($6);
+            
+            nameLogSensors = gMalloc((strlen($10)+strlen(LOG_EXT))*sizeof(char));
+            memcpy(nameLogSensors, $10, strlen($10));
+            strcat(nameLogSensors, LOG_EXT);
+            
+            nameLogRules = gMalloc((strlen($8)+strlen(LOG_EXT))*sizeof(char));
+            memcpy(nameLogRules, $8, strlen($8));
+            strcat(nameLogRules, LOG_EXT);
+            
             /*printf("### Copied ###\n");*/
             printf("\tConnect to IP: %s on Port: %d\n", conIP, conPort);
             printf("\tListen on Port: %d\n", lisPort);
+            
+            printf("\tLog Rules: %s\n\tLog Sensors: %s\n", nameLogRules, nameLogSensors);
            };
  
 %%
@@ -458,43 +474,64 @@ parseConfig:
 void parseSensors() {
 	printf("%s\n", "Parsing Sensors..");
 
-	yyin = fopen( "server/config/sensors", "r" );
+	if((yyin = fopen( "server/config/sensors", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/sensors...");
+		exit(ERROR);
+	}
 	
-        yyparse();
+    yyparse();
 }
 
 void parseActionneurs() {
 	printf("\n%s\n", "Parsing Actionneurs..");
 
-	yyin = fopen( "server/config/actionneurs", "r" );
+	if((yyin = fopen( "server/config/actionneurs", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/actionneurs...");
+		exit(ERROR);
+	}
 
-        yyparse();
+    yyparse();
 }
 
 void parseActions() {
 	printf("\n%s\n", "Parsing Actions..");
 
-	yyin = fopen( "server/config/actions", "r" );
+	if((yyin = fopen( "server/config/actions", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/actions...");
+		exit(ERROR);
+	}
 
-        yyparse();
+    yyparse();
 }
 
 void parseRules() {
 	printf("\n%s\n", "Parsing Rules..");
 
-	yyin = fopen( "server/config/rules", "r" );
+	if((yyin = fopen( "server/config/rules", "r" )) == NULL)
+	{
+		printf("ERROR: No File server/config/rules...\n");
+		exit(ERROR);
+	}
 
 	pthread_mutex_lock(&sensorsMutex);
 
-        yyparse();
+    yyparse();
 
-        pthread_mutex_unlock(&sensorsMutex);
+    pthread_mutex_unlock(&sensorsMutex);
 }
 
 void parseConfig() {
     printf("\n%s\n", "Parsing Config...");
 
-    yyin = fopen("server/config/config", "r");
+    if((yyin = fopen("server/config/config", "r")) == NULL)
+    {
+		printf("ERROR: No File server/config/config...\n");
+		exit(ERROR);
+	}
+		
     yyparse();
 
 }

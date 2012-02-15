@@ -24,6 +24,9 @@
 [Nn]"omAction:"         { strcpy(yylval.chaine, yytext); return NOMACTION; }
 [Aa]"ctionneurs:"       { strcpy(yylval.chaine, yytext); return ACTIONNEURS; }
 
+[Nn]"ame"[Ll]"og"[Rr]"ules:"	{ strcpy(yylval.chaine, yytext); return NAMELOGRULES; }
+[Nn]"ame"[Ll]"og"[Ss]"ensors:"	{ strcpy(yylval.chaine, yytext); return NAMELOGSENSORS; }
+
 ([0-9]{1,3}\.){3}[0-9]{1,3} {strcpy(yylval.chaine, yytext); return IP;}
 
 \.                      { strcpy(yylval.chaine, yytext); return POINT; }

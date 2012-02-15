@@ -3,6 +3,24 @@
 #include "rules.h"
 #include "common.h"
 
+void logRule(char name[SIZE_NAME]) {
+
+	FILE *fLogRule;
+    time_t t;
+    time(&t);
+    
+	fLogRule = fopen(nameLogRules, "a+");
+    if (fLogRule != NULL)
+    {
+        fprintf(fLogRule, "%d %s\n", (int)t, name);
+		fclose(fLogRule);
+	}
+    else 
+    {
+        printf("No File to Log Rules...\n");
+	}
+}
+
 void applyRules() {
 
     //printf("\nApplying rules..\n");
@@ -28,6 +46,7 @@ void applyRules() {
         if (b == 1) {
 
             //printf("TOUT OK!!!\n");
+            logRule(currentRule->name);
             applyAction(currentRule->action);
         } else {
             //printf("FAIL\n");
@@ -80,9 +99,9 @@ int testLess(int * data, int value) {
         return 0;
 }
 
-void setConditionName(struct condition_t * c, char sensorId[9], char cndName[20]) {
-    char t[9];
-    memset(t, '\0', sizeof (char) * 9);
+void setConditionName(struct condition_t * c, char sensorId[SIZE_ID], char cndName[SIZE_NAME]) {
+    char t[SIZE_ID];
+    memset(t, '\0', sizeof (char) * SIZE_ID);
     strcpy(t, sensorId);
 
     sensorType * sensor = getSensor(t);

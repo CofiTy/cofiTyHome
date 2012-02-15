@@ -1,10 +1,10 @@
 #include "sensors.h"
 #include "common.h"
 
-void logValue(char idSensor[9], char nameValue[20], int value) {
+void logValue(char idSensor[SIZE_ID], char nameValue[SIZE_NAME], int value) {
     FILE * pFile;
     puts("try Open");
-    pFile = fopen("GHome.log", "a+");
+    pFile = fopen(nameLogSensors, "a+");
     puts("Open");
     time_t t;
     time(&t);
@@ -14,22 +14,22 @@ void logValue(char idSensor[9], char nameValue[20], int value) {
         puts("Write");
         fclose(pFile);
     } else {
-        printf("Le fichier GHome.log n'a pas pu être ouvert !!!\n");
+        printf("Le fichier %s n'a pas pu être ouvert !!!\n", nameLogSensors);
     }
 }
 
-struct sensorType * getSensor(char id[20]) {
+struct sensorType * getSensor(char id_or_name[MAX(SIZE_NAME,SIZE_ID)]) {
     struct sensorType * current = sensors;
 
     while (current != NULL) {
-        if (strcmp(current->id, id) == 0 || (current->name != NULL && strcmp(current->name, id) == 0)) {
+        if (strcmp(current->id, id_or_name) == 0 || (current->name != NULL && strcmp(current->name, id_or_name) == 0)) {
             return current;
         }
 
         current = current->nextSensor;
     }
 
-    printf("Sensor not recognized : %s !!!\n", id);
+    printf("Sensor not recognized : %s !!!\n", id_or_name);
     return 0;
 }
 
@@ -38,7 +38,7 @@ void decodeTrame(char* trame) {
     pthread_mutex_lock(&sensorsMutex);
 
     int i;
-    char id[9];
+    char id[SIZE_ID];
 
     for (i = 0; i < 8; i++) {
         id[i] = trame[i + 16];

@@ -1,7 +1,7 @@
 #include "actions.h"
 #include "actionneurs.h"
 
-struct action_t * getAction(const char nom[20]) {
+struct action_t * getAction(const char nom[SIZE_NAME]) {
     struct action_t * current = actions;
 
     while (current != 0) {
@@ -26,6 +26,6 @@ void applyAction(struct action_t * action){
     }
 }
 
-void applyActionByName(const char nom[20]){
+void applyActionByName(const char nom[SIZE_NAME]){
     applyAction(getAction(nom));
 }

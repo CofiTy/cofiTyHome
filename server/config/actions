@@ -4,13 +4,11 @@
 #
 #  Format:
 #
-#  rule:
-#  	nomRegle
-#  conditions:
-#  	idCapteur operateur valeur
-#  	nomCapteur operateur valeur
-#  actions:
+#  nomAction:
 #  	nomAction
+#  actionneurs:
+#  	idActionneur.fonction
+#  	nomActionneur.fonction
 #  ...
 #  
 #####################################################
