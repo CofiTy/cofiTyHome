@@ -709,7 +709,7 @@ void parseFile(const char* file){
     pthread_mutex_unlock(&sensorsMutex);
     printf("Parsing of %s finished\n", file);
 }
-/*
+
 //bool reparseFiles(enumBenJ p, const char * file){
 int reparseFiles(int p, const char * file) {
 
@@ -724,19 +724,19 @@ int reparseFiles(int p, const char * file) {
         parseFile(file);
 
     if(p != F_ACTIONS)
-        parseFile(CONF_PATH ACTIONS_FILES);
+        parseFile(CONF_PATH ACTIONS_FILE);
     else
         parseFile(file);
 
     if(p != F_RULES)
-        parseFile(CONF_PATH RULESFILE);
+        parseFile(CONF_PATH RULES_FILE);
     else
         parseFile(file);
     
     return 1;
 
 }
-*/
+
 void clean(state progState){
 
     //TODO:on clean la memoire
