@@ -54,7 +54,6 @@ void * guiMsgRec(void* data){
 
   for(;;)
   {
-    printf("Sock: %d\n", client->sock);
     /* reception form sensors */
     nb = recv(client->sock, receiving, 8192, 0);
     puts("recv");
@@ -100,7 +99,6 @@ void * guiMsgSend(void* data){
   {
     /* Recuperation des messages de la boite au lettre "Envoi" */
     nb = mq_receive(client->mqSend, buff, 8192, NULL);
-    puts("mq rec");
     FAIL(nb);
     
     //printf("Sending toward GUI: %s\n", buff);
