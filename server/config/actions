@@ -24,3 +24,13 @@ nomAction:
 actionneurs:
 #	FF9F1E05.open
 	FF9F1E06.open
+	
+nomAction:
+	testOuvertureImg
+actionneurs:
+	cafeeee.open
+	
+nomAction:
+	testOuvertureImg2
+actionneurs:
+	cafeeee.close

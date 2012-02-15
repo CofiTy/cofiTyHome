@@ -74,4 +74,6 @@ void decodeInterrupteur(char* trame, struct sensorType* capteur);
 
 void decodeTrame(char* trame);
 
+void cleanActionneurs();
+
 #endif /*SENSORS_H_*/
