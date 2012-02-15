@@ -50,13 +50,7 @@ actions:
 rule:
 	testImg1
 conditions:
-	nico.switchButton==4
+	bascule.switchButton==2
 actions:
 	testOuvertureImg
 
-rule:
-	testImg2
-conditions:
-	nico.switchButton==3
-actions:
-	testOuvertureImg2

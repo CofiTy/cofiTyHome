@@ -206,8 +206,38 @@ void processTypeClose(){
   puts("Close detected!");
 }
 
-void processTypeHistory(char * message, mqd_t mqSend){
-  //TODO: Processing command
+void processTypeHistory(struct json_object* history, mqd_t mqSend){
+  struct json_object* objId;
+  struct json_object* objRollback;
+  
+  struct json_object* response;
+  struct json_object* messType;
+  struct json_object* message;
+  const char * sending;
+
+  int id;
+  int nbValues;
+
+  //Recuperation commande
+  objId = json_object_object_get(history, "id");
+  objRollback = json_object_object_get(history, "rollback");
+
+  id = json_object_get_int(objId);
+  nbValues = json_object_get_int(objRollback);
+
+  //Construction reponse
+  response = json_object_new_object();
+
+  messType = json_object_new_int(HDATA);
+  message = json_object_new_array();
+
+
+  json_object_object_add(response, "type", messType);
+  json_object_object_add(response, "message", message);
+
+  sending = json_object_to_json_string(response);
+  guiNetworkSend(sending, strlen(sending), mqSend);
+
 }
 
 void processCommand(char * command, mqd_t mqSend){

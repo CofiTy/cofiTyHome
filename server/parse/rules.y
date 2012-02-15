@@ -14,6 +14,8 @@
 
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
+
+        //TODO:appeler clean
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -36,6 +38,12 @@
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
 
+    typedef enum state {
+    INIT = 0,
+    RELOADING = 1
+    } state;
+
+    state progState = INIT;
 
 %}
 
@@ -554,10 +562,36 @@ void parseConfig() {
 void parseAll() {
 	printf("\n%s\n", "Start Parsing..");
 
+//TODO:Changer en parseFile.
 	parseSensors();
         parseActionneurs();
         parseActions();
         parseRules();
         parseConfig();
+}
+
+void parseFile(const char* file, state progState){
+    
+}
+
+//bool reparseFiles(enumBenJ p, const char * file){
+int reparseFiles(int p, const char * file) {
+//TODO:on clean la memoire
+//TODO:faire les parse qu'il faut.
+}
+
+void clean(state progState){
+
+    //TODO:on clean la memoire
+
+    if(progState == INIT){
+        exit(-1);
+    } else if(progState == RELOADING){
+        //parseAll
+    }
+}
+
+void getHistory(int id, int nbValues, struct json_object* message){
+    parseFile(nameLogRules, RELOADING);
 }
 
