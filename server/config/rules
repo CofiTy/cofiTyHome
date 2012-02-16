@@ -18,52 +18,17 @@
 #       -lt Lower than
 #
 #####################################################
-# rule:	
-#	 slideSuivante
-# conditions:	
-# 	bascule.switchButton==1
-# actions:
-# 	nextSlide
-#
-# rule:	
-# 	slidePrecedente
-# conditions:	
-# 	bascule.switchButton==2
-# actions:
-# 	previousSlide
-
-rule:
-  string1
-conditions:
-  bascule.switchButton==1
+rule:	
+ slideSuivante
+conditions:	
+	bascule.switchButton==1
 actions:
-  keyF1
+	nextSlide
 
-rule:
-  string2
-conditions:
-  bascule.switchButton==2
+rule:	
+	slidePrecedente
+conditions:	
+	bascule.switchButton==2
 actions:
-  keyF2
-
-rule:
-  string3
-conditions:
-  bascule.switchButton==3
-actions:
-  keyF3
-
-rule:
-  string4
-conditions:
-  bascule.switchButton==4
-actions:
-  keyF4
-
-rule:
-  fret
-conditions:
-  aileEst.contact==1
-actions:
-  keyEnter
+	previousSlide
 
