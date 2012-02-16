@@ -227,112 +227,93 @@ void processTypeClose(){
 void processTypeHistory(struct json_object* history, mqd_t mqSend)
 {
 
-    struct json_object* objId;
-    struct json_object* objRollback;
+  struct json_object* objId;
+  struct json_object* objRollback;
 
-    struct json_object* response;
-    struct json_object* messType;
-    struct json_object* message;
-    //const char * sending;
-  
-    char *command;
+  struct json_object* response;
+  struct json_object* messType;
+  struct json_object* message;
+
+  char *command;
 
 
-    char idStr[SIZE_ID] = {'\0'};
-    int nbValues;
-    char nbStr[10] = {'\0'};
+  char idStr[SIZE_ID] = {'\0'};
+  int nbValues;
+  char nbStr[10] = {'\0'};
 
-    FILE *com;
+  FILE *com;
 
-    /* Line in log file */
-    char readbuf[80];
+  /* Line in log file */
+  char readbuf[80];
 
-    //Recuperation commande
+  //Recuperation commande
 
-    objId = json_object_object_get(history, "id");
-    objRollback = json_object_object_get(history, "rollback");
+  objId = json_object_object_get(history, "id");
+  objRollback = json_object_object_get(history, "rollback");
 
-	/* WHAAAT? */
 
-    strcpy(idStr, json_object_get_string(objId));
-    nbValues = json_object_get_int(objRollback);
+  strcpy(idStr, json_object_get_string(objId));
+  nbValues = json_object_get_int(objRollback);
 
-    printf("### I want History For:%s\n", idStr);
 
-    //Construction reponse
+  //Construction reponse
 
-    response = json_object_new_object();
+  response = json_object_new_object();
 
-    messType = json_object_new_int(HDATA);
-    message = json_object_new_array();
-	
-	sprintf(nbStr, "%d", nbValues);
-	
-	command = (char *)gMalloc((sizeof(char) 
-						* (strlen("grep -i ") 
-						+ strlen(idStr) 
-						+ strlen(" ") 
-						+ strlen(nameLogSensors)  
-						+ strlen(" | tail -n ") 
-						+ strlen(nbStr)
-						+ 1 )));
-	
-	strcpy(command, "grep -i ");
-	strcat(command, idStr);
-	strcat(command, " " );
-	strcat(command, nameLogSensors);
-	strcat(command, " | tail -n ");
-	strcat(command, nbStr);
-	strcat(command, "\0");
+  messType = json_object_new_int(HDATA);
+  message = json_object_new_array();
 
-    printf("### Launching Command %s\n", command);
+  sprintf(nbStr, "%d", nbValues);
 
-    /* Good Popen! */
-	com = popen(command, "w");
+  command = (char *)gMalloc((sizeof(char) 
+        * (strlen("grep -i ") 
+          + strlen(idStr) 
+          + strlen(" ") 
+          + strlen(nameLogSensors)  
+          + strlen(" | tail -n ") 
+          + strlen(nbStr)
+          + 1 )));
 
-    /* TODO ERROOOOOORRR HEEEEEREEE */
-    printf("#### Résultat gets: %d\n\n ",fgets(readbuf, 80, com));
+  strcpy(command, "grep -i ");
+  strcat(command, idStr);
+  strcat(command, " " );
+  strcat(command, nameLogSensors);
+  strcat(command, " | tail -n ");
+  strcat(command, nbStr);
+  strcat(command, "\0");
 
-    while(fgets(readbuf, 80, com))
-    {
-        struct json_object *log = json_object_new_object();
-        //fputs(readbuf, com);
 
-        fprintf(stderr, "\n\n############## Heyyy Youuuu ###########\n\n");
+  com = popen(command, "r");
 
-        char *token = strtok(readbuf, " ");
-        while(token != NULL)
-        {
-            printf("[%s]\n", token);
-            token = strtok(NULL, " ");
-        }
 
-        /*
-        json_object_object_add(log, "type", json_object_new_string(<montype>));
-        json_object_object_add(log, "value", json_object_new_string(<value>));
-        json_object_object_add(log, "timestamp", json_object_new_string(<montimestamp>));
-        json_object_array_add(message, log);
-        */
+  while(fgets(readbuf, 80, com))
+  {
+    struct json_object *log = json_object_new_object();
+
+    char *tokenTime, *tokenId, *tokenType, *tokenValue;
+
+    tokenTime = strtok(readbuf, " ");
+
+    tokenId = strtok(NULL, " ");
+
+    tokenType = strtok(NULL, " ");
+
+    tokenValue = strtok(NULL, " ");
+
+    if( tokenTime != NULL && tokenId != NULL && tokenType != NULL && tokenValue !=NULL){
+      json_object_object_add(log, "type", json_object_new_string(tokenType));
+      json_object_object_add(log, "value", json_object_new_string(tokenValue));
+      json_object_object_add(log, "timestamp", json_object_new_string(tokenTime));
+      json_object_array_add(message, log); 
     }
+  }
 
-    pclose(com);
+  pclose(com);
 
-  /* Strcat de grep id | tail nbValues
-   *
-   * Ajout de chaque ligne dans un array json.
-   *
-   * struct json_object* log;
-   * log = json_object_new_object();
-   *
-   * json_object_object_add(log, "id", json_object_new_string(<monid>));
-   * json_object_object_add(log, "timestamp", json_object_new_string(<montimestamp>));
-   * json_object_array_add(message, log);
-   */
+  json_object_object_add(response, "type", messType);
+  json_object_object_add(response, "message", message);
 
-    json_object_object_add(response, "type", messType);
-    json_object_object_add(response, "message", message);
-
-    guiNetworkSend(json_object_to_json_string(response), strlen(json_object_to_json_string(response)), mqSend);
+  guiNetworkSend(json_object_to_json_string(response), strlen(json_object_to_json_string(response)), mqSend);
 
 }
 void readWholeFile(const char * fileName, char ** buffer){
@@ -454,7 +435,7 @@ void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
   parsedFlag = reparseFiles(fileType, CONF_PATH TMP_FILE);
   state = json_object_new_int(parsedFlag);
   json_object_object_add(respObj, "state", state);
-  
+
   if(parsedFlag == TRUE){
     switch(fileType){
       case F_RULES:
