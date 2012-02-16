@@ -362,6 +362,27 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
         else if (strcmp(fctName, "previous") == 0) {
           a->fct = pressKEYbackwards;
         }
+        else if (strcmp(fctName, "previous") == 0) {
+          a->fct = pressKEYbackwards;
+        }
+        else if (strcmp(fctName, "f1") == 0) {
+          a->fct = pressKEYF1;
+        }
+        else if (strcmp(fctName, "f2") == 0) {
+          a->fct = pressKEYF2;
+        }
+        else if (strcmp(fctName, "f3") == 0) {
+          a->fct = pressKEYF3;
+        }
+        else if (strcmp(fctName, "f4") == 0) {
+          a->fct = pressKEYF4;
+        }
+        else if (strcmp(fctName, "f5") == 0) {
+          a->fct = pressKEYF5;
+        }
+        else if (strcmp(fctName, "enter") == 0) {
+          a->fct = pressKEYEnter;
+        }
         else {
           printf("Fonction not found : %s\n", fctName);
         }
@@ -473,15 +494,49 @@ static void SendKey (Display * disp, KeySym keysym, KeySym modsym)
 void pressKEYforward(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  //sleep (5);  
   SendKey (disp, XK_Right , 0);  
 }
 
 void pressKEYbackwards(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  //sleep (5);  
   SendKey (disp, XK_Left , 0);  
+}
+
+void pressKEYF1(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_KP_F1 , 0);  
+}
+
+void pressKEYF2(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_KP_F2 , 0);  
+}
+
+void pressKEYF3(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_KP_F3 , 0);  
+}
+
+void pressKEYF4(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_KP_F4 , 0);  
+}
+
+void pressKEYF5(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_KP_F5 , 0);  
+}
+
+void pressKEYEnter(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_KP_Enter , 0);  
 }
 
 //---- MYSTERE ----------------------------------------------------------------------

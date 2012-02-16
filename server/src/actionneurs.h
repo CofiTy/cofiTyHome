@@ -63,6 +63,12 @@ void closeCHAUFFAGE(char id[SIZE_ID]);
 //----- VIRTUALKEYBOARD -------------------------------------------------------------
 void pressKEYforward(char id[SIZE_ID]);
 void pressKEYbackwards(char id[SIZE_ID]);
+void pressKEYF1(char id[SIZE_ID]);
+void pressKEYF2(char id[SIZE_ID]);
+void pressKEYF3(char id[SIZE_ID]);
+void pressKEYF4(char id[SIZE_ID]);
+void pressKEYF5(char id[SIZE_ID]);
+void pressKEYFEnter(char id[SIZE_ID]);
 
 //---- MYSTERE ----------------------------------------------------------------------
 void actionMYSTERE(char id[SIZE_ID]);
