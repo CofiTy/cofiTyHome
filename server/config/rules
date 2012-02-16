@@ -34,35 +34,35 @@
 
 rule:
   string1
-condition:
+conditions:
   bascule.switchButton==1
 actions:
   keyF1
 
 rule:
   string2
-condition:
+conditions:
   bascule.switchButton==2
 actions:
   keyF2
 
 rule:
   string3
-condition:
+conditions:
   bascule.switchButton==3
 actions:
   keyF3
 
 rule:
   string4
-condition:
+conditions:
   bascule.switchButton==4
 actions:
   keyF4
 
 rule:
   fret
-condition:
+conditions:
   aileEst.contact==1
 actions:
   keyEnter
