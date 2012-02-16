@@ -10,6 +10,8 @@
     #include "../src/actionneurs.h"
     #include "../src/common.h"
     #include "../src/init.h"
+
+    #include "../libHeaders/json.h"
     
     #include "../../kernel/memory/memory.h"
 
@@ -19,7 +21,6 @@
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
       parsedFlag = FALSE;
-      clean();
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -52,8 +53,9 @@
 
     state progState = INIT;
 
-    int idSensorToSearch;
+    char* idSensorToSearch;
     int remainingSensorsToSearch;
+    struct json_object* messageJSON;
 
 %}
 
@@ -72,6 +74,7 @@
 %token <valeur> CCAFFE
 %token <valeur> CVOLETS
 %token <valeur> CVKB
+%token <valeur> CMYSTERE
 
 %token <valeur> NOMACTION
 %token <valeur> ACTIONNEURS
@@ -105,7 +108,8 @@
 %type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur idActionneur nameActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
-%type <chaine> parseConfig 
+%type <chaine> parseConfig
+%type <chaine> parseLog onelog
  
 %%
 
@@ -115,6 +119,7 @@ root:
         | parseActions
         | parseRules
         | parseConfig
+        | parseLog
 ;
 
 /*************** Capteurs ***************/
@@ -291,6 +296,10 @@ typeActionneur:
         |CVKB
 {
     currentActionneur->type = VIRTUALKEYBOARD;
+};
+        |CMYSTERE
+{
+    currentActionneur->type = MYSTERE;
 };
 
 idActionneur:
@@ -624,74 +633,31 @@ parseConfig:
             
             printf("\tLog Rules: %s\n\tLog Sensors: %s\n", nameLogRules, nameLogSensors);
            };
- 
+
+/********************** Log **************************/
+
+parseLog:
+    onelog
+    | parseLog onelog
+;
+
+onelog:
+    IDENTIFIER IDENTIFIER IDENTIFIER IDENTIFIER
+{
+    if(strcmp($2, idSensorToSearch) == 0){
+        if(remainingSensorsToSearch > 0){
+            struct json_object* log;
+            log = json_object_new_object();
+
+            json_object_object_add(log, "value", json_object_new_string($4));
+            json_object_object_add(log, "timestamp", json_object_new_string($1));
+
+            json_object_array_add(messageJSON, log);
+        }
+    }
+};
+
 %%
-
-void parseSensors() {
-	printf("%s\n", "Parsing Sensors..");
-
-	if((yyin = fopen( "server/config/sensors", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/sensors...");
-		exit(ERROR);
-	}
-	
-    yyparse();
-}
-
-void parseActionneurs() {
-	printf("\n%s\n", "Parsing Actionneurs..");
-
-	if((yyin = fopen( "server/config/actionneurs", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/actionneurs...");
-		exit(ERROR);
-	}
-
-    yyparse();
-}
-
-void parseActions() {
-	printf("\n%s\n", "Parsing Actions..");
-
-	if((yyin = fopen( "server/config/actions", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/actions...");
-		exit(ERROR);
-	}
-
-    yyparse();
-}
-
-void parseRules() {
-	printf("\n%s\n", "Parsing Rules..");
-
-	if((yyin = fopen( "server/config/rules", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/rules...\n");
-		exit(ERROR);
-	}
-
-	pthread_mutex_lock(&sensorsMutex);
-
-    yyparse();
-
-    pthread_mutex_unlock(&sensorsMutex);
-}
-
-void parseConfig() {
-    printf("\n%s\n", "Parsing Config...");
-
-    if((yyin = fopen("server/config/config", "r")) == NULL)
-    {
-		printf("ERROR: No File server/config/config...\n");
-		exit(ERROR);
-	}
-		
-    yyparse();
-
-}
-
 
 void parseFile(const char* file){
     printf("Trying to Parse %s\n", file);
@@ -728,24 +694,33 @@ int reparseFiles(int p, const char * file) {
         parseFile(CONF_PATH SENSORS_FILE);
     else
         parseFile(file);
-
+    
+    if(parsedFlag == TRUE){
     if(p != F_ACTIONNEURS)
         parseFile(CONF_PATH ACTIONNEURS_FILE);
     else
         parseFile(file);
+    }
 
+    if(parsedFlag == TRUE){
     if(p != F_ACTIONS)
         parseFile(CONF_PATH ACTIONS_FILE);
     else
         parseFile(file);
+    }
 
+    if(parsedFlag == TRUE){
     if(p != F_RULES)
         parseFile(CONF_PATH RULES_FILE);
     else
         parseFile(file);
+    }
+    
+    if(parsedFlag == FALSE){
+      clean();
+    }
 
-    return 1;
-
+    return parsedFlag;
 }
 
 void clean(){
@@ -759,9 +734,10 @@ void clean(){
     }
 }
 /*
-void getHistory(int id, int nbValues, struct json_object* message){
+void getHistory(char * id, int nbValues, struct json_object* message){
     idSensorToSearch = id;
     remainingSensorsToSearch = nbValues;
+    messageJSON = message;
 
     parseFile(nameLogRules);
 

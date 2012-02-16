@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "../libHeaders/json.h"
+#include "../../kernel/memory/memory.h"
 #include "guiInterface.h"
 #include "guiNetwork.h"
 #include "sensors.h"
@@ -22,7 +23,8 @@ typedef enum {
   LOGS = 9,
   LDATA = 10,
   EDITS = 11,
-  EDATA = 12 
+  EDATA = 12, 
+  EDATARESP = 13 
 }MsgTypes;
 
 void processTypeInitialise(mqd_t mqSend){
@@ -361,6 +363,19 @@ void readWholeFile(const char * fileName, char ** buffer){
   fclose(file);
 }
 
+void writeWholeFile(const char * fileName, char ** buffer){
+  FILE *file;
+  if((file = fopen(fileName, "w")) == NULL)
+  {
+    printf("ERROR: While opening TMP file...\n");
+    exit(ERROR);
+  }
+
+  //Read file contents into buffer
+  fprintf(file, "%s", *buffer);
+  fclose(file);
+}
+
 void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   int fileType;
   const char * sending;
@@ -410,6 +425,69 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   sending = json_object_to_json_string(response);
   guiNetworkSend(sending, strlen(sending), mqSend);
   gFree(buffer);
+}
+
+void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
+
+  struct json_object* name;
+  struct json_object* file;
+  struct json_object* response;
+  struct json_object* type;
+  struct json_object* respObj;
+  struct json_object* state;
+  struct json_object* message;
+  int fileType, parsedFlag;
+  char* newDataFile;
+  char* sending;
+
+  response = json_object_new_object();
+  respObj = json_object_new_object();
+  type = json_object_new_int(EDATARESP);
+  json_object_object_add(response, "type", type);
+
+  name = json_object_object_get(fileObj, "name");
+  file = json_object_object_get(fileObj, "file");
+  fileType = json_object_get_int(name);
+  newDataFile = json_object_get_string(file);
+
+  writeWholeFile(CONF_PATH TMP_FILE, &newDataFile);
+  parsedFlag = reparseFiles(fileType, CONF_PATH TMP_FILE);
+  state = json_object_new_int(parsedFlag);
+  json_object_object_add(respObj, "state", state);
+  
+  if(parsedFlag == TRUE){
+    switch(fileType){
+      case F_RULES:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH RULES_FILE);
+        break;
+
+      case F_ACTIONS:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH ACTIONS_FILE);
+        break;
+
+      case F_ACTIONNEURS:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH ACTIONNEURS_FILE);
+        break;
+
+      case F_SENSORS:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH SENSORS_FILE);
+        break;
+
+      default:
+        puts("File: Unkown type");
+    }
+    message = json_object_new_string("Configuration updated");
+  } else{
+    system("rm "CONF_PATH TMP_FILE);
+    message = json_object_new_string("Invalid File!");
+  }
+
+  json_object_object_add(respObj, "info", message);
+  json_object_object_add(response, "message", respObj);
+
+  sending = json_object_to_json_string(response);
+  guiNetworkSend(sending, strlen(sending), mqSend);
+  gFree(newDataFile);
 }
 
 void processCommand(char * command, mqd_t mqSend){
@@ -477,7 +555,8 @@ void processCommand(char * command, mqd_t mqSend){
       break;
 
     case EDATA:
-      puts("type EData Error");
+      puts("type EData detected");
+      processTypeEData(message, mqSend);
       break;
 
     default:

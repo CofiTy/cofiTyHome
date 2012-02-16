@@ -3,6 +3,7 @@
 #include <unistd.h> //Pour STDIN_FILENO
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include "common.h"
 
@@ -37,7 +38,10 @@ int main(int argc, char ** argv) {
   while (done == 0) //Boucle principale
   {
 
-    nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+    do{
+      nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+    }while(errno == EINTR);
+    
     FAIL(nfds);
 
     int n;

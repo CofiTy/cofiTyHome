@@ -368,6 +368,18 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
         break;
       }
 
+    case MYSTERE:
+      {
+        if (strcmp(fctName, "action") == 0) {
+          a->fct = actionMYSTERE;
+        }else if (strcmp(fctName, "fin") == 0) {
+          a->fct = finMYSTERE;
+        }else {
+          printf("Fonction not found : %s\n", fctName);
+        }
+        break;
+      }
+
     default:
       puts("Actionneur: Type not found");
   }
@@ -461,13 +473,40 @@ static void SendKey (Display * disp, KeySym keysym, KeySym modsym)
 void pressKEYforward(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  sleep (5);  
+  //sleep (5);  
   SendKey (disp, XK_Right , 0);  
 }
 
 void pressKEYbackwards(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  sleep (5);  
+  //sleep (5);  
   SendKey (disp, XK_Left , 0);  
 }
+
+//---- MYSTERE ----------------------------------------------------------------------
+FILE *pp; 
+int onGoing = FALSE;
+void * mplayer(){
+  return NULL;
+}
+
+void actionMYSTERE(char id[SIZE_ID]){
+  if(onGoing == TRUE){
+    finMYSTERE(NULL);
+  }
+  onGoing = TRUE;
+  if((pp = popen("mplayer weAre.mp3", "w")) == NULL){ 
+    perror("popen"); 
+    exit(1);
+  }
+}
+
+void finMYSTERE(char id[SIZE_ID]){
+  if(onGoing == TRUE){
+    fputs("q\n", pp);
+    pclose(pp);
+    onGoing = FALSE;
+  }
+}
+

@@ -26,6 +26,7 @@ typedef enum typeActionneur
     CAFFE,
     CHAUFFAGE,
     VIRTUALKEYBOARD,
+    MYSTERE
         
 } typeActionneur;
 
@@ -63,7 +64,11 @@ void closeCHAUFFAGE(char id[SIZE_ID]);
 void pressKEYforward(char id[SIZE_ID]);
 void pressKEYbackwards(char id[SIZE_ID]);
 
-void cleanActionneurs();
+//---- MYSTERE ----------------------------------------------------------------------
+void actionMYSTERE(char id[SIZE_ID]);
+void finMYSTERE(char id[SIZE_ID]);
+
+  void cleanActionneurs();
 
 #endif /*ACTIONNEURS_H_*/
 

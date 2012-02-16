@@ -34,3 +34,13 @@ nomAction:
   previousSlide
 actionneurs:
   clavier.previous
+
+nomAction:
+  startFun
+actionneurs:
+  surprise.action
+
+nomAction:
+  endFun
+actionneurs:
+  surprise.fin
