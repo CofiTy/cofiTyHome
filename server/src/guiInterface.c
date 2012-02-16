@@ -288,7 +288,7 @@ void processTypeHistory(struct json_object* history, mqd_t mqSend)
     printf("### Launching Command %s\n", command);
 
     /* Good Popen! */
-	com = popen(command, "w");
+	com = popen(command, "r");
 
     /* TODO ERROOOOOORRR HEEEEEREEE */
     printf("#### Résultat gets: %d\n\n ",fgets(readbuf, 80, com));
