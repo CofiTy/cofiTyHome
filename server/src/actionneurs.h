@@ -68,7 +68,7 @@ void pressKEYF2(char id[SIZE_ID]);
 void pressKEYF3(char id[SIZE_ID]);
 void pressKEYF4(char id[SIZE_ID]);
 void pressKEYF5(char id[SIZE_ID]);
-void pressKEYFEnter(char id[SIZE_ID]);
+void pressKEYEnter(char id[SIZE_ID]);
 
 //---- MYSTERE ----------------------------------------------------------------------
 void actionMYSTERE(char id[SIZE_ID]);
