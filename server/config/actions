@@ -16,15 +16,13 @@
 nomAction:
 	ToutFermer
 actionneurs:
-#	FF9F1E05.close
 	courrantSalle.close
 	
 nomAction:
 	ToutOuvrir
 actionneurs:
-#	FF9F1E05.open
-	FF9F1E06.open
-	
+	courrantSalle.open
+
 nomAction:
   nextSlide
 actionneurs:
@@ -34,6 +32,36 @@ nomAction:
   previousSlide
 actionneurs:
   clavier.previous
+
+nomAction:
+  keyF1
+actionneurs:
+  clavier.f1
+
+nomAction:
+  keyF2
+actionneurs:
+  clavier.f2
+
+nomAction:
+  keyF3
+actionneurs:
+  clavier.f3
+
+nomAction:
+  keyF4
+actionneurs:
+  clavier.f4
+
+nomAction:
+  keyF5
+actionneurs:
+  clavier.f5
+
+nomAction:
+  keyEnter
+actionneurs:
+  clavier.enter
 
 nomAction:
   startFun

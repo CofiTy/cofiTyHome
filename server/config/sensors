@@ -18,9 +18,8 @@
 #####################################################
 
 INTERRUPTEUR 0021CBE2 bascule 
-INTERRUPTEUR 0021CBE5 nico
 PRESENCE 00053F44 intrusion
-TEMPERATURE 00893382 salon
+TEMPERATURE 00893382 tempSalon
 CONTACT 0001B291 aileEst
 CONTACT 0001B292 aileOuest
 HORLOGE 42424242 now

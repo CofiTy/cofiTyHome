@@ -18,63 +18,52 @@
 #       -lt Lower than
 #
 #####################################################
+# rule:	
+#	 slideSuivante
+# conditions:	
+# 	bascule.switchButton==1
+# actions:
+# 	nextSlide
+#
+# rule:	
+# 	slidePrecedente
+# conditions:	
+# 	bascule.switchButton==2
+# actions:
+# 	previousSlide
 
-
-rule:	
-	byebye
-conditions:	
-	bascule.switchButton==4
-actions:
-	startFun
-
-rule:	
-	getOut
-conditions:	
-	bascule.switchButton==3
-actions:
-	endFun
-
-rule:	
-	allumeLampe
-conditions:	
-	bascule.switchButton==4
-actions:
-	ToutOuvrir
-	
-rule:	
-	fermeLampe
-conditions:	
-	bascule.switchButton==3
-actions:
-	ToutFermer
-
-rule:	
-	slideSuivante
-conditions:	
-	bascule.switchButton==1
-actions:
-	nextSlide
-
-rule:	
-	slidePrecedente
-conditions:	
-	bascule.switchButton==2
-actions:
-	previousSlide
-
-rule:	
-	temperature
-conditions:	
-	salon>5
-	intrusion.presence<=20
-	intrusion.luminosite<=20
-actions:
-	ToutOuvrir
-	
 rule:
-	cafe
-conditions:
-	aileEst<=5	
-	aileOuest==35
+  string1
+condition:
+  bascule.switchButton==1
 actions:
-	ToutOuvrir
+  keyF1
+
+rule:
+  string2
+condition:
+  bascule.switchButton==2
+actions:
+  keyF2
+
+rule:
+  string3
+condition:
+  bascule.switchButton==3
+actions:
+  keyF3
+
+rule:
+  string4
+condition:
+  bascule.switchButton==4
+actions:
+  keyF4
+
+rule:
+  fret
+condition:
+  aileEst.contact==1
+actions:
+  keyEnter
+

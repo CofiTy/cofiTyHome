@@ -18,9 +18,9 @@
 #
 #####################################################
 
-#TODO: Changer valeur id
-#COURRANT FF9F1E05
-COURRANT FF9F1E06 courrantSalle
-CAFFE F99F1E03 cafeeee
-VIRTUALKEYBOARD F99F1E09 clavier
+COURRANT FF9F1E05 courrantSalle
+CAFFE F99F1E22 machineCafe
+VOLETS F99F1E33 voletsSalon
+CHAUFFAGE F99F1E23 thermostat
+VIRTUALKEYBOARD F99F1E39 clavier
 MYSTERE F99F1E29 surprise
