@@ -506,31 +506,31 @@ void pressKEYbackwards(char id[SIZE_ID])
 void pressKEYF1(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  SendKey (disp, XK_KP_F1 , 0);  
+  SendKey (disp, XK_F1 , 0);  
 }
 
 void pressKEYF2(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  SendKey (disp, XK_KP_F2 , 0);  
+  SendKey (disp, XK_F2 , 0);  
 }
 
 void pressKEYF3(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  SendKey (disp, XK_KP_F3 , 0);  
+  SendKey (disp, XK_F3 , 0);  
 }
 
 void pressKEYF4(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  SendKey (disp, XK_KP_F4 , 0);  
+  SendKey (disp, XK_F4 , 0);  
 }
 
 void pressKEYF5(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  SendKey (disp, XK_KP_F5 , 0);  
+  SendKey (disp, XK_F5 , 0);  
 }
 
 void pressKEYEnter(char id[SIZE_ID])
