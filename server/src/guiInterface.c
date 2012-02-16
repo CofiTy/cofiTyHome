@@ -299,6 +299,8 @@ void processTypeHistory(struct json_object* history, mqd_t mqSend)
     tokenType = strtok(NULL, " ");
 
     tokenValue = strtok(NULL, " ");
+    /* Getting rid of \n */
+    tokenValue[strlen(tokenValue)-1] = '\0';
 
     if( tokenTime != NULL && tokenId != NULL && tokenType != NULL && tokenValue !=NULL){
       json_object_object_add(log, "type", json_object_new_string(tokenType));
