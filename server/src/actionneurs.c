@@ -536,7 +536,7 @@ void pressKEYF5(char id[SIZE_ID])
 void pressKEYEnter(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
-  SendKey (disp, XK_KP_Enter , 0);  
+  SendKey (disp, XK_Return , 0);  
 }
 
 //---- MYSTERE ----------------------------------------------------------------------
