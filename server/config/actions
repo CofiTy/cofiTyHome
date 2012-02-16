@@ -34,31 +34,6 @@ actionneurs:
   clavier.previous
 
 nomAction:
-  keyF1
-actionneurs:
-  clavier.f1
-
-nomAction:
-  keyF2
-actionneurs:
-  clavier.f2
-
-nomAction:
-  keyF3
-actionneurs:
-  clavier.f3
-
-nomAction:
-  keyF4
-actionneurs:
-  clavier.f4
-
-nomAction:
-  keyF5
-actionneurs:
-  clavier.f5
-
-nomAction:
   keyEnter
 actionneurs:
   clavier.enter
