@@ -318,6 +318,7 @@ void processTypeHistory(struct json_object* history, mqd_t mqSend)
   guiNetworkSend(json_object_to_json_string(response), strlen(json_object_to_json_string(response)), mqSend);
 
 }
+
 void readWholeFile(const char * fileName, char ** buffer){
   FILE *file;
   unsigned long fileLen;
@@ -473,6 +474,9 @@ void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
   gFree(newDataFile);
 }
 
+/**
+ * Process a GUI command and send response if needed
+ **/
 void processCommand(char * command, mqd_t mqSend){
 
   struct json_object* objCommand;
