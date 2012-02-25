@@ -16,10 +16,6 @@
 
 #include "../../kernel/memory/memory.h"
 
-/**
- * TODO: guiNetworkStop: On rentre dans kill thread et on sort pas: Pas de close
- */
-
 typedef struct Client *PClient;
 
 typedef struct Client {
