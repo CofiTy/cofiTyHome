@@ -18,6 +18,9 @@
 
 typedef struct Client *PClient;
 
+/**
+ * Structure GUI Client Informations
+ **/
 typedef struct Client {
   PClient next;
   int sock;
@@ -26,15 +29,27 @@ typedef struct Client {
   mqd_t mqSend;
 }Client;
 
+/**
+ * Structure List of GUI Clients
+ **/
 typedef struct {
   PClient first;
   PClient current;
 }List;
 
+/**
+ * Thread ID of connexion manager Thread
+ **/
 pthread_t pthreadConnexion;
 
+/**
+ * List of GUI CLients
+ **/
 List clientList;
 
+/**
+ * Thread Function: Receive GUI Message
+ **/
 void * guiMsgRec(void* data){
 
   char buff[8192];
@@ -66,9 +81,8 @@ void * guiMsgRec(void* data){
       } else if(buff[i] == '}'){
         --blocs;
       }
-      if(blocs == 0){ /* If enough data we can process */
-        puts("recv");
-        /*Traiter traite*/
+      /* If enough data we can process */
+      if(blocs == 0){ 
         processCommand(traite, client->mqSend);
         j = 0;
         memset(traite, '\0', 8192);
@@ -84,6 +98,9 @@ void * guiMsgRec(void* data){
   }
 }
 
+/**
+ * Thread Function: Sending GUI Message
+ **/
 void * guiMsgSend(void* data){
 
   char buff[8192];
@@ -93,7 +110,7 @@ void * guiMsgSend(void* data){
 
   for(;;)
   {
-    /* Recuperation des messages de la boite au lettre "Envoi" */
+    /* Read Messages in MQueue */
     nb = mq_receive(client->mqSend, buff, 8192, NULL);
     FAIL(nb);
     
@@ -109,12 +126,14 @@ void * guiMsgSend(void* data){
       nbSent += nb;
       sending += nb;
     }
-    //puts("sent");
     sending = (char *) buff;
   }
 
 }
 
+/**
+ * Thread Function: Manage GUI Connexions
+ **/
 void * guiNetworkConnexion(){
 
   int acceptSock, tmpSock;
@@ -130,22 +149,30 @@ void * guiNetworkConnexion(){
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(lisPort);
 
+  /* Create The listening socket */
   acceptSock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(acceptSock);
 
+  /* Bind Socket */
   FAIL(bind(acceptSock, (struct sockaddr *)&saddr, sizeof(saddr)));
 
-  FAIL(listen(acceptSock, 10));
-  puts("Listening");
 
   for(;;){
     memset(&saddr, 0, sizeof(struct sockaddr_in));
+    
+    /* Creation of MQueue name */
     sprintf(name, "/mqMsgSendNb%d", i++);
+  
+    /* Listen */
+    FAIL(listen(acceptSock, 10));
+    puts("Listening");
 
+    /* Accept GUI connexion */
     tmpSock = accept(acceptSock, (struct sockaddr *)&saddr_client, &size_addr);
     FAIL(tmpSock);
     puts("gotConnexion");
 
+    /* Put Create Client Information in list */
     if(clientList.first == NULL){
       clientList.first = gMalloc(sizeof(Client));
       clientList.first->next = NULL;
@@ -159,23 +186,32 @@ void * guiNetworkConnexion(){
 
     clientList.current->sock = tmpSock;
     
+    /* Create Client MQ */
     clientList.current->mqSend = mq_open(name, O_RDWR | O_CREAT, S_IRWXU, NULL);
     FAIL(clientList.current->mqSend);
 
+    /* Launch Client Reception Thread */
     pthread_create(&clientList.current->pthreadRec, NULL, guiMsgRec, (void*)clientList.current);
     pthread_detach(clientList.current->pthreadRec);
 
+    /* Launch Client Sending Thread */
     pthread_create(&clientList.current->pthreadSend, NULL, guiMsgSend, (void*)clientList.current);
     pthread_detach(clientList.current->pthreadSend);
   }
 }
 
+/**
+ * Initialisation of the GUI Network
+ **/
 void guiNetworkStart(){
   clientList.first = NULL;
   pthread_create(&pthreadConnexion, NULL, guiNetworkConnexion, NULL);
   pthread_detach(pthreadConnexion);
 }
 
+/**
+ * Desactivation of GUI Network and free related memory
+ **/
 void guiNetworkStop(){
 
   FAIL(pthread_cancel(pthreadConnexion));
@@ -193,6 +229,9 @@ void guiNetworkStop(){
   puts("Closed");
 }
 
+/**
+ * Send Message toward GUI Client
+ **/
 int guiNetworkSend(const char * msg_ptr, size_t msg_len, mqd_t mqId){
   return mq_send( mqId, msg_ptr, msg_len, 0);
 }

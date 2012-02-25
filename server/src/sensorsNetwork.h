@@ -4,12 +4,12 @@
 #include "common.h"
 
 /**
- * Initialisation of the Network
+ * Initialisation of the Sensors Network
  **/
 void sensorsNetworkStart();
 
 /**
- * Desactivation of Network and free related memory
+ * Desactivation of Sensors Network and free related memory
  **/
 void sensorsNetworkStop();
 

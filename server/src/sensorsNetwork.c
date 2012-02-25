@@ -107,7 +107,7 @@ void * sensorsMsgSend(){
 }
 
 /**
- * Initialisation of the Network
+ * Initialisation of the Sensors Network
  **/
 void sensorsNetworkStart(){
 
@@ -145,7 +145,7 @@ void sensorsNetworkStart(){
 }
 
 /**
- * Desactivation of Network and free related memory
+ * Desactivation of Sensors Network and free related memory
  **/
 void sensorsNetworkStop(){
 
@@ -156,6 +156,9 @@ void sensorsNetworkStop(){
   puts("Closed");
 }
 
+/**
+ * Send Message toward Sensors
+ **/
 int sensorsNetworkSend(const char * msg_ptr, size_t msg_len){
   return mq_send( mqSensorsSend, msg_ptr, msg_len, 0);
 }
