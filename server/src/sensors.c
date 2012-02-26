@@ -4,15 +4,12 @@
 
 void logValue(char idSensor[SIZE_ID], char nameValue[SIZE_NAME], int value) {
     FILE * pFile;
-    //puts("try Open");
     pFile = fopen(nameLogSensors, "a+");
-    //puts("Open");
     time_t t;
     time(&t);
 
     if (pFile != NULL) {
         fprintf(pFile, "%d %s %s %d\n", (int)t, idSensor, nameValue, value);
-        //puts("Write");
         fclose(pFile);
     } else {
         printf("Le fichier %s n'a pas pu être ouvert !!!\n", nameLogSensors);
@@ -30,12 +27,10 @@ struct sensorType * getSensor(char id_or_name[MAX(SIZE_NAME,SIZE_ID)]) {
         current = current->nextSensor;
     }
 
-    //printf("Sensor not recognized : %s !!!\n", id_or_name);
     return 0;
 }
 
 void decodeTrame(char* trame) {
-    //printf("Searching for corresponding sensor...\n");
     pthread_mutex_lock(&sensorsMutex);
 
     int i;
@@ -84,8 +79,6 @@ void decodePresence(char* trame, struct sensorType* capteur) {
 
     logValue(capteur->id, "presence", presence);
     logValue(capteur->id, "luminosite", lumin);
-    printf("valeur de la luminosite: %d, valeur presence %d \n",((dataPRESENCE*) capteur->data)->luminosite, ((dataPRESENCE*) capteur->data)->presence );
-    printf("decode presence!\n");
 
 }
 
@@ -125,7 +118,6 @@ void decodeInterrupteur(char* trame, struct sensorType* capteur) {
         }
     }
             logValue(capteur->id, "switchButton", ((dataINTERRUPTEUR*) capteur->data)->switchButton);
-            printf("decode interrupteur!\n");
 }
 
 void decodeContact(char* trame, struct sensorType* capteur) {
@@ -138,7 +130,6 @@ void decodeContact(char* trame, struct sensorType* capteur) {
 
     logValue(capteur->id, "contact", ((dataCONTACT*) capteur->data)->contact);
 
-    printf("decode contact fenetre!\n");
 }
 
 void decodeTemperature(char* trame, struct sensorType* capteur) {
@@ -154,7 +145,6 @@ void decodeTemperature(char* trame, struct sensorType* capteur) {
     
     logValue(capteur->id, "contact", temp);
 
-    printf("decode Temperature!, %d\n", temp);
 }
 
 void decodeHorloge(char* trame, struct sensorType* capteur) {}

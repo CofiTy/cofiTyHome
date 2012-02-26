@@ -132,7 +132,6 @@ void processTypeInitialise(mqd_t mqSend){
  **/
 void processTypeCommand(struct json_object* command){
   const char* com = json_object_get_string(command);
-  printf("Commande : %s\n", com);
   applyActionByName(com);
 }
 
@@ -155,9 +154,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
   struct sensorType * current;
   struct dataPRESENCE dataPres;
   struct dataTEMPERATURE dataTemp;
-  puts("geting lenght");
   lenght = json_object_array_length(update);
-  puts("got lenght");
 
   message = json_object_new_array();
   response = json_object_new_object();
