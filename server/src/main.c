@@ -67,7 +67,11 @@ int main(int argc, char ** argv) {
           stopWatchingLogs();
         }
         else {
-          puts("Commande invalide\nUsage: exit, quit, q");
+          puts("Commande invalide\nUsage:");
+          puts("  exit, quit, q");
+          puts("  logR, logRules, lr");
+          puts("  logS, logSensors, ls");
+          puts("  stopL, stopLogs, sl");
         }
       }
     }
