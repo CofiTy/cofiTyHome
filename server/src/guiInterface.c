@@ -27,6 +27,9 @@ typedef enum {
   EDATARESP = 13 
 }MsgTypes;
 
+/**
+ * Construct an initialisation messsage and send it toward GUI Client
+ **/
 void processTypeInitialise(mqd_t mqSend){
 
   struct json_object* configuration;
@@ -124,12 +127,18 @@ void processTypeInitialise(mqd_t mqSend){
   guiNetworkSend(message, strlen(message), mqSend);
 }
 
+/**
+ * Exectute action requested by GUI Client
+ **/
 void processTypeCommand(struct json_object* command){
   const char* com = json_object_get_string(command);
   printf("Commande : %s\n", com);
   applyActionByName(com);
 }
 
+/**
+ * Send update message toward GUI Client with requested sensors Informations
+ **/
 void processTypeUpdate(struct json_object* update, mqd_t mqSend){
 
   char* id;
@@ -224,6 +233,9 @@ void processTypeClose(){
   puts("Close detected!");
 }
 
+/**
+ * Send sensors information history toward GUI Client
+ **/
 void processTypeHistory(struct json_object* history, mqd_t mqSend)
 {
 
@@ -360,6 +372,9 @@ void writeWholeFile(const char * fileName, char ** buffer){
   fclose(file);
 }
 
+/**
+ * Send requested configuration file toward GUI Client
+ **/
 void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   int fileType;
   const char * sending;
@@ -411,6 +426,9 @@ void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
   gFree(buffer);
 }
 
+/**
+ * Check new configuration file and replace if valid
+ **/
 void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
 
   struct json_object* name;
