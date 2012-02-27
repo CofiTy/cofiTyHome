@@ -18,7 +18,7 @@ PARSEOBJ=$(PARSEBUILDDIR)rules.tab.o $(PARSEBUILDDIR)lex.yy.o
 MEMORYOBJ=$(MEMORYBUILDDIR)memory.o
 
 FLEX=flex -o$(PARSEDIR)lex.yy.c
-BISON=bison -o$(PARSEDIR)rules.tab.c -d
+BISON=byacc -o$(PARSEDIR)rules.tab.c -d
 
 $(EXE) : $(PARSEOBJ) $(MEMORYOBJ) $(OBJ) $(BUILDDIR)main.o
 		$(EDL) $(LDFLAGS) -o $(EXE) $(OBJ) $(PARSEOBJ) $(MEMORYOBJ) $(LIBS) $(BUILDDIR)main.o

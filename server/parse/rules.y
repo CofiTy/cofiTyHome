@@ -665,6 +665,7 @@ void parseFile(const char* file){
     {
         fprintf(stderr, "ERROR: No file named %s\n", file);
     }
+    YY_FLUSH_BUFFER;
     pthread_mutex_lock(&sensorsMutex);
     yyparse();
     pthread_mutex_unlock(&sensorsMutex);
@@ -678,10 +679,27 @@ void parseAll() {
   parsedFlag = TRUE;
   
   parseFile(CONF_PATH SENSORS_FILE);
-  parseFile(CONF_PATH ACTIONNEURS_FILE);
-  parseFile(CONF_PATH ACTIONS_FILE);
-  parseFile(CONF_PATH RULES_FILE);
-  parseFile(CONF_PATH CONFIG_FILE);
+
+  if(parsedFlag == TRUE){
+    parseFile(CONF_PATH ACTIONNEURS_FILE);
+  }
+
+  if(parsedFlag == TRUE){
+    parseFile(CONF_PATH ACTIONS_FILE);
+  }
+
+  if(parsedFlag == TRUE){
+    parseFile(CONF_PATH RULES_FILE);
+  }
+
+  if(parsedFlag == TRUE){
+    parseFile(CONF_PATH CONFIG_FILE);
+  }
+    
+  if(parsedFlag == FALSE){
+    clean();
+  }
+
 }
 
 int reparseFiles(int p, const char * file) {
@@ -734,6 +752,8 @@ void clean(){
     if(progState == INIT){
         exit(-1);
     } else if(progState == RELOADING){
+        yyerrok;
+        yyclearin;
         parseAll();
     }
 }
