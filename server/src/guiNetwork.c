@@ -60,6 +60,7 @@ void * guiMsgRec(void* data){
   Client* client = (Client*)data;
 
   memset(buff, '\0', 8192);
+  memset(traite, '\0', 8192);
   total = 0;
   blocs = 0;
 
@@ -82,6 +83,7 @@ void * guiMsgRec(void* data){
       }
       /* If enough data we can process */
       if(blocs == 0){ 
+        fprintf(stderr, "GUI said: %s\n", traite);
         processCommand(traite, client->mqSend);
         j = 0;
         memset(traite, '\0', 8192);

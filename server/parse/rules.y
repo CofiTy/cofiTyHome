@@ -690,30 +690,34 @@ int reparseFiles(int p, const char * file) {
     progState = RELOADING;
     parsedFlag = TRUE;
 
-    if(p != F_SENSORS)
+    if(p != F_SENSORS){
         parseFile(CONF_PATH SENSORS_FILE);
-    else
+    }else{
         parseFile(file);
-    
+    }
+
     if(parsedFlag == TRUE){
-    if(p != F_ACTIONNEURS)
+      if(p != F_ACTIONNEURS){
         parseFile(CONF_PATH ACTIONNEURS_FILE);
-    else
+      }else{
         parseFile(file);
+      }
     }
 
     if(parsedFlag == TRUE){
-    if(p != F_ACTIONS)
+      if(p != F_ACTIONS){
         parseFile(CONF_PATH ACTIONS_FILE);
-    else
+      }else{
         parseFile(file);
+      }
     }
 
     if(parsedFlag == TRUE){
-    if(p != F_RULES)
+      if(p != F_RULES){
         parseFile(CONF_PATH RULES_FILE);
-    else
+      }else{
         parseFile(file);
+      }
     }
     
     if(parsedFlag == FALSE){
