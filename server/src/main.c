@@ -76,6 +76,7 @@ int main(int argc, char ** argv) {
       }
     }
   }
+  stopWatchingLogs();
   destroy();
 
   return 0;
