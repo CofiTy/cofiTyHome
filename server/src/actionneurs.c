@@ -1,16 +1,19 @@
 #include "actionneurs.h"
 
 struct trame {
+    /*structure definissant une trame reconnaissable par un actionneur, element par element*/
   char* SYNC; //SYNC = "A55A";
-  char* HEADER; // (TX MESSAGE): 3
+  char* HEADER; // (TX MESSAGE): 6
   char* LENGHT; //LENGHT: B
   char* ORG; //ORG : 05
-  char* DATA; //DATA : DB3: 0100 0000, le reste a zero => DATA: 40000000 B1
-  //DATA : DB3: 0110 0000, le reste a zero => DATA: 60000000 B0
+  char* DATA; //DATA : DB3: 0100 0000, le reste a zero => DATA: 50000000 B1
+  //DATA : DB3: 0110 0000, le reste a zero => DATA: 70000000 B0
   char* ID; //ID= FF9F1E05
   char* STATUS; //STATUS : doc
   char* CHECKSUM; //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum
 };
+
+/*methode permettant de transformer un int en char, ayant une base maximale de 16*/
 
 void itochar(int toBeTrans, char* buffer, int radix) //max base to transform: 16
 {
@@ -21,7 +24,7 @@ void itochar(int toBeTrans, char* buffer, int radix) //max base to transform: 16
   while (n > 0) {
     reste = n % radix;
     n = n / radix;
-    switch (reste) {
+    switch (reste) { //si la base est > 10, on utilise la notation hexa
       case 10:
         {
           reverseBuffer[i++] = 'A';
@@ -63,11 +66,11 @@ void itochar(int toBeTrans, char* buffer, int radix) //max base to transform: 16
   }
   reverseBuffer[i] = '\0';
 
-  strncpy(buffer, reverseBuffer, i);
-  gFree(reverseBuffer);
+  strncpy(buffer, reverseBuffer, i); //on copie le numero ecrit dans la nouvelle base dans le char recu en parametre
+  gFree(reverseBuffer);//liberation de la memoire temporaire
 }
 
-int oneCharHexToInt(char hex) {
+int oneCharHexToInt(char hex) { //conversion d'un seul caractere representant un no en hexo en int
   int result;
   switch (hex) {
     case 'A':
@@ -159,7 +162,7 @@ int oneCharHexToInt(char hex) {
   return result;
 }
 
-int hexToInt(char* hex) {
+int hexToInt(char* hex) { //conversion d'un nb hexa en int
   int result = 0, i, pow = 1, j = 0, cont = 0;
   for (i = 1; i >= 0; i--) {
 
@@ -172,7 +175,8 @@ int hexToInt(char* hex) {
   return result;
 }
 
-void calculateCheckSum(struct trame* trameAEnv) {
+/*calcul de la checkSum -> least significant byte */
+void calculateCheckSum(struct trame* trameAEnv) { 
   char* checkSum = (char*) gMalloc(sizeof (char[2]));
   char* lSB = (char*) gMalloc(sizeof (char[2]));
   int sum = 0, i;
