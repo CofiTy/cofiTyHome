@@ -21,8 +21,6 @@ void logRule(char name[SIZE_NAME]) {
 
 void applyRules() {
 
-    //printf("\nApplying rules..\n");
-
     pthread_mutex_lock(&sensorsMutex);
     struct rule_t * currentRule = startRule;
     struct condition_t * currentCondition;
@@ -43,11 +41,8 @@ void applyRules() {
 
         if (b == 1) {
 
-            printf("Regle ! : %s\n", currentRule->name);
             logRule(currentRule->name);
             applyAction(currentRule->action);
-        } else {
-            //printf("FAIL\n");
         }
 
         currentRule = currentRule->nextRule;
@@ -57,7 +52,6 @@ void applyRules() {
 }
 
 int testEqual(int * data, int value) {
-    //printf("testEqual %d  :  %d\n", *data, value);
     if (*data == value)
         return 1;
     else
@@ -65,7 +59,6 @@ int testEqual(int * data, int value) {
 }
 
 int testGreaterOrEqual(int * data, int value) {
-    //printf("testGreaterOrEqual %d  :  %d\n", *data, value);
     if (*data >= value)
         return 1;
     else
@@ -73,7 +66,6 @@ int testGreaterOrEqual(int * data, int value) {
 }
 
 int testLessOrEqual(int * data, int value) {
-    //printf("testLessOrEqual %d  :  %d\n", *data, value);
     if (*data <= value)
         return 1;
     else
@@ -81,7 +73,6 @@ int testLessOrEqual(int * data, int value) {
 }
 
 int testGreater(int * data, int value) {
-    //printf("testGreater %d  :  %d\n", *data, value);
     if (*data > value) {
         return 1;
     } else {
@@ -90,7 +81,6 @@ int testGreater(int * data, int value) {
 }
 
 int testLess(int * data, int value) {
-    //printf("testLess %d  :  %d\n", *data, value);
     if (*data < value)
         return 1;
     else

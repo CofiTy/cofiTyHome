@@ -58,7 +58,7 @@ typedef enum {
  * IDEM
  */
 #define FAIL(x) if(x == -1) {\
-	perror(#x);exit(-1);}
+  perror(#x);exit(-1);}
 	
 #define ERROR -1
 

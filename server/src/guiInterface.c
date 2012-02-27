@@ -68,7 +68,7 @@ void processTypeInitialise(mqd_t mqSend){
         break;
 
       case INTERRUPTEUR:
-        type = json_object_new_string("Interupteur");
+        type = json_object_new_string("Interrupteur");
         break;
 
       case PRESENCE:
@@ -132,7 +132,6 @@ void processTypeInitialise(mqd_t mqSend){
  **/
 void processTypeCommand(struct json_object* command){
   const char* com = json_object_get_string(command);
-  printf("Commande : %s\n", com);
   applyActionByName(com);
 }
 
@@ -155,9 +154,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
   struct sensorType * current;
   struct dataPRESENCE dataPres;
   struct dataTEMPERATURE dataTemp;
-  puts("geting lenght");
   lenght = json_object_array_length(update);
-  puts("got lenght");
 
   message = json_object_new_array();
   response = json_object_new_object();
@@ -179,7 +176,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
         break;
 
       case INTERRUPTEUR:
-        type = json_object_new_string("Interupteur");
+        type = json_object_new_string("Interrupteur");
         break;
 
       case HORLOGE:
@@ -301,6 +298,7 @@ void processTypeHistory(struct json_object* history, mqd_t mqSend)
   while(fgets(readbuf, 80, com))
   {
     struct json_object *log = json_object_new_object();
+    struct sensorType * current;
 
     char *tokenTime, *tokenId, *tokenType, *tokenValue;
 
@@ -315,7 +313,34 @@ void processTypeHistory(struct json_object* history, mqd_t mqSend)
     tokenValue[strlen(tokenValue)-1] = '\0';
 
     if( tokenTime != NULL && tokenId != NULL && tokenType != NULL && tokenValue !=NULL){
-      json_object_object_add(log, "type", json_object_new_string(tokenType));
+      
+    current = getSensor(tokenId); 
+      switch(current->type){
+
+        case TEMPERATURE:
+          json_object_object_add(log, "type", json_object_new_string("Temperature"));
+          break;
+        
+        case CONTACT:
+          json_object_object_add(log, "type", json_object_new_string("Contact"));
+          break;
+        
+        case INTERRUPTEUR:
+          json_object_object_add(log, "type", json_object_new_string("Interrupteur"));
+          break;
+
+        case PRESENCE:
+          if(strcmp(tokenType, "luminosite")){
+            json_object_object_add(log, "type", json_object_new_string("Luminosite"));
+          }else{
+            json_object_object_add(log, "type", json_object_new_string("Presence"));
+          }
+          break;
+        
+        default:
+          ;
+      }
+
       json_object_object_add(log, "value", json_object_new_string(tokenValue));
       json_object_object_add(log, "timestamp", json_object_new_string(tokenTime));
       json_object_array_add(message, log); 

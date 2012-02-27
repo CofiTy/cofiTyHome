@@ -67,7 +67,6 @@ void * guiMsgRec(void* data){
   {
     /* reception form sensors */
     nb = recv(client->sock, receiving, 8192, 0);
-    puts("recv");
     FAIL(nb);
     total += nb;
     receiving += nb;
@@ -107,6 +106,7 @@ void * guiMsgSend(void* data){
   int nb, nbSent, total;
   char* sending = (char *) buff;
   Client* client = (Client*)data;
+  memset(buff, '\0', 8192);
 
   for(;;)
   {
@@ -114,18 +114,17 @@ void * guiMsgSend(void* data){
     nb = mq_receive(client->mqSend, buff, 8192, NULL);
     FAIL(nb);
     
-    //printf("Sending toward GUI: %s\n", buff);
-
     total = nb;
     nbSent = 0;
     while(nbSent < total)
     {
-      /* Sending toward sensors */
+      /* Sending toward GUI Client */
       nb = send(client->sock, sending, nb, 0);
       FAIL(nb);
       nbSent += nb;
       sending += nb;
     }
+    memset(buff, '\0', 8192);
     sending = (char *) buff;
   }
 

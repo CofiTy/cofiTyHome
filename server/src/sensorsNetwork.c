@@ -60,7 +60,6 @@ void * sensorsMsgRec(){
       data[j++] = buff[i++];
       /* If enough data we can process */
       if(j == 28){
-        //printf("Trame : %s\n", data);
         decodeTrame(data);
         j = 0;
         memset(data, '\0', 32);
@@ -88,8 +87,6 @@ void * sensorsMsgSend(){
     nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
 
-    //printf("Sending toward Gateway: %s\n", buff);
-
     total = nb;
     nbSent = 0;
     while(nbSent < total)
@@ -100,7 +97,6 @@ void * sensorsMsgSend(){
       nbSent += nb;
       sending += nb;
     }
-    //puts("sent");
     sending = (char *) buff;
   }
 
