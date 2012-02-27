@@ -1,6 +1,7 @@
 %{
 
 	#include "rules.tab.h"
+  int state = 0;
 	
 %}
 
@@ -62,5 +63,3 @@
 .			{ ; /*cerr << "Unrecognized token!" << endl; exit(1); */ }
 
 %%
-
-

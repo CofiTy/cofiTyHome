@@ -743,6 +743,7 @@ int reparseFiles(int p, const char * file) {
     
     if(parsedFlag == FALSE){
       clean();
+      parsedFlag = FALSE;
     }
 
     return parsedFlag;
@@ -755,11 +756,10 @@ void clean(){
     if(progState == INIT){
         exit(-1);
     } else if(progState == RELOADING){
-        yyerrok;
-        yyclearin;
         parseAll();
     }
 }
+
 /*
 void getHistory(char * id, int nbValues, struct json_object* message){
     idSensorToSearch = id;

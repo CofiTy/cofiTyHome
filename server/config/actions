@@ -14,14 +14,14 @@
 #####################################################
 
 nomAction:
-	ToutFermer
+  ToutFermer
 actionneurs:
-	courrantSalle.close
-	
+  courrantSalle.close
+
 nomAction:
-	ToutOuvrir
+  ToutOuvrir
 actionneurs:
-	courrantSalle.open
+  courrantSalle.open
 
 nomAction:
   nextSlide

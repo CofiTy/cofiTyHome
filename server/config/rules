@@ -18,30 +18,31 @@
 #       -lt Lower than
 #
 #####################################################
-rule:	
+
+rule:
  slideSuivante
-conditions:	
-	bascule.switchButton==1
+conditions:
+  bascule.switchButton==1
 actions:
-	nextSlide
+  nextSlide
 
-rule:	
-	slidePrecedente
-conditions:	
-	bascule.switchButton==2
+rule:
+  slidePrecedente
+conditions:
+  bascule.switchButton==2
 actions:
-	previousSlide
+  previousSlide
 
-rule:	
-	allumeLampe
-conditions:	
-	bascule.switchButton==4
+rule:
+  allumeLampe
+conditions:
+  bascule.switchButton==4
 actions:
-	ToutOuvrir
-	
-rule:	
-	fermeLampe
-conditions:	
-	bascule.switchButton==3
+  ToutOuvrir
+
+rule:
+  fermeLampe
+conditions:
+  bascule.switchButton==3
 actions:
-	ToutFermer
+  ToutFermer
