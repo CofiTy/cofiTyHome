@@ -13,6 +13,27 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define CONF_PATH "server/config/"
+
+#define ACTIONNEURS_FILE "actionneurs"
+
+#define ACTIONS_FILE "actions"
+
+#define CONFIG_FILE "config"
+
+#define TMP_FILE "temporary"
+
+#define RULES_FILE "rules"
+
+#define SENSORS_FILE "sensors"
+
+typedef enum {
+    F_RULES = 1,
+    F_ACTIONS = 2,
+    F_ACTIONNEURS = 3,
+    F_SENSORS = 4
+}FileTypes;
+
 /**
  * Extension that we use for logs.
  */
@@ -37,7 +58,7 @@
  * IDEM
  */
 #define FAIL(x) if(x == -1) {\
-	perror(#x);exit(-1);}
+  perror(#x);exit(-1);}
 	
 #define ERROR -1
 

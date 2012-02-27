@@ -7,6 +7,7 @@
 #  PRESENCE : presence luminosite
 #  TEMPERATURE : temp
 #  CONTACT : contact
+#  HORLOGE : currentTime
 #  
 #  Format:
 #
@@ -16,9 +17,16 @@
 #
 #####################################################
 
-INTERRUPTEUR 0021CBE2 bascule 
-INTERRUPTEUR 0021CBE5 nico
-PRESENCE 00053F44 intrusion
-TEMPERATURE 00893382 salon
-CONTACT 0001B291 aileEst
-CONTACT 0001B292 aileOuest
+#INTERRUPTEUR 0021CBE2 bascule 
+#PRESENCE 00053F44 intrusion
+#TEMPERATURE 00893382 tempSalon
+#CONTACT 0001B291 aileEst
+#CONTACT 0001B292 aileOuest
+#HORLOGE 42424242 now
+
+INTERRUPTEUR 0021CC07 bascule 
+PRESENCE 00053E7B intrusion
+TEMPERATURE 00893386 tempSalon
+CONTACT 0001B595 aileEst
+CONTACT 0001B596 aileOuest
+HORLOGE 42424242 now

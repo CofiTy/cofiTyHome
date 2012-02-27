@@ -1,10 +1,15 @@
 #include <stdio.h>
 
 #include "../libHeaders/json.h"
+#include "../../kernel/memory/memory.h"
 #include "guiInterface.h"
 #include "guiNetwork.h"
 #include "sensors.h"
 #include "actions.h"
+
+#include "common.h"
+
+#include "../../kernel/memory/memory.h"
 
 typedef enum {
   INITIALISE = 1,
@@ -14,9 +19,17 @@ typedef enum {
   DATA = 5,
   CLOSE = 6,
   HISTORY = 7,
-  HDATA = 8
+  HDATA = 8,
+  LOGS = 9,
+  LDATA = 10,
+  EDITS = 11,
+  EDATA = 12, 
+  EDATARESP = 13 
 }MsgTypes;
 
+/**
+ * Construct an initialisation messsage and send it toward GUI Client
+ **/
 void processTypeInitialise(mqd_t mqSend){
 
   struct json_object* configuration;
@@ -43,6 +56,8 @@ void processTypeInitialise(mqd_t mqSend){
   json_object_object_add(configuration, "type", messType);
 
   pthread_mutex_lock(&sensorsMutex);
+  
+
   while (current != NULL) {
     switch(current->type){
 
@@ -55,11 +70,14 @@ void processTypeInitialise(mqd_t mqSend){
         break;
 
       case INTERRUPTEUR:
-        type = json_object_new_string("Interupteur");
+        type = json_object_new_string("Interrupteur");
         break;
 
       case PRESENCE:
         type = json_object_new_string("Presence");
+        break;
+
+      case HORLOGE:
         break;
 
       default:
@@ -77,7 +95,10 @@ void processTypeInitialise(mqd_t mqSend){
     json_object_object_add(sensorObj, "name", name);
     json_object_object_add(sensorObj, "type", type);
 
-    json_object_array_add(sensorsList, sensorObj);
+
+    if(current->type != HORLOGE){
+      json_object_array_add(sensorsList, sensorObj);
+    }
 
     if(current->type == PRESENCE){
       type = json_object_new_string("Luminosite");
@@ -110,12 +131,17 @@ void processTypeInitialise(mqd_t mqSend){
   guiNetworkSend(message, strlen(message), mqSend);
 }
 
+/**
+ * Exectute action requested by GUI Client
+ **/
 void processTypeCommand(struct json_object* command){
   const char* com = json_object_get_string(command);
-  printf("Commande : %s\n", com);
   applyActionByName(com);
 }
 
+/**
+ * Send update message toward GUI Client with requested sensors Informations
+ **/
 void processTypeUpdate(struct json_object* update, mqd_t mqSend){
 
   char* id;
@@ -132,9 +158,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
   struct sensorType * current;
   struct dataPRESENCE dataPres;
   struct dataTEMPERATURE dataTemp;
-  puts("geting lenght");
   lenght = json_object_array_length(update);
-  puts("got lenght");
 
   message = json_object_new_array();
   response = json_object_new_object();
@@ -156,7 +180,7 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
         break;
 
       case INTERRUPTEUR:
-        type = json_object_new_string("Interupteur");
+        type = json_object_new_string("Interrupteur");
         break;
 
       case PRESENCE:
@@ -206,10 +230,298 @@ void processTypeClose(){
   puts("Close detected!");
 }
 
-void processTypeHistory(char * message, mqd_t mqSend){
-  //TODO: Processing command
+/**
+ * Send sensors information history toward GUI Client
+ **/
+void processTypeHistory(struct json_object* history, mqd_t mqSend)
+{
+
+  struct json_object* objId;
+  struct json_object* objRollback;
+
+  struct json_object* response;
+  struct json_object* messType;
+  struct json_object* message;
+
+  char *command;
+
+
+  char idStr[SIZE_ID] = {'\0'};
+  int nbValues;
+  char nbStr[10] = {'\0'};
+
+  FILE *com;
+
+  /* Line in log file */
+  char readbuf[80];
+
+  //Recuperation commande
+
+  objId = json_object_object_get(history, "id");
+  objRollback = json_object_object_get(history, "rollback");
+
+
+  strcpy(idStr, json_object_get_string(objId));
+  nbValues = json_object_get_int(objRollback);
+
+
+  //Construction reponse
+
+  response = json_object_new_object();
+
+  messType = json_object_new_int(HDATA);
+  message = json_object_new_array();
+
+  sprintf(nbStr, "%d", nbValues);
+
+  command = (char *)gMalloc((sizeof(char) 
+        * (strlen("grep -i ") 
+          + strlen(idStr) 
+          + strlen(" ") 
+          + strlen(nameLogSensors)  
+          + strlen(" | tail -n ") 
+          + strlen(nbStr)
+          + 1 )));
+
+  strcpy(command, "grep -i ");
+  strcat(command, idStr);
+  strcat(command, " " );
+  strcat(command, nameLogSensors);
+  strcat(command, " | tail -n ");
+  strcat(command, nbStr);
+  strcat(command, "\0");
+
+
+  com = popen(command, "r");
+
+
+  while(fgets(readbuf, 80, com))
+  {
+    struct json_object *log = json_object_new_object();
+    struct sensorType * current;
+
+    char *tokenTime, *tokenId, *tokenType, *tokenValue;
+
+    tokenTime = strtok(readbuf, " ");
+
+    tokenId = strtok(NULL, " ");
+
+    tokenType = strtok(NULL, " ");
+
+    tokenValue = strtok(NULL, " ");
+    /* Getting rid of \n */
+    tokenValue[strlen(tokenValue)-1] = '\0';
+
+    if( tokenTime != NULL && tokenId != NULL && tokenType != NULL && tokenValue !=NULL){
+      
+    current = getSensor(tokenId); 
+      switch(current->type){
+
+        case TEMPERATURE:
+          json_object_object_add(log, "type", json_object_new_string("Temperature"));
+          break;
+        
+        case CONTACT:
+          json_object_object_add(log, "type", json_object_new_string("Contact"));
+          break;
+        
+        case INTERRUPTEUR:
+          json_object_object_add(log, "type", json_object_new_string("Interrupteur"));
+          break;
+
+        case PRESENCE:
+          if(strcmp(tokenType, "luminosite")){
+            json_object_object_add(log, "type", json_object_new_string("Luminosite"));
+          }else{
+            json_object_object_add(log, "type", json_object_new_string("Presence"));
+          }
+          break;
+        
+        default:
+          ;
+      }
+
+      json_object_object_add(log, "value", json_object_new_string(tokenValue));
+      json_object_object_add(log, "timestamp", json_object_new_string(tokenTime));
+      json_object_array_add(message, log); 
+    }
+  }
+
+  pclose(com);
+
+  json_object_object_add(response, "type", messType);
+  json_object_object_add(response, "message", message);
+
+  guiNetworkSend(json_object_to_json_string(response), strlen(json_object_to_json_string(response)), mqSend);
+
 }
 
+void readWholeFile(const char * fileName, char ** buffer){
+  FILE *file;
+  unsigned long fileLen;
+  if((file = fopen(fileName, "r")) == NULL)
+  {
+    printf("ERROR: No File to open...\n");
+    exit(ERROR);
+  }
+
+  //Get file length
+  fseek(file, 0, SEEK_END);
+  fileLen=ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+  //Allocate memory
+  *buffer=(char *)gMalloc(fileLen+1);
+  if (!(*buffer))
+  {
+    fprintf(stderr, "Memory error!");
+    fclose(file);
+    exit(ERROR);;
+  }
+  
+  memset(*buffer, '\0', fileLen+1);
+
+  //Read file contents into buffer
+  fread(*buffer, fileLen, 1, file);
+  fclose(file);
+}
+
+void writeWholeFile(const char * fileName, char ** buffer){
+  FILE *file;
+  if((file = fopen(fileName, "w")) == NULL)
+  {
+    printf("ERROR: While opening TMP file...\n");
+    exit(ERROR);
+  }
+
+  //Read file contents into buffer
+  fprintf(file, "%s", *buffer);
+  fclose(file);
+}
+
+/**
+ * Send requested configuration file toward GUI Client
+ **/
+void processTypeEdits(struct json_object * typeId, mqd_t mqSend){
+  int fileType;
+  const char * sending;
+  struct json_object * response;
+  struct json_object* type;
+  struct json_object* fileObj;
+  struct json_object* name;
+  struct json_object* file;
+  char *buffer;
+
+  fileType = json_object_get_int(typeId);
+  response = json_object_new_object();
+  fileObj = json_object_new_object();
+  type = json_object_new_int(EDATA);
+  json_object_object_add(response, "type", type);
+
+  switch(fileType){
+    case F_RULES:
+      name = json_object_new_int(F_RULES);
+      readWholeFile("server/config/rules", &buffer);
+      break;
+
+    case F_ACTIONS:
+      name = json_object_new_int(F_ACTIONS);
+      readWholeFile("server/config/actions", &buffer);
+      break;
+
+    case F_ACTIONNEURS:
+      name = json_object_new_int(F_ACTIONNEURS);
+      readWholeFile("server/config/actionneurs", &buffer);
+      break;
+
+    case F_SENSORS:
+      name = json_object_new_int(F_SENSORS);
+      readWholeFile("server/config/sensors", &buffer);
+      break;
+
+    default:
+      puts("File: Unkown type");
+  }
+
+  json_object_object_add(fileObj, "name", name);
+  file = json_object_new_string(buffer);
+  json_object_object_add(fileObj, "file", file);
+  json_object_object_add(response, "message", fileObj);
+
+  sending = json_object_to_json_string(response);
+  guiNetworkSend(sending, strlen(sending), mqSend);
+  gFree(buffer);
+}
+
+/**
+ * Check new configuration file and replace if valid
+ **/
+void processTypeEData(struct json_object * fileObj, mqd_t mqSend){
+
+  struct json_object* name;
+  struct json_object* file;
+  struct json_object* response;
+  struct json_object* type;
+  struct json_object* respObj;
+  struct json_object* state;
+  struct json_object* message;
+  int fileType, parsedFlag;
+  char* newDataFile;
+  char* sending;
+
+  response = json_object_new_object();
+  respObj = json_object_new_object();
+  type = json_object_new_int(EDATARESP);
+  json_object_object_add(response, "type", type);
+
+  name = json_object_object_get(fileObj, "name");
+  file = json_object_object_get(fileObj, "file");
+  fileType = json_object_get_int(name);
+  newDataFile = json_object_get_string(file);
+
+  writeWholeFile(CONF_PATH TMP_FILE, &newDataFile);
+  parsedFlag = reparseFiles(fileType, CONF_PATH TMP_FILE);
+  state = json_object_new_int(parsedFlag);
+  json_object_object_add(respObj, "state", state);
+
+  if(parsedFlag == TRUE){
+    switch(fileType){
+      case F_RULES:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH RULES_FILE);
+        break;
+
+      case F_ACTIONS:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH ACTIONS_FILE);
+        break;
+
+      case F_ACTIONNEURS:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH ACTIONNEURS_FILE);
+        break;
+
+      case F_SENSORS:
+        system("mv "CONF_PATH TMP_FILE" "CONF_PATH SENSORS_FILE);
+        break;
+
+      default:
+        puts("File: Unkown type");
+    }
+    message = json_object_new_string("Configuration updated");
+  } else{
+    system("cat "CONF_PATH TMP_FILE);
+    message = json_object_new_string("Invalid File!");
+  }
+
+  json_object_object_add(respObj, "info", message);
+  json_object_object_add(response, "message", respObj);
+
+  sending = json_object_to_json_string(response);
+  guiNetworkSend(sending, strlen(sending), mqSend);
+  gFree(newDataFile);
+}
+
+/**
+ * Process a GUI command and send response if needed
+ **/
 void processCommand(char * command, mqd_t mqSend){
 
   struct json_object* objCommand;
@@ -259,6 +571,24 @@ void processCommand(char * command, mqd_t mqSend){
 
     case HDATA:
       puts("type HDataerror");
+      break;
+
+    case LOGS:
+      puts("type Logs detected");
+      break;
+
+    case LDATA:
+      puts("type LData Error");
+      break;
+
+    case EDITS:
+      puts("type EDITS detected");
+      processTypeEdits(message, mqSend);
+      break;
+
+    case EDATA:
+      puts("type EData detected");
+      processTypeEData(message, mqSend);
       break;
 
     default:

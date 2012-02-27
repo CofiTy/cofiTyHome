@@ -15,10 +15,26 @@
 #include "sensors.h"
 #include "common.h"
 
-int i, j, sock;
+int i, j;
+
+/**
+ * Full Duplex Socket for Sensors communication
+ **/
+int sock;
+
+/**
+ * Threads ID, reception and invoice for sensors communication
+ **/
 pthread_t pthreadSensorsRec, pthreadSensorsSend;
+
+/**
+ * Message queue ID for invoice messages toward Sensors
+ **/
 mqd_t mqSensorsSend;
 
+/**
+ * Thread Function: Receive Sensors Message
+ **/
 void * sensorsMsgRec(){
 
   char buff[128];
@@ -38,27 +54,27 @@ void * sensorsMsgRec(){
     total += nb;
     receiving += nb;
 
-    /* If enough data we can process */
     i = 0;
     j = 0;
     while(i < (strlen(buff))){
       data[j++] = buff[i++];
+      /* If enough data we can process */
       if(j == 28){
-        /*Traiter data*/
-        printf("Trame : %s\n", data);
         decodeTrame(data);
-        //puts("finished decoding");
         j = 0;
         memset(data, '\0', 32);
       }
     }
 
-      total = 0;
-      receiving = (char *) buff;
-      memset(buff, '\0', 128);
+    total = 0;
+    receiving = (char *) buff;
+    memset(buff, '\0', 128);
   }
 }
 
+/**
+ * Thread Function: Sending Messages Toward Sensors
+ **/
 void * sensorsMsgSend(){
 
   char buff[8192];
@@ -67,11 +83,9 @@ void * sensorsMsgSend(){
 
   for(;;)
   {
-    /* Recuperation des messages de la boite au lettre "Envoi" */
+    /* Read Messages in MQueue */
     nb = mq_receive(mqSensorsSend, buff, 8192, 0);
     FAIL(nb);
-    
-    printf("Sending toward Gateway: %s\n", buff);
 
     total = nb;
     nbSent = 0;
@@ -83,14 +97,17 @@ void * sensorsMsgSend(){
       nbSent += nb;
       sending += nb;
     }
-    puts("sent");
     sending = (char *) buff;
   }
 
 }
 
+/**
+ * Initialisation of the Sensors Network
+ **/
 void sensorsNetworkStart(){
 
+  /* Create MessageQueue */
   mqSensorsSend = mq_open("/SensorsMsgSend", O_RDWR | O_CREAT, S_IRWXU, NULL);
   FAIL(mqSensorsSend);
 
@@ -104,20 +121,28 @@ void sensorsNetworkStart(){
 
   socklen_t len = sizeof(struct sockaddr_in);
 
+  /* Create Socket */
   sock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(sock);
 
+  /* Connect Socket */
   FAIL(connect(sock, (struct sockaddr *)&saddr, len));
-  
+
   puts("Connected to gateway");
+
+  /* Launch Thread Reception */
   pthread_create(&pthreadSensorsRec, NULL, sensorsMsgRec, NULL);
   pthread_detach(pthreadSensorsRec);
 
+  /* Launch Thread Sending */
   pthread_create(&pthreadSensorsSend, NULL, sensorsMsgSend, NULL);
   pthread_detach(pthreadSensorsSend);
 
 }
 
+/**
+ * Desactivation of Sensors Network and free related memory
+ **/
 void sensorsNetworkStop(){
 
   FAIL(pthread_cancel(pthreadSensorsRec));
@@ -127,6 +152,9 @@ void sensorsNetworkStop(){
   puts("Closed");
 }
 
+/**
+ * Send Message toward Sensors
+ **/
 int sensorsNetworkSend(const char * msg_ptr, size_t msg_len){
   return mq_send( mqSensorsSend, msg_ptr, msg_len, 0);
 }

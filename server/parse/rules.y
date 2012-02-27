@@ -9,11 +9,18 @@
     #include "../src/actions.h"
     #include "../src/actionneurs.h"
     #include "../src/common.h"
+    #include "../src/init.h"
+
+    #include "../libHeaders/json.h"
     
     #include "../../kernel/memory/memory.h"
 
+    int parsedFlag;
+    void clean();
+
     void yyerror(char * msg) {
       fprintf(stderr, "Problème lors du parsage d'un des fichiers !! : %s\n", msg);
+      parsedFlag = FALSE;
     }
 
     //-- Lexer prototype required by bison, aka getNextToken()
@@ -35,7 +42,20 @@
 
     struct action_t * currentAction;
     struct actionFct_t * currentActionFct;
+    
+    int flagTime = FALSE;
 
+    typedef enum state {
+    INIT = 0,
+    RELOADING = 1
+    } state;
+    
+
+    state progState = INIT;
+
+    char* idSensorToSearch;
+    int remainingSensorsToSearch;
+    struct json_object* messageJSON;
 
 %}
 
@@ -47,11 +67,14 @@
 %token <valeur> CPRESENCE
 %token <valeur> CTEMPERATURE
 %token <valeur> CCONTACT
+%token <valeur> CHORLOGE
 
 %token <valeur> CCOURRANT
 %token <valeur> CCHAUFFAGE
 %token <valeur> CCAFFE
 %token <valeur> CVOLETS
+%token <valeur> CVKB
+%token <valeur> CMYSTERE
 
 %token <valeur> NOMACTION
 %token <valeur> ACTIONNEURS
@@ -77,13 +100,16 @@
 %token <chaine> IDENTIFIER
 %token <valeur> NUMBER
 
+%token <chaine> TIMEGREATERTHAN
+%token <chaine> TIMELOWERTHAN
  
 %type <chaine> root 
 %type <chaine> parseSensors oneSensor initSensor typeSensor idSensor nameSensor
 %type <chaine> parseActionneurs oneActionneur initActionneur typeActionneur idActionneur nameActionneur
 %type <chaine> parseActions oneAction actionId someActionneursFct oneActionneurFct
 %type <chaine> parseRules onerule someconditions someactions operator ruleid onecondition conditionid
-%type <chaine> parseConfig 
+%type <chaine> parseConfig
+%type <chaine> parseLog onelog
  
 %%
 
@@ -93,6 +119,7 @@ root:
         | parseActions
         | parseRules
         | parseConfig
+        | parseLog
 ;
 
 /*************** Capteurs ***************/
@@ -136,7 +163,8 @@ initSensor:
 
     if((currentSensor = gMalloc(sizeof(struct sensorType))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor, 0, sizeof(struct sensorType));
 
@@ -154,7 +182,8 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataINTERRUPTEUR))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataINTERRUPTEUR));
 
@@ -167,7 +196,8 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataPRESENCE))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataPRESENCE));
 
@@ -179,7 +209,8 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataTEMPERATURE))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataTEMPERATURE));
 
@@ -191,12 +222,29 @@ typeSensor:
 
     if((currentSensor->data = gMalloc(sizeof(dataCONTACT))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentSensor->data, 0, sizeof(dataCONTACT));
 
     currentSensor->decode = decodeContact;
 };
+       | CHORLOGE
+{
+    currentSensor->type = HORLOGE;
+
+    if((currentSensor->data = gMalloc(sizeof(dataHORLOGE))) == NULL)
+    {
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
+    }
+    memset(currentSensor->data, 0, sizeof(dataHORLOGE));
+
+    currentSensor->decode = decodeHorloge;
+};
+
+
+
 
 /*************** Actionneurs ***************/
 
@@ -215,7 +263,8 @@ initActionneur:
 
     if((currentActionneur = gMalloc(sizeof(struct actionneur_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentActionneur, 0, sizeof(struct actionneur_t));
 
@@ -243,6 +292,14 @@ typeActionneur:
         |CCHAUFFAGE
 {
     currentActionneur->type = CHAUFFAGE;
+};
+        |CVKB
+{
+    currentActionneur->type = VIRTUALKEYBOARD;
+};
+        |CMYSTERE
+{
+    currentActionneur->type = MYSTERE;
 };
 
 idActionneur:
@@ -287,7 +344,8 @@ actionId:
 
     if((currentAction = gMalloc(sizeof(struct action_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentAction, 0, sizeof(struct action_t));
 
@@ -312,7 +370,8 @@ oneActionneurFct:
 
     if((currentActionFct = gMalloc(sizeof(struct actionFct_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentActionFct, 0, sizeof(struct actionFct_t));
 
@@ -349,7 +408,8 @@ ruleid:
 
     if((currentRule = gMalloc(sizeof(struct rule_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentRule, 0, sizeof(struct rule_t));
 
@@ -378,7 +438,8 @@ conditionid:
 
     if((currentCondition = gMalloc(sizeof(struct condition_t))) == NULL)
     {
-		printf("No Memory\n");
+		fprintf(stderr, "No Memory\n");
+        exit(ERROR);
     }
     memset(currentCondition, 0, sizeof(struct condition_t));
 
@@ -399,7 +460,12 @@ conditionid:
 
     struct condition_t * old = currentCondition;
 
-    currentCondition = calloc(1, sizeof(struct condition_t));
+    if((currentCondition = gMalloc(sizeof(struct condition_t))) == NULL)
+    {
+        fprintf(stderr, "No Memory\n");
+        exit(ERROR);
+    }
+    memset(currentCondition, 0, sizeof(struct condition_t));
 
     if(currentRule->conditions == 0){
             currentRule->conditions = currentCondition;
@@ -417,11 +483,71 @@ conditionid:
 numberid:
     IDENTIFIER
 {
-    currentCondition->value = atoi($1);
+	if(flagTime)
+	{
+        int i;
+
+        int hi = 0;
+        char h[3] = {'\0'};
+        int mi = 0;
+        char m[3] = {'\0'};
+
+        struct tm str_time;
+        time_t currentTime;
+
+        if(strlen($1) > 5)
+        {
+            yyerror("Temps Invalide!\n");
+        }
+
+        for(i = 0;i < strlen($1); i++)
+        {
+            if($1[i] == 'h' || $1[i] == 'H'){
+                hi = 42;
+                continue;
+            }
+            if(hi < 2)
+            {
+                h[hi++] = $1[i];
+            }
+            else
+            {
+                if(mi < 2)
+                {
+                    m[mi++] = $1[i];
+                }
+            }
+        }
+
+        hi = atoi(h);
+        mi = atoi(m);
+
+        if(hi < 0  || hi > 23
+            || mi < 0 || mi > 59)
+        {
+            yyerror("Temps Invalide!\n");
+        }
+
+        currentTime = time (NULL);
+        memcpy(&str_time, localtime(&currentTime), sizeof(struct tm));
+
+        str_time.tm_hour = hi;
+        str_time.tm_min = mi;
+        str_time.tm_sec = 0;
+
+        currentCondition->value = mktime(&str_time);
+	}
+	else
+	{
+		currentCondition->value = atoi($1);
+	}
+	flagTime = FALSE;
+    
 };
     | NUMBER
 {
-    currentCondition->value = $1;
+	
+	currentCondition->value = $1;
 };
 
 operator:
@@ -445,6 +571,16 @@ operator:
 {
     currentCondition->conditionOK = testLess;
 };
+	| TIMEGREATERTHAN
+{
+    currentCondition->conditionOK = testTimeMore;
+    flagTime = TRUE;
+};
+	| TIMELOWERTHAN
+{
+    currentCondition->conditionOK = testTimeLess;
+    flagTime = TRUE;
+};
 
 someactions:
 	IDENTIFIER
@@ -463,17 +599,31 @@ parseConfig:
             printf("\tConnect to IP: %s on Port: %s\n",$2, $4);
             printf("\tListen on Port: %s\n", $6);
             */
-            conIP = gMalloc(strlen($2)*sizeof(char));
+            if((conIP = gMalloc(strlen($2)*sizeof(char))) == NULL)
+            {
+                fprintf(stderr, "No Memory!\n");
+                exit(ERROR);
+            }
             memcpy(conIP, $2, strlen($2));
 
             conPort = atoi($4);
             lisPort = atoi($6);
             
-            nameLogSensors = gMalloc((strlen($10)+strlen(LOG_EXT))*sizeof(char));
+            if((nameLogSensors =
+            gMalloc((strlen($10)+strlen(LOG_EXT))*sizeof(char))) == NULL)
+            {
+                fprintf(stderr, "No Memory!\n");
+                exit(ERROR);
+            }
             memcpy(nameLogSensors, $10, strlen($10));
             strcat(nameLogSensors, LOG_EXT);
             
-            nameLogRules = gMalloc((strlen($8)+strlen(LOG_EXT))*sizeof(char));
+            if((nameLogRules =
+            gMalloc((strlen($8)+strlen(LOG_EXT))*sizeof(char))) == NULL)
+            {
+                fprintf(stderr, "No Memory!\n");
+                exit(ERROR);
+            }
             memcpy(nameLogRules, $8, strlen($8));
             strcat(nameLogRules, LOG_EXT);
             
@@ -483,81 +633,118 @@ parseConfig:
             
             printf("\tLog Rules: %s\n\tLog Sensors: %s\n", nameLogRules, nameLogSensors);
            };
- 
+
+/********************** Log **************************/
+
+parseLog:
+    onelog
+    | parseLog onelog
+;
+
+onelog:
+    IDENTIFIER IDENTIFIER IDENTIFIER IDENTIFIER
+{
+    if(strcmp($2, idSensorToSearch) == 0){
+        if(remainingSensorsToSearch > 0){
+            struct json_object* log;
+            log = json_object_new_object();
+
+            json_object_object_add(log, "value", json_object_new_string($4));
+            json_object_object_add(log, "timestamp", json_object_new_string($1));
+
+            json_object_array_add(messageJSON, log);
+        }
+    }
+};
+
 %%
 
-void parseSensors() {
-	printf("%s\n", "Parsing Sensors..");
-
-	if((yyin = fopen( "server/config/sensors", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/sensors...");
-		exit(ERROR);
-	}
-	
-    yyparse();
-}
-
-void parseActionneurs() {
-	printf("\n%s\n", "Parsing Actionneurs..");
-
-	if((yyin = fopen( "server/config/actionneurs", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/actionneurs...");
-		exit(ERROR);
-	}
-
-    yyparse();
-}
-
-void parseActions() {
-	printf("\n%s\n", "Parsing Actions..");
-
-	if((yyin = fopen( "server/config/actions", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/actions...");
-		exit(ERROR);
-	}
-
-    yyparse();
-}
-
-void parseRules() {
-	printf("\n%s\n", "Parsing Rules..");
-
-	if((yyin = fopen( "server/config/rules", "r" )) == NULL)
-	{
-		printf("ERROR: No File server/config/rules...\n");
-		exit(ERROR);
-	}
-
-	pthread_mutex_lock(&sensorsMutex);
-
-    yyparse();
-
-    pthread_mutex_unlock(&sensorsMutex);
-}
-
-void parseConfig() {
-    printf("\n%s\n", "Parsing Config...");
-
-    if((yyin = fopen("server/config/config", "r")) == NULL)
+void parseFile(const char* file){
+    printf("Trying to Parse %s\n", file);
+    if((yyin = fopen(file, "r")) == NULL)
     {
-		printf("ERROR: No File server/config/config...\n");
-		exit(ERROR);
-	}
-		
+        fprintf(stderr, "ERROR: No file named %s\n", file);
+    }
+    pthread_mutex_lock(&sensorsMutex);
     yyparse();
-
+    pthread_mutex_unlock(&sensorsMutex);
+    printf("Parsing of %s finished\n", file);
 }
 
 void parseAll() {
-	printf("\n%s\n", "Start Parsing..");
-
-	parseSensors();
-        parseActionneurs();
-        parseActions();
-        parseRules();
-        parseConfig();
+  printf("\n%s\n", "Start Parsing..");
+  
+  progState = INIT;
+  parsedFlag = TRUE;
+  
+  parseFile(CONF_PATH SENSORS_FILE);
+  parseFile(CONF_PATH ACTIONNEURS_FILE);
+  parseFile(CONF_PATH ACTIONS_FILE);
+  parseFile(CONF_PATH RULES_FILE);
+  parseFile(CONF_PATH CONFIG_FILE);
 }
 
+int reparseFiles(int p, const char * file) {
+
+    cleanMemory();
+    progState = RELOADING;
+    parsedFlag = TRUE;
+
+    if(p != F_SENSORS){
+        parseFile(CONF_PATH SENSORS_FILE);
+    }else{
+        parseFile(file);
+    }
+
+    if(parsedFlag == TRUE){
+      if(p != F_ACTIONNEURS){
+        parseFile(CONF_PATH ACTIONNEURS_FILE);
+      }else{
+        parseFile(file);
+      }
+    }
+
+    if(parsedFlag == TRUE){
+      if(p != F_ACTIONS){
+        parseFile(CONF_PATH ACTIONS_FILE);
+      }else{
+        parseFile(file);
+      }
+    }
+
+    if(parsedFlag == TRUE){
+      if(p != F_RULES){
+        parseFile(CONF_PATH RULES_FILE);
+      }else{
+        parseFile(file);
+      }
+    }
+    
+    if(parsedFlag == FALSE){
+      clean();
+    }
+
+    return parsedFlag;
+}
+
+void clean(){
+
+    cleanMemory();
+
+    if(progState == INIT){
+        exit(-1);
+    } else if(progState == RELOADING){
+        parseAll();
+    }
+}
+/*
+void getHistory(char * id, int nbValues, struct json_object* message){
+    idSensorToSearch = id;
+    remainingSensorsToSearch = nbValues;
+    messageJSON = message;
+
+    parseFile(nameLogRules);
+
+    
+}
+*/

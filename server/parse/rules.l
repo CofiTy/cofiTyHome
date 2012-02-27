@@ -14,11 +14,16 @@
 "PRESENCE"		{ strcpy(yylval.chaine, yytext); return CPRESENCE; }
 "TEMPERATURE"		{ strcpy(yylval.chaine, yytext); return CTEMPERATURE; }
 "CONTACT"		{ strcpy(yylval.chaine, yytext); return CCONTACT; }
+"HORLOGE"      { strcpy(yylval.chaine, yytext); return CHORLOGE; }
+
 
 "COURRANT"		{ strcpy(yylval.chaine, yytext); return CCOURRANT; }
 "CAFFE"                 { strcpy(yylval.chaine, yytext); return CCAFFE; }
 "VOLETS"		{ strcpy(yylval.chaine, yytext); return CVOLETS; }
 "CHAUFFAGE"		{ strcpy(yylval.chaine, yytext); return CCHAUFFAGE; }
+"VIRTUALKEYBOARD" 	{ strcpy(yylval.chaine, yytext); return CVKB; }
+"MYSTERE" 	{ strcpy(yylval.chaine, yytext); return CMYSTERE; }
+
 
 [Rr]"ule:"		{ strcpy(yylval.chaine, yytext); return RULE; }
 [Cc]"onditions:"	{ strcpy(yylval.chaine, yytext); return CONDITIONS; }
@@ -39,6 +44,9 @@
 "<="			{ strcpy(yylval.chaine, yytext); return LESSOREQUAL; }
 ">"			{ strcpy(yylval.chaine, yytext); return GREATER; }
 "<"			{strcpy(yylval.chaine, yytext); return LESS; }
+
+"-gt"	{ strcpy(yylval.chaine, yytext); return TIMEGREATERTHAN; }
+"-lt"	{ strcpy(yylval.chaine, yytext); return TIMELOWERTHAN; }
 
 [Cc]"onnect"[Ss]"erver:"    {strcpy(yylval.chaine, yytext); return CONNECT; }
 [Ll]"isten"[Cc]"lient:"     {strcpy(yylval.chaine, yytext); return LISTEN; }

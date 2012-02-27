@@ -3,8 +3,10 @@
 #include <unistd.h> //Pour STDIN_FILENO
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include "common.h"
+#include "logWatch.h"
 
 #include "init.h"
 #include "../parse/rules.tab.h"
@@ -37,7 +39,10 @@ int main(int argc, char ** argv) {
   while (done == 0) //Boucle principale
   {
 
-    nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+    do{
+      nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+    }while(errno == EINTR);
+    
     FAIL(nfds);
 
     int n;
@@ -54,13 +59,27 @@ int main(int argc, char ** argv) {
         } else if (strcmp(chaine, "reload\n") == 0 ||  strcmp(chaine, "update\n") == 0 || strcmp(chaine, "u\n") == 0){
           cleanMemory();
           parseAll();
+        } else if (strcmp(chaine, "logR\n") == 0 ||  strcmp(chaine, "logRules\n") == 0 || strcmp(chaine, "lr\n") == 0){
+          watchLogRules();
+        } else if (strcmp(chaine, "logS\n") == 0 ||  strcmp(chaine, "logSensors\n") == 0 || strcmp(chaine, "ls\n") == 0){
+          watchLogSensors();
+        } else if (strcmp(chaine, "stopL\n") == 0 ||  strcmp(chaine, "stopLogs\n") == 0 || strcmp(chaine, "sl\n") == 0){
+          stopWatchingLogs();
+        } else if (strcmp(chaine, "clean\n") == 0 ||  strcmp(chaine, "clear\n") == 0 || strcmp(chaine, "cl\n") == 0){
+          system("clear");
         }
         else {
-          puts("Commande invalide\nUsage: exit, quit, q");
+          puts("Commande invalide\nUsage:");
+          puts("  exit, quit, q");
+          puts("  logR, logRules, lr");
+          puts("  logS, logSensors, ls");
+          puts("  stopL, stopLogs, sl");
+          puts("  clean, clear, cl");
         }
       }
     }
   }
+  stopWatchingLogs();
   destroy();
 
   return 0;

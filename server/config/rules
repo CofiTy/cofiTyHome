@@ -1,6 +1,6 @@
 ######################################################
 #
-#  Fichier de règles. Si vous ne specifiez pas d'attribut pour un capteur, prend le 1er.
+#  Fichier de regles. Si vous ne specifiez pas d'attribut pour un capteur, prend le 1er.
 #
 #  Format:
 #
@@ -12,9 +12,25 @@
 #  actions:
 #  	nomAction
 #  ...
-#  
+# 
+#   operateur de temps:
+#       -gt Greater than
+#       -lt Lower than
+#
 #####################################################
+rule:	
+ slideSuivante
+conditions:	
+	bascule.switchButton==1
+actions:
+	nextSlide
 
+rule:	
+	slidePrecedente
+conditions:	
+	bascule.switchButton==2
+actions:
+	previousSlide
 
 rule:	
 	allumeLampe
@@ -24,39 +40,8 @@ actions:
 	ToutOuvrir
 	
 rule:	
-	allumeLampe
+	fermeLampe
 conditions:	
-	bascule.switchButton==1
+	bascule.switchButton==3
 actions:
 	ToutFermer
-
-rule:	
-	temperature
-conditions:	
-	salon>5
-	intrusion.presence<=20
-	intrusion.luminosite<=20
-actions:
-	ToutOuvrir
-	
-rule:
-	cafe
-conditions:
-	aileEst<=5	
-	aileOuest==35
-actions:
-	ToutOuvrir
-	
-rule:
-	testImg1
-conditions:
-	nico.switchButton==4
-actions:
-	testOuvertureImg
-
-rule:
-	testImg2
-conditions:
-	nico.switchButton==3
-actions:
-	testOuvertureImg2

@@ -1,6 +1,6 @@
 ######################################################
 #
-#  Fichier de règles.
+#  Fichier des actions
 #
 #  Format:
 #
@@ -16,21 +16,34 @@
 nomAction:
 	ToutFermer
 actionneurs:
-#	FF9F1E05.close
 	courrantSalle.close
 	
 nomAction:
 	ToutOuvrir
 actionneurs:
-#	FF9F1E05.open
-	FF9F1E06.open
-	
+	courrantSalle.open
+
 nomAction:
-	testOuvertureImg
+  nextSlide
 actionneurs:
-	cafeeee.open
-	
+  clavier.next
+
 nomAction:
-	testOuvertureImg2
+  previousSlide
 actionneurs:
-	cafeeee.close
+  clavier.previous
+
+nomAction:
+  keyEnter
+actionneurs:
+  clavier.enter
+
+nomAction:
+  startFun
+actionneurs:
+  surprise.action
+
+nomAction:
+  endFun
+actionneurs:
+  surprise.fin
