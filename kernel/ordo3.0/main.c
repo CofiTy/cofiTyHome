@@ -5,83 +5,82 @@
 #include "semaphore.h"
 #include "m_queue.h"
 
-/*
- * TODO: CONTEXT DUPLICATION
- */
 
-void pam();
-void ping();
-void pong();
+void consommateur();
+void producteur();
 int mq1;
+int sm1;
+char mode;
 
-int main()
+int main(int nargs, char ** args)
 {
 	int i;
-	int pid;
-	char buffer[20];
-	start_scheduler();
-	mq1 = new_message_queue();
-	create_thread(1000000,&ping);
-	pid = create_thread(1000000,&pong);
-	create_thread(1000000,&pam);
-	for(i=0;i<20;i++)
+	if (nargs == 1)
 	{
-		//sleep(1);
-		printf("producteur\n");
-		if(i%4==0)
-		{
-			sprintf(buffer,"hello %d",i);
-			printf("envoi de \"hello %d\"\n",i);
-			send_message(mq1,buffer,20);
-		}
+		printf("usage: \"./a.out A\" ou \"./a.out B\"\n");
+		return;
 	}
-	//del_message_queue(mq1);
-	kill(pid);
+	mode = args[1][0];
+	start_scheduler();
+	create_thread(1000000,&producteur);
 	i = wait();
-	printf("le %deme est mort\n",i);
-	i = wait();
-	printf("le %deme est mort\n",i);
-	send_message(mq1,"KILL",5);
-	i = wait();
-	printf("le %deme est mort\n",i);
+	printf("[MAIN] \nle thread n %d est mort\n",i);
 	return 1;
 }
 
-void ping()
+void producteur()
 {
 	int i;
 	int a;
-	char buffer[20] = {0};
+	int pid;
+	char buffer[40] = {0};
+	mq1 = new_message_queue();
+	sm1 = new_semaphore(0);
+	pid = create_thread(1000000,&consommateur);
+	for(i=0;i<5;i++)
+	{
+		sprintf(buffer,"Packet n %d",i);
+		printf("[Producteur]\tEnvoi du nouveau packet n %d\n",i);
+		send_message(mq1,buffer,40);
+		printf("[Producteur]\tAttente de l'accuse de reception\n");
+		sem_take(sm1);
+		printf("[Producteur]\tAccuse de reception recu\n");
+	}
+	if (mode == 'A')
+	{
+		sprintf(buffer,"K",i);
+		printf("[Producteur]\tenvoi d'un message de suicide \n");
+		send_message(mq1,buffer,2);
+	}
+	else
+	{
+		sprintf(buffer,"M",i);
+		kill(pid);
+		send_message(mq1,buffer,2);
+	}
+		i = wait();
+		printf("[Producteur]\tLe consommateur est mort \n");
+		del_message_queue(mq1);
+		del_semaphore(sm1);
+}
+void consommateur()
+{
+	int i;
+	int a;
+	char buffer[40] = {0};
 	for(i=0;;i++)
 	{
-		if ((a = receive_message(mq1,buffer,20))==0)
-		{
-			break;
-		}
-		printf("ping: message: \"%s\" de taille %d\n",buffer,a);
+		receive_message(mq1,buffer,40);
 		if (buffer[0] == 'K')
 		{
+			printf("[Consommateur]\tReception d'un message de suicide\n");
+			printf("[Consommateur]\tSUICIDE\n");
 			break;
 		}
-	}
-}
-void pong()
-{
-	int i;
-	for(i=0;i<5;i++)
-	{
-		printf("pong\n");
+		printf("[Consommateur]\tNouveau packet recu: %s\n",buffer);
+		printf("[Consommateur]\tTraitement...\n");
 		sleep(2);
+		printf("\n[Consommateur]\tOn accuse de la reception\n");
+		sem_give(sm1);
 	}
 }
-
-void pam()
-{
-	int i;
-	for(i=0;i<5;i++)
-	{
-		sleep(1);
-		printf("pam\n");
-	}
-}
-
