@@ -1,16 +1,19 @@
 #include "actionneurs.h"
 
 struct trame {
+    /*structure definissant une trame reconnaissable par un actionneur, element par element*/
   char* SYNC; //SYNC = "A55A";
-  char* HEADER; // (TX MESSAGE): 3
+  char* HEADER; // (TX MESSAGE): 6
   char* LENGHT; //LENGHT: B
   char* ORG; //ORG : 05
-  char* DATA; //DATA : DB3: 0100 0000, le reste a zero => DATA: 40000000 B1
-  //DATA : DB3: 0110 0000, le reste a zero => DATA: 60000000 B0
+  char* DATA; //DATA : DB3: 0100 0000, le reste a zero => DATA: 50000000 B1
+  //DATA : DB3: 0110 0000, le reste a zero => DATA: 70000000 B0
   char* ID; //ID= FF9F1E05
   char* STATUS; //STATUS : doc
   char* CHECKSUM; //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum
 };
+
+/*methode permettant de transformer un int en char, ayant une base maximale de 16*/
 
 void itochar(int toBeTrans, char* buffer, int radix) //max base to transform: 16
 {
@@ -21,7 +24,7 @@ void itochar(int toBeTrans, char* buffer, int radix) //max base to transform: 16
   while (n > 0) {
     reste = n % radix;
     n = n / radix;
-    switch (reste) {
+    switch (reste) { //si la base est > 10, on utilise la notation hexa
       case 10:
         {
           reverseBuffer[i++] = 'A';
@@ -63,11 +66,11 @@ void itochar(int toBeTrans, char* buffer, int radix) //max base to transform: 16
   }
   reverseBuffer[i] = '\0';
 
-  strncpy(buffer, reverseBuffer, i);
-  gFree(reverseBuffer);
+  strncpy(buffer, reverseBuffer, i); //on copie le numero ecrit dans la nouvelle base dans le char recu en parametre
+  gFree(reverseBuffer);//liberation de la memoire temporaire
 }
 
-int oneCharHexToInt(char hex) {
+int oneCharHexToInt(char hex) { //conversion d'un seul caractere representant un no en hexo en int
   int result;
   switch (hex) {
     case 'A':
@@ -159,7 +162,7 @@ int oneCharHexToInt(char hex) {
   return result;
 }
 
-int hexToInt(char* hex) {
+int hexToInt(char* hex) { //conversion d'un nb hexa en int
   int result = 0, i, pow = 1, j = 0, cont = 0;
   for (i = 1; i >= 0; i--) {
 
@@ -172,7 +175,8 @@ int hexToInt(char* hex) {
   return result;
 }
 
-void calculateCheckSum(struct trame* trameAEnv) {
+/*calcul de la checkSum -> least significant byte de la somme de tous les octets sauf les octets de SYNC */
+void calculateCheckSum(struct trame* trameAEnv) { 
   char* checkSum = (char*) gMalloc(sizeof (char[2]));
   char* lSB = (char*) gMalloc(sizeof (char[2]));
   int sum = 0, i;
@@ -211,10 +215,10 @@ void calculateCheckSum(struct trame* trameAEnv) {
 void createMessageOpen(char id[SIZE_ID], char* trameToSend) {
   /*
   //SYNC: A55A
-  //HEADER (TX MESSAGE): 3
+  //HEADER (TX MESSAGE): 6
   //LENGHT: B
   //ORG : 05
-  //DATA : DB3: 0100 0000, le reste a zero => DATA: 40000000 B1
+  //DATA : DATA: 50000000 B0
   //ID= FF9F1E05
   //STATUS : 0
   //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
@@ -247,10 +251,10 @@ void createMessageOpen(char id[SIZE_ID], char* trameToSend) {
 void createMessageClose(char id[SIZE_ID], char* trameToSend) {
   /*
   //SYNC: A55A
-  //HEADER (TX MESSAGE): 3
+  //HEADER (TX MESSAGE): 6
   //LENGHT: B
   //ORG : 05
-  //DATA : DB3: 0100 0000, le reste a zero => DATA: 40000000 B1
+  //DATA : 70000000 B1
   //ID= FF9F1E05
   //STATUS : 0
   //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
@@ -266,7 +270,7 @@ void createMessageClose(char id[SIZE_ID], char* trameToSend) {
   trameAEnvoyer->STATUS = "10";
   trameAEnvoyer->SYNC = "A55A";
   calculateCheckSum(trameAEnvoyer);
-  //trameAEnvoyer->CHECKSUM = "00";
+
   strcpy(trameToSend, trameAEnvoyer->SYNC);
   strcat(trameToSend, trameAEnvoyer->HEADER);
   strcat(trameToSend, trameAEnvoyer->LENGHT);
@@ -275,9 +279,9 @@ void createMessageClose(char id[SIZE_ID], char* trameToSend) {
   strcat(trameToSend, trameAEnvoyer->ID);
   strcat(trameToSend, trameAEnvoyer->STATUS);
   strcat(trameToSend, trameAEnvoyer->CHECKSUM);
-  //strcat(trameToSend, '\0');
+
   gFree(trameAEnvoyer);
-  //return trameToSend;
+
 }
 
 struct actionneur_t * getActionneur(char id_or_name[MAX(SIZE_NAME, SIZE_ID)]) {
@@ -295,6 +299,7 @@ struct actionneur_t * getActionneur(char id_or_name[MAX(SIZE_NAME, SIZE_ID)]) {
   return 0;
 }
 
+/*methode qui reconait l'actionneur qui doit recevoir une trame et qui fait pointer le pointer de fontion sur la bonne methode*/
 void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
   switch (a->actionneur->type) {
     case COURRANT:
@@ -407,16 +412,16 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
 
 
 }
-
+/*methode qui ferme le circuit commande par l'actionneur prise*/
 void openCOURRANT(char id[SIZE_ID]) {
   char* trame = (char*) gMalloc(sizeof (char[28]));
   memset(trame, '\0', 28);
   createMessageOpen(id, trame);
-  //puts(trame);
   sensorsNetworkSend(trame, 28);
   gFree(trame);
 }
 
+/*methode qui ouvre le circuit commande par l'actionneur prise*/
 void closeCOURRANT(char id[SIZE_ID]) {
   char* trame = (char*) gMalloc(sizeof (char[28]));
   memset(trame, '\0', 28);
@@ -461,7 +466,7 @@ void cleanActionneurs(){
 
 }
 
-
+/*methode qui simule la frappe d'une touche clavier*/
 static void SendKey (Display * disp, KeySym keysym, KeySym modsym)  
 {  
   KeyCode keycode = 0, modcode = 0;  
