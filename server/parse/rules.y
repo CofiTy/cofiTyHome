@@ -659,15 +659,18 @@ onelog:
 
 %%
 
+
 void parseFile(const char* file){
     printf("Trying to Parse %s\n", file);
-    if((yyin = fopen(file, "r")) == NULL)
+    FILE * f;
+    if((f = fopen(file, "r")) == NULL)
     {
         fprintf(stderr, "ERROR: No file named %s\n", file);
     }
-    YY_FLUSH_BUFFER;
     pthread_mutex_lock(&sensorsMutex);
+    yyrestart(f);
     yyparse();
+    fclose(f);
     pthread_mutex_unlock(&sensorsMutex);
     printf("Parsing of %s finished\n", file);
 }
