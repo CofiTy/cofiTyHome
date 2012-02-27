@@ -175,7 +175,7 @@ int hexToInt(char* hex) { //conversion d'un nb hexa en int
   return result;
 }
 
-/*calcul de la checkSum -> least significant byte */
+/*calcul de la checkSum -> least significant byte de la somme de tous les octets sauf les octets de SYNC */
 void calculateCheckSum(struct trame* trameAEnv) { 
   char* checkSum = (char*) gMalloc(sizeof (char[2]));
   char* lSB = (char*) gMalloc(sizeof (char[2]));
@@ -215,10 +215,10 @@ void calculateCheckSum(struct trame* trameAEnv) {
 void createMessageOpen(char id[SIZE_ID], char* trameToSend) {
   /*
   //SYNC: A55A
-  //HEADER (TX MESSAGE): 3
+  //HEADER (TX MESSAGE): 6
   //LENGHT: B
   //ORG : 05
-  //DATA : DB3: 0100 0000, le reste a zero => DATA: 40000000 B1
+  //DATA : DATA: 50000000 B0
   //ID= FF9F1E05
   //STATUS : 0
   //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
@@ -251,10 +251,10 @@ void createMessageOpen(char id[SIZE_ID], char* trameToSend) {
 void createMessageClose(char id[SIZE_ID], char* trameToSend) {
   /*
   //SYNC: A55A
-  //HEADER (TX MESSAGE): 3
+  //HEADER (TX MESSAGE): 6
   //LENGHT: B
   //ORG : 05
-  //DATA : DB3: 0100 0000, le reste a zero => DATA: 40000000 B1
+  //DATA : 70000000 B1
   //ID= FF9F1E05
   //STATUS : 0
   //CHECKSUM:least significant byte from addition of all bytes except for sync and checksum*/
@@ -270,7 +270,7 @@ void createMessageClose(char id[SIZE_ID], char* trameToSend) {
   trameAEnvoyer->STATUS = "10";
   trameAEnvoyer->SYNC = "A55A";
   calculateCheckSum(trameAEnvoyer);
-  //trameAEnvoyer->CHECKSUM = "00";
+
   strcpy(trameToSend, trameAEnvoyer->SYNC);
   strcat(trameToSend, trameAEnvoyer->HEADER);
   strcat(trameToSend, trameAEnvoyer->LENGHT);
@@ -279,9 +279,9 @@ void createMessageClose(char id[SIZE_ID], char* trameToSend) {
   strcat(trameToSend, trameAEnvoyer->ID);
   strcat(trameToSend, trameAEnvoyer->STATUS);
   strcat(trameToSend, trameAEnvoyer->CHECKSUM);
-  //strcat(trameToSend, '\0');
+
   gFree(trameAEnvoyer);
-  //return trameToSend;
+
 }
 
 struct actionneur_t * getActionneur(char id_or_name[MAX(SIZE_NAME, SIZE_ID)]) {
@@ -299,6 +299,7 @@ struct actionneur_t * getActionneur(char id_or_name[MAX(SIZE_NAME, SIZE_ID)]) {
   return 0;
 }
 
+/*methode qui reconait l'actionneur qui doit recevoir une trame et qui fait pointer le pointer de fontion sur la bonne methode*/
 void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
   switch (a->actionneur->type) {
     case COURRANT:
@@ -411,16 +412,16 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
 
 
 }
-
+/*methode qui ferme le circuit commande par l'actionneur prise*/
 void openCOURRANT(char id[SIZE_ID]) {
   char* trame = (char*) gMalloc(sizeof (char[28]));
   memset(trame, '\0', 28);
   createMessageOpen(id, trame);
-  //puts(trame);
   sensorsNetworkSend(trame, 28);
   gFree(trame);
 }
 
+/*methode qui ouvre le circuit commande par l'actionneur prise*/
 void closeCOURRANT(char id[SIZE_ID]) {
   char* trame = (char*) gMalloc(sizeof (char[28]));
   memset(trame, '\0', 28);
@@ -465,7 +466,7 @@ void cleanActionneurs(){
 
 }
 
-
+/*methode qui simule la frappe d'une touche clavier*/
 static void SendKey (Display * disp, KeySym keysym, KeySym modsym)  
 {  
   KeyCode keycode = 0, modcode = 0;  
