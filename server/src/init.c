@@ -8,6 +8,7 @@
 #include "actions.h"
 #include "actionneurs.h"
 #include "initCheckRules.h"
+#include "timedCheck.h"
 #include "common.h"
 
 #include "init.h"
@@ -26,6 +27,7 @@ void init()
   parseConfig();
 
   initRules();
+  startTimedCheck(60);
 
   sensorsNetworkStart();
   guiNetworkStart();
@@ -37,6 +39,7 @@ void destroy()
   guiNetworkStop();
   sensorsNetworkStop();
 
+  stopTimedCheck();
   stopRules();
   pthread_mutex_destroy(&sensorsMutex);
 

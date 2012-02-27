@@ -388,6 +388,12 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
         else if (strcmp(fctName, "enter") == 0) {
           a->fct = pressKEYEnter;
         }
+        else if (strcmp(fctName, "up") == 0) {
+          a->fct = pressKEYUp;
+        }
+        else if (strcmp(fctName, "down") == 0) {
+          a->fct = pressKEYDown;
+        }
         else {
           printf("Fonction not found : %s\n", fctName);
         }
@@ -400,6 +406,10 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
           a->fct = actionMYSTERE;
         }else if (strcmp(fctName, "fin") == 0) {
           a->fct = finMYSTERE;
+        }else if (strcmp(fctName, "jeu") == 0) {
+          a->fct = jeuMYSTERE;
+        }else if (strcmp(fctName, "finJeu") == 0) {
+          a->fct = finJeuMYSTERE;
         }else {
           printf("Fonction not found : %s\n", fctName);
         }
@@ -496,6 +506,18 @@ static void SendKey (Display * disp, KeySym keysym, KeySym modsym)
 }
 
 //---- VIRTUALKEYBOARD -------------------------------------
+void pressKEYUp(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_Up , 0);  
+}
+
+void pressKEYDown(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_Down , 0);  
+}
+
 void pressKEYforward(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
@@ -546,9 +568,27 @@ void pressKEYEnter(char id[SIZE_ID])
 
 //---- MYSTERE ----------------------------------------------------------------------
 FILE *pp; 
+FILE *pJ; 
 int onGoing = FALSE;
-void * mplayer(){
-  return NULL;
+int onGoingJeu = FALSE;
+
+void jeuMYSTERE(char id[SIZE_ID]){
+  if(onGoingJeu == TRUE){
+   finJeuMYSTERE(NULL); 
+  }
+  onGoingJeu = TRUE;
+  if((pJ = popen("armagetronad", "w")) == NULL){ 
+    perror("popen");
+    exit(-3);
+  }
+}
+
+void finJeuMYSTERE(char id[SIZE_ID]){
+  if(onGoingJeu == TRUE){
+    system("killall -q armagetronad");
+    pclose(pJ);
+    onGoingJeu = FALSE;
+  }
 }
 
 void actionMYSTERE(char id[SIZE_ID]){
@@ -557,8 +597,8 @@ void actionMYSTERE(char id[SIZE_ID]){
   }
   onGoing = TRUE;
   if((pp = popen("mplayer weAre.mp3", "w")) == NULL){ 
-    perror("popen"); 
-    exit(1);
+    perror("popen");
+    exit(-3);
   }
 }
 

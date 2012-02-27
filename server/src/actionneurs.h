@@ -69,12 +69,16 @@ void pressKEYF3(char id[SIZE_ID]);
 void pressKEYF4(char id[SIZE_ID]);
 void pressKEYF5(char id[SIZE_ID]);
 void pressKEYEnter(char id[SIZE_ID]);
+void pressKEYUp(char id[SIZE_ID]);
+void pressKEYDown(char id[SIZE_ID]);
 
 //---- MYSTERE ----------------------------------------------------------------------
 void actionMYSTERE(char id[SIZE_ID]);
 void finMYSTERE(char id[SIZE_ID]);
+void finJeuMYSTERE(char id[SIZE_ID]);
+void jeuMYSTERE(char id[SIZE_ID]);
 
-  void cleanActionneurs();
+void cleanActionneurs();
 
 #endif /*ACTIONNEURS_H_*/
 

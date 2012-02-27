@@ -22,27 +22,72 @@
 rule:
  slideSuivante
 conditions:
-  bascule.switchButton==1
+  bascule.switchButton == 1
 actions:
   nextSlide
 
 rule:
   slidePrecedente
 conditions:
-  bascule.switchButton==2
+  bascule.switchButton == 2
 actions:
   previousSlide
 
 rule:
-  allumeLampe
+  flecheHaut
 conditions:
-  bascule.switchButton==4
+  bascule.switchButton == 4
 actions:
-  lightsOn
+  pressUp
 
 rule:
-  fermeLampe
+  flecheBas
 conditions:
-  bascule.switchButton==3
+  bascule.switchButton == 3
 actions:
-  lightsOff
+  pressDown
+
+rule:
+  enter
+conditions:
+  aileEst.contact == 1
+actions:
+  pressEnter
+
+rule:
+  gaming
+conditions:
+  aileOuest.contact == 1
+actions:
+  startJeu
+
+rule:
+  yeah
+conditions:
+  now -gt 22h43
+  now -lt 22h44
+actions:
+  startFun
+
+rule:
+  endPres
+conditions:
+  now -gt 22h44
+actions:
+  endFun
+
+#rule:
+#  allumeLampe
+#conditions:
+#  aileOuest.contact == 1
+#  intrusion.luminosite < 10
+#actions:
+#  lightsOn
+
+#rule:
+#  fermeLampe
+#conditions:
+#  aileOuest.contact == 1
+#  intrusion.luminosite > 10
+#actions:
+#  lightsOff

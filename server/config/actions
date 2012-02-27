@@ -34,9 +34,29 @@ actionneurs:
   clavier.previous
 
 nomAction:
-  keyEnter
+  pressEnter
 actionneurs:
   clavier.enter
+
+nomAction:
+  pressUp
+actionneurs:
+  clavier.up
+
+nomAction:
+  pressDown
+actionneurs:
+  clavier.down
+
+nomAction:
+  startJeu
+actionneurs:
+  surprise.jeu
+
+nomAction:
+  stopJeu
+actionneurs:
+  surprise.finJeu
 
 nomAction:
   startFun
