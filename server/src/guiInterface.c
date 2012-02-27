@@ -56,6 +56,8 @@ void processTypeInitialise(mqd_t mqSend){
   json_object_object_add(configuration, "type", messType);
 
   pthread_mutex_lock(&sensorsMutex);
+  
+
   while (current != NULL) {
     switch(current->type){
 
@@ -76,7 +78,6 @@ void processTypeInitialise(mqd_t mqSend){
         break;
 
       case HORLOGE:
-        type = json_object_new_string("Horloge");
         break;
 
       default:
@@ -94,7 +95,10 @@ void processTypeInitialise(mqd_t mqSend){
     json_object_object_add(sensorObj, "name", name);
     json_object_object_add(sensorObj, "type", type);
 
-    json_object_array_add(sensorsList, sensorObj);
+
+    if(current->type != HORLOGE){
+      json_object_array_add(sensorsList, sensorObj);
+    }
 
     if(current->type == PRESENCE){
       type = json_object_new_string("Luminosite");
@@ -177,10 +181,6 @@ void processTypeUpdate(struct json_object* update, mqd_t mqSend){
 
       case INTERRUPTEUR:
         type = json_object_new_string("Interrupteur");
-        break;
-
-      case HORLOGE:
-        type = json_object_new_string("Horloge");
         break;
 
       case PRESENCE:
@@ -378,6 +378,8 @@ void readWholeFile(const char * fileName, char ** buffer){
     fclose(file);
     exit(ERROR);;
   }
+  
+  memset(*buffer, '\0', fileLen+1);
 
   //Read file contents into buffer
   fread(*buffer, fileLen, 1, file);
