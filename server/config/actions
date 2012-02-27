@@ -14,12 +14,12 @@
 #####################################################
 
 nomAction:
-  ToutFermer
+  lightsOff
 actionneurs:
   courrantSalle.close
 
 nomAction:
-  ToutOuvrir
+  lightsOn
 actionneurs:
   courrantSalle.open
 
@@ -47,3 +47,33 @@ nomAction:
   endFun
 actionneurs:
   surprise.fin
+
+nomAction:
+  startCafe
+actionneurs:
+  machineCafe.open
+
+nomAction:
+  stopCafe
+actionneurs:
+  machineCafe.close
+
+nomAction:
+  ouvrirVolets
+actionneurs:
+  voletsSalon.open
+
+nomAction:
+  fermerVolets
+actionneurs:
+  voletsSalon.close
+
+nomAction:
+  chaufferMaison
+actionneurs:
+  thermostat.open
+
+nomAction:
+  stopChauffage
+actionneurs:
+  thermostat.close

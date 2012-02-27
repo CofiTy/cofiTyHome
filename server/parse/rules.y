@@ -675,6 +675,18 @@ void parseFile(const char* file){
     printf("Parsing of %s finished\n", file);
 }
 
+void parseConfig(){
+    progState = INIT;
+    parsedFlag = TRUE;
+    
+    parseFile(CONF_PATH CONFIG_FILE);
+    
+    if(parsedFlag == FALSE){
+      cleanMemory();
+      exit(-1);
+    }
+}
+
 void parseAll() {
   printf("\n%s\n", "Start Parsing..");
   
@@ -695,14 +707,9 @@ void parseAll() {
     parseFile(CONF_PATH RULES_FILE);
   }
 
-  if(parsedFlag == TRUE){
-    parseFile(CONF_PATH CONFIG_FILE);
-  }
-    
   if(parsedFlag == FALSE){
     clean();
   }
-
 }
 
 int reparseFiles(int p, const char * file) {

@@ -23,6 +23,7 @@ void init()
   pthread_mutex_init(&sensorsMutex, NULL);
 
   parseAll();
+  parseConfig();
 
   initRules();
 

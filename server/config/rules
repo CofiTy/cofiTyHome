@@ -38,11 +38,11 @@ rule:
 conditions:
   bascule.switchButton==4
 actions:
-  ToutOuvrir
+  lightsOn
 
 rule:
   fermeLampe
 conditions:
   bascule.switchButton==3
 actions:
-  ToutFermer
+  lightsOff
