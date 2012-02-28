@@ -551,7 +551,7 @@ void processCommand(char * command, mqd_t mqSend){
       break;
 
     case UPDATE:
-      puts("Update detected");
+      /*puts("Update detected");*/
       processTypeUpdate(message, mqSend);
       break;
 
