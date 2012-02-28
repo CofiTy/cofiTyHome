@@ -10,6 +10,10 @@ void catchedAlarm(int sig_num) {
       alarm(sleepTime);
 }
 
+void catchedAlarmDone(int sig_num) {
+}
+
+
 void startTimedCheck(int nbSec){
   signal(SIGALRM, catchedAlarm);
   sleepTime = nbSec;
@@ -17,5 +21,5 @@ void startTimedCheck(int nbSec){
 }
 
 void stopTimedCheck(){
-  signal(SIGALRM, NULL);
+  signal(SIGALRM, catchedAlarmDone);
 }

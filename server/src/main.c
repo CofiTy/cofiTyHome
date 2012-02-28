@@ -69,8 +69,10 @@ int main(int argc, char ** argv) {
           system("clear");
         } else if (strcmp(chaine, "launchT\n") == 0 ||  strcmp(chaine, "launchTime\n") == 0 || strcmp(chaine, "lt\n") == 0){
           startTimedCheck(60);
+          puts("Timer Started");
         } else if (strcmp(chaine, "stopT\n") == 0 ||  strcmp(chaine, "stopTime\n") == 0 || strcmp(chaine, "st\n") == 0){
           stopTimedCheck();
+          puts("Timer Stopped");
         }
         else {
           puts("Commande invalide\nUsage:");
