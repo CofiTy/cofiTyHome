@@ -44,6 +44,16 @@ actionneurs:
   clavier.escape
 
 nomAction:
+  pressQ
+actionneurs:
+  clavier.q
+
+nomAction:
+  pressD
+actionneurs:
+  clavier.d
+
+nomAction:
   pressUp
 actionneurs:
   clavier.up

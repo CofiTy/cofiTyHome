@@ -397,6 +397,12 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
         else if (strcmp(fctName, "escape") == 0) {
           a->fct = pressKEYEscape;
         }
+        else if (strcmp(fctName, "q") == 0) {
+          a->fct = pressKEYq;
+        }
+        else if (strcmp(fctName, "d") == 0) {
+          a->fct = pressKEYd;
+        }
         else {
           printf("Fonction not found : %s\n", fctName);
         }
@@ -439,7 +445,6 @@ void closeCOURRANT(char id[SIZE_ID]) {
   char* trame = (char*) gMalloc(sizeof (char[28]));
   memset(trame, '\0', 28);
   createMessageClose(id, trame);
-  //puts(trame);
   sensorsNetworkSend(trame, 28);
   gFree(trame);
 }
@@ -573,6 +578,18 @@ void pressKEYEscape(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
   SendKey (disp, XK_Escape , 0);  
+}
+
+void pressKEYq(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_q , 0);  
+}
+
+void pressKEYd(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_d , 0);  
 }
 
 //---- MYSTERE ----------------------------------------------------------------------

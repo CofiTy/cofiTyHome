@@ -72,6 +72,8 @@ void pressKEYEnter(char id[SIZE_ID]);
 void pressKEYUp(char id[SIZE_ID]);
 void pressKEYDown(char id[SIZE_ID]);
 void pressKEYEscape(char id[SIZE_ID]);
+void pressKEYq(char id[SIZE_ID]);
+void pressKEYd(char id[SIZE_ID]);
 
 //---- MYSTERE ----------------------------------------------------------------------
 void actionMYSTERE(char id[SIZE_ID]);

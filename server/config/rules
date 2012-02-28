@@ -34,6 +34,20 @@ actions:
   previousSlide
 
 rule:
+ toucheD
+conditions:
+  basculeP2.switchButton == 1
+actions:
+  pressD
+
+rule:
+  toucheQ
+conditions:
+  basculeP2.switchButton == 2
+actions:
+  pressQ
+
+rule:
   flecheHaut
 conditions:
   bascule.switchButton == 4
