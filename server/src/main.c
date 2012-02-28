@@ -67,6 +67,10 @@ int main(int argc, char ** argv) {
           stopWatchingLogs();
         } else if (strcmp(chaine, "clean\n") == 0 ||  strcmp(chaine, "clear\n") == 0 || strcmp(chaine, "cl\n") == 0){
           system("clear");
+        } else if (strcmp(chaine, "launchT\n") == 0 ||  strcmp(chaine, "launchTime\n") == 0 || strcmp(chaine, "lt\n") == 0){
+          startTimedCheck(60);
+        } else if (strcmp(chaine, "stopT\n") == 0 ||  strcmp(chaine, "stopTime\n") == 0 || strcmp(chaine, "st\n") == 0){
+          stopTimedCheck();
         }
         else {
           puts("Commande invalide\nUsage:");
@@ -75,6 +79,8 @@ int main(int argc, char ** argv) {
           puts("  logS, logSensors, ls");
           puts("  stopL, stopLogs, sl");
           puts("  clean, clear, cl");
+          puts("  launchT launchTime lt");
+          puts("  stopT stopTime st");
         }
       }
     }
