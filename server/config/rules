@@ -74,7 +74,14 @@ conditions:
   now -gt 01h22
   now -lt 01h23
 actions:
-  startJeu
+  startFun
+
+rule:
+  stopYeah
+conditions:
+  now -gt 01h23
+actions:
+  endFun
 
 #rule:
 #  allumeLampe
