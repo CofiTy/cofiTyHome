@@ -394,6 +394,9 @@ void setActionneurFct(struct actionFct_t * a, char fctName[SIZE_NAME]) {
         else if (strcmp(fctName, "down") == 0) {
           a->fct = pressKEYDown;
         }
+        else if (strcmp(fctName, "escape") == 0) {
+          a->fct = pressKEYEscape;
+        }
         else {
           printf("Fonction not found : %s\n", fctName);
         }
@@ -564,6 +567,12 @@ void pressKEYEnter(char id[SIZE_ID])
 {
   Display *disp = XOpenDisplay (NULL);  
   SendKey (disp, XK_Return , 0);  
+}
+
+void pressKEYEscape(char id[SIZE_ID])
+{
+  Display *disp = XOpenDisplay (NULL);  
+  SendKey (disp, XK_Escape , 0);  
 }
 
 //---- MYSTERE ----------------------------------------------------------------------

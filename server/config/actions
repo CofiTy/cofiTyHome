@@ -39,6 +39,11 @@ actionneurs:
   clavier.enter
 
 nomAction:
+  pressEscape
+actionneurs:
+  clavier.escape
+
+nomAction:
   pressUp
 actionneurs:
   clavier.up

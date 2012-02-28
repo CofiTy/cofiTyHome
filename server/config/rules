@@ -55,26 +55,12 @@ actions:
   pressEnter
 
 rule:
-  gaming
-conditions:
-  aileOuest.contact == 1
-actions:
-  startJeu
-
-rule:
   yeah
 conditions:
   now -gt 01h22
   now -lt 01h23
 actions:
-  startFun
-
-rule:
-  endPres
-conditions:
-  now -gt 01h23
-actions:
-  endFun
+  startJeu
 
 #rule:
 #  allumeLampe
