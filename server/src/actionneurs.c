@@ -605,6 +605,7 @@ void actionMYSTERE(char id[SIZE_ID]){
 void finMYSTERE(char id[SIZE_ID]){
   if(onGoing == TRUE){
     fputs("q\n", pp);
+    sleep(1);
     pclose(pp);
     onGoing = FALSE;
   }

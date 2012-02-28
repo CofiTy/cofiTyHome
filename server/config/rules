@@ -61,20 +61,20 @@ conditions:
 actions:
   startJeu
 
-#rule:
-#  yeah
-#conditions:
-#  now -gt 22h43
-#  now -lt 22h44
-#actions:
-#  startFun
-#
-#rule:
-#  endPres
-#conditions:
-#  now -gt 22h44
-#actions:
-#  endFun
+rule:
+  yeah
+conditions:
+  now -gt 01h22
+  now -lt 01h23
+actions:
+  startFun
+
+rule:
+  endPres
+conditions:
+  now -gt 01h23
+actions:
+  endFun
 
 #rule:
 #  allumeLampe
