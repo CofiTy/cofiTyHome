@@ -3,5 +3,7 @@
 /GHome/build/Debug/
 CofiTyHome
 GHome.log
+*.log
+*.mp3
 /TestPushKey/nbproject/private/
 /TestPushKey/build/Debug/
