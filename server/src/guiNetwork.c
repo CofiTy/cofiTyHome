@@ -23,6 +23,7 @@ typedef struct Client *PClient;
  **/
 typedef struct Client {
   PClient next;
+  PClient previous;
   int sock;
   pthread_t pthreadRec;
   pthread_t pthreadSend;
@@ -47,6 +48,17 @@ pthread_t pthreadConnexion;
  **/
 List clientList;
 
+void cleanClient(Client * client){
+    FAIL(pthread_cancel(client->pthreadSend));
+    FAIL(pthread_cancel(client->pthreadRec));
+    close(client->sock);
+    FAIL(mq_close(client->mqSend));
+
+    client->next->previous = client->previous;
+    client->previous->next = client->next;
+    gFree(client);
+}
+
 /**
  * Thread Function: Receive GUI Message
  **/
@@ -69,6 +81,9 @@ void * guiMsgRec(void* data){
     /* reception form sensors */
     nb = recv(client->sock, receiving, 8192, 0);
     FAIL(nb);
+    if(strlen(receiving) == 0){
+      cleanClient(client);
+    }
     total += nb;
     receiving += nb;
 
@@ -184,11 +199,14 @@ void * guiNetworkConnexion(){
     if(clientList.first == NULL){
       clientList.first = gMalloc(sizeof(Client));
       clientList.first->next = NULL;
+      clientList.first->previous = NULL;
       clientList.current = clientList.first;
     } 
     else{
       clientList.current = gMalloc(sizeof(Client));
       clientList.current->next = clientList.first;
+      clientList.current->previous = NULL;
+      clientList.first->previous = clientList.current;
       clientList.first = clientList.current;
     }
 
