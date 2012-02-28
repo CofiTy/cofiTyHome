@@ -573,13 +573,12 @@ int onGoing = FALSE;
 int onGoingJeu = FALSE;
 
 void jeuMYSTERE(char id[SIZE_ID]){
-  if(onGoingJeu == TRUE){
-   finJeuMYSTERE(NULL); 
-  }
-  onGoingJeu = TRUE;
-  if((pJ = popen("armagetronad", "w")) == NULL){ 
-    perror("popen");
-    exit(-3);
+  if(onGoingJeu != TRUE){
+    onGoingJeu = TRUE;
+    if((pJ = popen("armagetronad", "w")) == NULL){ 
+      perror("popen");
+      exit(-3);
+    }
   }
 }
 
