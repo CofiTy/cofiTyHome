@@ -66,12 +66,11 @@ void * guiMsgRec(void* data){
 
   char buff[8192];
   char traite[8192];
-  int i, j, nb, total, blocs;
+  int i, j, nb, blocs;
   Client* client = (Client*)data;
 
   memset(buff, '\0', 8192);
   memset(traite, '\0', 8192);
-  total = 0;
   blocs = 0;
   j = 0;
 
@@ -83,7 +82,6 @@ void * guiMsgRec(void* data){
     if(strlen(buff) == 0){
       cleanClient(client);
     }
-    total += nb;
 
     i = 0;
     while(i < (strlen(buff))){
@@ -97,13 +95,12 @@ void * guiMsgRec(void* data){
       if(blocs == 0){ 
         processCommand(traite, client->mqSend);
         j = 0;
+        blocs = 0;
         memset(traite, '\0', 8192);
       }
       ++i;
     }
 
-    total = 0;
-    blocs = 0;
     memset(buff, '\0', 8192);
   }
 }

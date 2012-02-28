@@ -39,10 +39,9 @@ void * sensorsMsgRec(){
 
   char buff[128];
   char data[32];
-  int nb, total;
+  int nb;
 
   memset(buff, '\0', 128);
-  total = 0;
   j = 0;
 
   for(;;)
@@ -50,8 +49,6 @@ void * sensorsMsgRec(){
     /* reception form sensors */
     nb = recv(sock, buff, 128, 0);
     FAIL(nb);
-
-    total += nb;
 
     i = 0;
     while(i < (strlen(buff))){
@@ -64,7 +61,6 @@ void * sensorsMsgRec(){
       }
     }
 
-    total = 0;
     memset(buff, '\0', 128);
   }
 }
