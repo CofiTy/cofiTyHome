@@ -40,7 +40,6 @@ void * sensorsMsgRec(){
   char buff[128];
   char data[32];
   int nb, total;
-  char* receiving = (char *) buff;
 
   memset(buff, '\0', 128);
   total = 0;
@@ -53,7 +52,6 @@ void * sensorsMsgRec(){
     FAIL(nb);
 
     total += nb;
-    receiving += nb;
 
     i = 0;
     while(i < (strlen(buff))){
@@ -67,7 +65,6 @@ void * sensorsMsgRec(){
     }
 
     total = 0;
-    receiving = (char *) buff;
     memset(buff, '\0', 128);
   }
 }

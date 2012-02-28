@@ -67,7 +67,6 @@ void * guiMsgRec(void* data){
   char buff[8192];
   char traite[8192];
   int i, j, nb, total, blocs;
-  char* receiving = (char *) buff;
   Client* client = (Client*)data;
 
   memset(buff, '\0', 8192);
@@ -79,13 +78,12 @@ void * guiMsgRec(void* data){
   for(;;)
   {
     /* reception form sensors */
-    nb = recv(client->sock, receiving, 8192, 0);
+    nb = recv(client->sock, buff, 8192, 0);
     FAIL(nb);
-    if(strlen(receiving) == 0){
+    if(strlen(buff) == 0){
       cleanClient(client);
     }
     total += nb;
-    receiving += nb;
 
     i = 0;
     while(i < (strlen(buff))){
@@ -106,7 +104,6 @@ void * guiMsgRec(void* data){
 
     total = 0;
     blocs = 0;
-    receiving = (char *) buff;
     memset(buff, '\0', 8192);
   }
 }
