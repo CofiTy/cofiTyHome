@@ -330,7 +330,7 @@ void processTypeHistory(struct json_object* history, mqd_t mqSend)
           break;
 
         case PRESENCE:
-          if(strcmp(tokenType, "luminosite")){
+          if(strcmp(tokenType, "luminosite") == 0){
             json_object_object_add(log, "type", json_object_new_string("Luminosite"));
           }else{
             json_object_object_add(log, "type", json_object_new_string("Presence"));
