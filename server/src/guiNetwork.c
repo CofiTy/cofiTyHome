@@ -152,6 +152,14 @@ void * guiNetworkConnexion(){
   /* Create The listening socket */
   acceptSock = socket(AF_INET, SOCK_STREAM, 0);
   FAIL(acceptSock);
+  
+  int optval;
+  int optlen;
+  char *optval2;
+
+  // set SO_REUSEADDR on a socket to true (1):
+  optval = 1;
+  FAIL(setsockopt(acceptSock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval));
 
   /* Bind Socket */
   FAIL(bind(acceptSock, (struct sockaddr *)&saddr, sizeof(saddr)));

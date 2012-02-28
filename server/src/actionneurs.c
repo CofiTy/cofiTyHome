@@ -585,7 +585,7 @@ void jeuMYSTERE(char id[SIZE_ID]){
 
 void finJeuMYSTERE(char id[SIZE_ID]){
   if(onGoingJeu == TRUE){
-    system("killall -q armagetronad.real -9");
+    system("killall -q armagetronad.real");
     pclose(pJ);
     onGoingJeu = FALSE;
   }
