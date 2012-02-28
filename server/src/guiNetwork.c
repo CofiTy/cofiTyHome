@@ -67,7 +67,6 @@ void * guiMsgRec(void* data){
   char buff[8192];
   char traite[8192];
   int i, j, nb, total, blocs;
-  int over = 0;
   char* receiving = (char *) buff;
   Client* client = (Client*)data;
 
@@ -75,6 +74,7 @@ void * guiMsgRec(void* data){
   memset(traite, '\0', 8192);
   total = 0;
   blocs = 0;
+  j = 0;
 
   for(;;)
   {
@@ -88,7 +88,6 @@ void * guiMsgRec(void* data){
     receiving += nb;
 
     i = 0;
-    j = 0;
     while(i < (strlen(buff))){
       traite[j++] = buff[i];
       if(buff[i] == '{'){
@@ -107,7 +106,6 @@ void * guiMsgRec(void* data){
 
     total = 0;
     blocs = 0;
-    over = 0;
     receiving = (char *) buff;
     memset(buff, '\0', 8192);
   }
