@@ -89,7 +89,7 @@ void * guiMsgRec(void* data){
 
     i = 0;
     j = 0;
-    while(i < (strlen(buff) - 1)){
+    while(i < (strlen(buff))){
       traite[j++] = buff[i];
       if(buff[i] == '{'){
         ++blocs;
