@@ -18,8 +18,9 @@
 #
 #####################################################
 
+#COURRANT FF9F1E07 courrantSalle
 #COURRANT FF9F1E05 courrantSalle
-COURRANT FF9F1E07 courrantSalle
+COURRANT FF9F1E06 courrantSalle
 CAFFE F99F1E22 machineCafe
 VOLETS F99F1E33 voletsSalon
 CHAUFFAGE F99F1E23 thermostat
