@@ -44,6 +44,7 @@ void * sensorsMsgRec(){
 
   memset(buff, '\0', 128);
   total = 0;
+  j = 0;
 
   for(;;)
   {
@@ -55,7 +56,6 @@ void * sensorsMsgRec(){
     receiving += nb;
 
     i = 0;
-    j = 0;
     while(i < (strlen(buff))){
       data[j++] = buff[i++];
       /* If enough data we can process */
